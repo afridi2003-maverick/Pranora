@@ -29,23 +29,73 @@ Related: [app-flow.md](./app-flow.md) · [prd.md](./prd.md)
 
 ## 3. Color Palette
 
+Pranora uses **only** the colors below: a 10-step green scale plus white, black and red. Do not add other hues.
+
+### 3.1 Green scale (brand)
+
 | Token | Hex | Use |
 |---|---|---|
-| `primary-600` | `#0F9D8A` | Teal — main brand, buttons, active tab |
-| `primary-50` | `#E7F7F4` | Light backgrounds, chips |
-| `secondary-500` | `#FF8A3D` | Warm orange — highlights, pets, CTAs secondary |
-| `emergency-600` | `#E53935` | Emergency button, overdue vaccine |
-| `success-600` | `#2E7D32` | Open now, completed, vaccine done |
-| `warning-500` | `#F9A825` | Due soon, pending |
-| `info-600` | `#1E88E5` | Links, info banners |
-| `neutral-900` | `#1B1F23` | Main text |
-| `neutral-600` | `#5B6470` | Secondary text |
-| `neutral-200` | `#E3E7EB` | Borders, dividers |
-| `neutral-50` | `#F7F9FA` | App background |
-| `white` | `#FFFFFF` | Cards |
+| `green-50` | `#E1F3E1` | App background tint, selected chip background, info banners |
+| `green-100` | `#B8E6B5` | Hover/pressed backgrounds, progress track, "due soon" background |
+| `green-200` | `#8CD2A3` | Borders on active cards, disabled primary button |
+| `green-300` | `#6BBF8B` | Illustrations, map cluster fill, chart secondary |
+| `green-400` | `#4BA772` | Icons, "open now" dot, completed check |
+| `green-500` | `#3A9A63` | Map marker, large headings, focus ring — **not for small text on white** |
+| `green-600` | `#2F7B53` | **Primary** — buttons, active tab, links, small text on white |
+| `green-700` | `#256E4C` | Button hover/pressed, selected tab label |
+| `green-800` | `#1D5A3F` | Headers on light backgrounds, dark-mode surfaces |
+| `green-900` | `#154537` | Footer, dark hero sections, dark-mode background |
 
-Dark mode (P2): same hues, background `#101417`, cards `#1A2026`.
-All text/background pairs must pass **WCAG AA (4.5:1)**.
+### 3.2 Base colors
+
+| Token | Hex | Use |
+|---|---|---|
+| `white` | `#FFFFFF` | Cards, sheets, text on `green-600`+ and on red |
+| `black` | `#000000` | Main text. Use opacity for softer text: 87% (body), 60% (secondary), 38% (disabled), 12% (dividers/borders) |
+| `red` | `#FF0000` | **Emergency only** — emergency button, emergency map pins, overdue vaccine, errors, destructive actions |
+
+### 3.3 Semantic mapping
+
+| Meaning | Color |
+|---|---|
+| Primary action | `green-600` background, white text |
+| Open now / success / done | `green-400` icon + `green-600` text |
+| Pending / due soon | `green-100` background + `green-800` text |
+| Closed / cancelled / disabled | black 38% text, black 12% border |
+| Emergency / error / overdue | `red` |
+| Links | `green-600`, underline on hover |
+
+### 3.4 Contrast rules (WCAG AA)
+
+| Pair | Ratio | Allowed for |
+|---|---|---|
+| White on `green-600` `#2F7B53` | ~5.2 : 1 | All text ✅ |
+| White on `green-500` `#3A9A63` | ~3.5 : 1 | Large/bold text ≥ 18 px only |
+| White on `red` `#FF0000` | ~4.0 : 1 | Bold text ≥ 18 px only (emergency button uses 18 px bold) |
+| Red text on white | ~4.0 : 1 | Bold ≥ 18 px, or always paired with an icon |
+| Black on `green-50` / `green-100` | > 15 : 1 | All text ✅ |
+| `green-900` on `green-50` | ~9.3 : 1 | All text ✅ |
+
+Never put small (< 18 px regular) text in white on `green-500` or lighter, or in red.
+
+### 3.5 Dark mode (P2)
+
+Background `green-900`, cards `green-800`, text white (87% / 60%), primary actions `green-300` with `green-900` text, emergency stays `red`.
+
+### 3.6 Tokens (Tailwind / NativeWind)
+
+```js
+colors: {
+  green: {
+    50: '#E1F3E1', 100: '#B8E6B5', 200: '#8CD2A3', 300: '#6BBF8B', 400: '#4BA772',
+    500: '#3A9A63', 600: '#2F7B53', 700: '#256E4C', 800: '#1D5A3F', 900: '#154537',
+  },
+  primary: '#2F7B53',
+  white: '#FFFFFF',
+  black: '#000000',
+  emergency: '#FF0000',
+}
+```
 
 ---
 
@@ -93,17 +143,17 @@ Numbers: in Bangla mode use Bangla digits (১২৩) for prices, dates and dist
 
 | Component | Notes |
 |---|---|
-| Button | Primary (teal), Secondary (outline), Danger (red), Ghost; full-width on mobile; loading state |
-| Emergency FAB | Red circle, phone/siren icon, label "জরুরি", bottom-right above tab bar |
+| Button | Primary (`green-600`, hover `green-700`), Secondary (`green-600` outline), Danger (`red`), Ghost; full-width on mobile; loading state |
+| Emergency FAB | `red` circle, white phone/siren icon, bold label "জরুরি", bottom-right above tab bar |
 | Input | Label above, helper/error text below in same language; phone input with fixed `+880` prefix |
 | OTP input | 6 boxes, auto-read SMS on Android |
 | Chips / Filters | Horizontal scroll: এখন খোলা · ২৪/৭ · জরুরি · বাসায় ভিজিট |
 | Clinic card | Photo, name, verified ✔, distance "২.৩ কি.মি.", open status pill, rating ★, fee from ৳, Call + Directions icons |
-| Map marker | Teal pin with paw icon; red pin for emergency/24-7; selected = larger with label; clusters show count |
+| Map marker | `green-500` pin with white paw icon; `red` pin for emergency/24-7; selected = `green-800`, larger, with label; clusters `green-300` with count |
 | Bottom sheet | 3 snap points: peek (1 card), half (list), full |
 | Pet card | Round photo, name, species icon, age |
-| Reminder card | Color strip by status (green done, yellow due, red overdue), CTA |
-| Status pill | pending (yellow), confirmed (blue), completed (green), cancelled (grey) |
+| Reminder card | Color strip by status (`green-400` done, `green-100` due soon, `red` overdue), CTA |
+| Status pill | pending (`green-100` bg / `green-800` text), confirmed (`green-600` bg / white), completed (`green-50` bg / `green-700` text + ✔), cancelled (black 12% border / black 60% text) |
 | Empty state | Illustration + one-line message + single CTA |
 | Toast / Snackbar | Bottom, 3 s, bilingual |
 | Language switch | "বাংলা | EN" segmented control in settings and web header |
@@ -120,7 +170,7 @@ Header with greeting + notification bell → pet carousel → reminder card → 
 - "My location" button bottom-right; "এই এলাকায় খুঁজুন" pill appears after panning.
 - Bottom sheet list with clinic cards sorted by distance; result count "৫ কি.মি.-এর মধ্যে ১২টি ক্লিনিক".
 - Tapping a marker scrolls the list to that card and highlights it.
-- Emergency variant: red top bar, only open clinics, Call button is the primary (largest) action.
+- Emergency variant: `red` top bar with white bold title, only open clinics, Call button is the primary (largest) action.
 - Web desktop: 40% list / 60% map split; hover on card highlights marker.
 
 ### 8.3 Services

@@ -15,6 +15,7 @@ Always:
 - Nearest vet search uses the nearby_clinics RPC; only verified providers are public.
 - Handle loading, empty, error, offline and location-denied states.
 - Keep the emergency button reachable on Home and Map; map results also available as a list.
+- Colors: only the green scale (#E1F3E1 #B8E6B5 #8CD2A3 #6BBF8B #4BA772 #3A9A63 #2F7B53 #256E4C #1D5A3F #154537), #FFFFFF, #000000 and #FF0000 (emergency/error only). Primary = #2F7B53. Use design tokens, never raw hex in components.
 - Tap targets >= 48px, Bangla text >= 14px with ~1.6 line height (Hind Siliguri).
 
 Never:

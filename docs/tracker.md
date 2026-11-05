@@ -151,6 +151,7 @@ _Last updated: 2026-11-06_
 | 2026-11-06 | App name: **Pranora**. Bangla is default language, English supported. |
 | 2026-11-06 | Extra feature: nearest veterinary on map + services catalog, on app and website. |
 | 2026-11-06 | Stack: Expo + Next.js monorepo, Supabase with PostGIS. |
+| 2026-11-06 | Color palette: 10-step green scale + white, black, red (emergency only). Primary `#2F7B53`. See [design.md §3](./design.md#3-color-palette). |
 
 ## Blockers / Open Questions
 
