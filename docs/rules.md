@@ -10,7 +10,12 @@ These rules apply to every contributor (human or AI). A short version lives in [
 2. **Emergency is always reachable** — never remove or hide the emergency button on Home and Map.
 3. **Map results must also be available as a list** (accessibility + low-end devices).
 4. Only **verified** providers appear on the public map and in search.
-5. Never present the AI symptom checker or tips as a diagnosis — always show "এটি চিকিৎসকের পরামর্শের বিকল্প নয় / This is not a substitute for a vet".
+5. Never present the AI assistant or tips as a diagnosis — always show "এটি চিকিৎসকের পরামর্শের বিকল্প নয় / This is not a substitute for a vet".
+6. **AI never**: diagnoses, names a medicine or dose, writes prescriptions, pretends to be human, says something is done before the system confirms it, or asks for passwords, OTPs or payment details. AI must never call adoption-decision RPCs.
+7. **Humans decide adoptions** — approve/reject is always a human action. Diagnoses and prescriptions only by a qualified vet; medical records are written only by vets.
+8. **Location & phone privacy** — an animal's exact location and personal phone numbers are never shown publicly. Rescue locations are visible only to the reviewer, assigned rescuer and admins; adoption shows district/upazila only. Strip EXIF/GPS from uploaded photos.
+9. **Call recording is off by default** and needs both participants' consent.
+10. Source of truth for features: [prd.md](./prd.md), aligned with [PetCare_BD_Feature_List_Bangla.pdf](./PetCare_BD_Feature_List_Bangla.pdf).
 
 ## 2. Code Style
 
@@ -68,7 +73,8 @@ These rules apply to every contributor (human or AI). A short version lives in [
 ## 8. Testing
 
 - New logic needs unit tests; new RPC/RLS needs pgTAP tests.
-- Critical flows (OTP login, nearest vet, booking, payment) need E2E tests (Playwright web, Maestro app).
+- Critical flows (OTP login, nearest vet, booking, rescue report → close, adoption apply → handover, payment) need E2E tests (Playwright web, Maestro app).
+- AI changes must pass the bn/en guardrail eval set (no diagnosis/dose, emergency detection, no fake confirmations).
 - Test on a low-end Android device (2–3 GB RAM) before release.
 
 ## 9. Performance Budgets
@@ -78,6 +84,7 @@ These rules apply to every contributor (human or AI). A short version lives in [
 | Web LCP (4G) | < 2.5 s |
 | App cold start | < 3 s |
 | Nearest-vet result | < 1.5 s |
+| Urgent rescue report → reviewer alert | < 1 min |
 | JS bundle (web, first load) | < 200 KB gzipped |
 | Image size | < 150 KB (WebP) |
 

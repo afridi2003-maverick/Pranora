@@ -15,13 +15,27 @@ Bangla-first pet care platform for Bangladesh — **Android · iOS · Web**
 
 ## ✨ What is Pranora?
 
-Pranora helps pet owners in Bangladesh find the **nearest veterinarian on a map**, book appointments or home visits, keep their pet's vaccination and health records, get reminders, and access every pet service — grooming, pet shop, boarding, adoption and more — in **Bangla** or **English**.
+Pranora brings **pet adoption, rescue of injured animals and veterinary care** together in one place for Bangladesh. Pet owners can find the **nearest veterinarian on a map**, book appointments by time slot or serial number, keep their pet's vaccination and health records, and access every pet service — grooming, pet shop, boarding and more — in **Bangla** or **English**.
 
-> প্রাণোরা দিয়ে আপনি ম্যাপে নিকটস্থ পশু ডাক্তার খুঁজে পাবেন, অ্যাপয়েন্টমেন্ট বা বাসায় ডাক্তার বুক করতে পারবেন, টিকার রিমাইন্ডার পাবেন এবং পোষা প্রাণীর সব সেবা এক জায়গায় পাবেন।
+> প্রাণোরা দিয়ে আপনি পোষা প্রাণী দত্তক নিতে পারবেন, আহত প্রাণীর উদ্ধারের জন্য রিপোর্ট করতে পারবেন, ম্যাপে নিকটস্থ পশু ডাক্তার খুঁজে অ্যাপয়েন্টমেন্ট বা সিরিয়াল নিতে পারবেন, টিকার রিমাইন্ডার পাবেন এবং পোষা প্রাণীর সব সেবা এক জায়গায় পাবেন।
+
+The feature list comes from [PetCare_BD_Feature_List_Bangla.pdf](docs/PetCare_BD_Feature_List_Bangla.pdf) (working title "PetCare BD").
 
 ---
 
 ## ⭐ Highlight Features
+
+### 🚑 Rescue — উদ্ধার
+- Anyone can report an injured, lost or abandoned animal with photo, area and urgency
+- Urgent reports reach a human reviewer immediately; one rescuer is assigned and can accept or decline
+- Case page with notes and photos; the reporter sees only the status (জমা · দেখা হচ্ছে · উদ্ধার চলছে · শেষ)
+- Exact location is shown only to the people who need it
+
+### 🏡 Adoption — দত্তক
+- Browse without login; filter by species, age and district
+- Listings only from verified shelters and approved individuals
+- One application form; **a human always approves or rejects — never AI**
+- Two-sided handover: the pet's profile and medical/vaccine records move to the new owner
 
 ### 📍 Nearest Veterinary on Map — নিকটস্থ পশু চিকিৎসক
 Available on both the app and the website.
@@ -46,16 +60,22 @@ Available on both the app and the website.
 | 🎓 | Training | প্রশিক্ষণ |
 | 🚕 | Pet taxi | পেট ট্যাক্সি |
 | 🏡 | Adoption | দত্তক |
+| 🚑 | Animal rescue | উদ্ধার |
 | 🔎 | Lost & found | হারানো ও প্রাপ্তি |
 | 📚 | Tips & community | টিপস ও কমিউনিটি |
+| 🤖 | AI assistant (chat & voice) | এআই সহকারী |
 
 ### More
-- 🐶 Multiple pet profiles with QR pet ID
-- 💉 Auto vaccine schedule + reminders (push & SMS)
-- 📋 Medical history, prescriptions, reports — export as PDF
-- 💳 Cash, bKash, Nagad, Rocket, cards (SSLCommerz)
-- 🏥 Provider dashboard for vets, clinics and shops
-- 🛡️ Verified vets (BVC registration check)
+- 👥 One account, several roles — e.g. pet owner **and** rescuer; login with mobile number or email
+- 🐶 Multiple pet profiles with QR pet ID — one profile for life, even after adoption
+- 🎫 Book by time slot or **serial number (সিরিয়াল)**; cancel/reschedule until the clinic's cut-off
+- 💉 Auto vaccine schedule + reminders (push now, SMS next phase)
+- 📋 Medical history and visit notes written by vets — export as PDF
+- 💬 AI assistant for general care questions — never diagnoses or prescribes (next phase)
+- 📞 Owner–vet audio & video calls; recording off by default (next phase)
+- 💳 Cash first; bKash, Nagad, Rocket, cards (SSLCommerz) later
+- 🏥 Dashboards for vets, clinics, shops and shelters
+- 🛡️ Verified vets (BVC registration check) and shelters; admin moderation and audit log
 
 ---
 
@@ -69,8 +89,9 @@ Available on both the app and the website.
 | Backend | Supabase — PostgreSQL + **PostGIS**, Auth (phone OTP), Storage, Realtime, Edge Functions |
 | Maps | Google Maps (react-native-maps, @vis.gl/react-google-maps), Places; Barikoi optional |
 | i18n | i18next / next-intl — Bangla default, English |
-| Payments | SSLCommerz (bKash, Nagad, Rocket, cards) |
+| Payments | Cash first; SSLCommerz (bKash, Nagad, Rocket, cards) later |
 | Notifications | Expo Push / FCM, local SMS gateway |
+| Calls & AI (Phase 2) | Agora / Daily.co audio + video; LLM API with Bangla STT/TTS via Edge Functions |
 | Quality | TypeScript strict, Zod, Vitest, Playwright, Maestro, Sentry, PostHog |
 
 ---
@@ -115,7 +136,7 @@ git clone https://github.com/afridi2003-maverick/Pranora.git
 cd Pranora
 pnpm install
 
-cp .env.example .env.local      # fill in keys (see docs/trd.md §13)
+cp .env.example .env.local      # fill in keys (see docs/trd.md §15)
 
 supabase start                  # local Postgres + PostGIS
 supabase db reset               # run migrations + seed
@@ -141,8 +162,9 @@ pnpm dev                        # web on http://localhost:3000 + Expo dev server
 
 | Document | Description |
 |---|---|
+| [Feature list (PDF, Bangla)](docs/PetCare_BD_Feature_List_Bangla.pdf) | Original feature list and phases ("PetCare BD") that the docs follow |
 | [PRD](docs/prd.md) | Product requirements, features, personas, release plan |
-| [TRD](docs/trd.md) | Architecture, tech stack, nearest-vet design, security |
+| [TRD](docs/trd.md) | Architecture, tech stack, nearest-vet, rescue/adoption and AI design, security |
 | [App Flow](docs/app-flow.md) | Screens, navigation and user flows |
 | [Design Brief](docs/design.md) | Brand, colors, Bangla typography, components |
 | [Schema](docs/schema.md) | Database tables, PostGIS functions, RLS |

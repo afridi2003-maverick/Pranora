@@ -1,6 +1,6 @@
 # Pranora — AI assistant rules (full version: docs/rules.md)
 
-Project: Pranora (প্রাণোরা) — Bangla-first pet care app + website for Bangladesh.
+Project: Pranora (প্রাণোরা) — Bangla-first pet care app + website for Bangladesh: adoption, animal rescue and vet care (+ nearest-vet map and services catalog). Feature source: docs/PetCare_BD_Feature_List_Bangla.pdf (working title "PetCare BD").
 Stack: Turborepo + pnpm, Expo (React Native) app, Next.js web, Supabase (Postgres + PostGIS, Auth, Storage, Edge Functions), TypeScript strict, Tailwind/NativeWind, TanStack Query, Zod, i18next/next-intl.
 
 Read before working: docs/prd.md, docs/trd.md, docs/app-flow.md, docs/design.md, docs/schema.md, docs/tracker.md.
@@ -17,11 +17,14 @@ Always:
 - Keep the emergency button reachable on Home and Map; map results also available as a list.
 - Colors: only the green scale (#E1F3E1 #B8E6B5 #8CD2A3 #6BBF8B #4BA772 #3A9A63 #2F7B53 #256E4C #1D5A3F #154537), #FFFFFF, #000000 and #FF0000 (emergency/error only). Primary = #2F7B53. Use design tokens, never raw hex in components.
 - Tap targets >= 48px, Bangla text >= 14px with ~1.6 line height (Hind Siliguri).
+- Roles come from user_roles (a user can have several, e.g. owner + rescuer); check with has_role()/is_admin().
+- Adoption approve/reject and handover only via their RPCs, always by a human; medical records are written only by vets.
 
 Never:
 - Hard-code UI text, commit secrets, or use the Supabase service-role key outside Edge Functions.
 - Trust client-side payment success; only the server IPN decides.
 - Log phone numbers, OTPs, addresses or medical data.
-- Present symptom checker/tips as a diagnosis.
+- Show an animal's exact location or personal phone numbers publicly; keep call recording off without both people's consent.
+- Let the AI assistant diagnose, name medicines/doses, pretend to be human, confirm actions the system hasn't confirmed, or ask for passwords/payment info; never present AI or tips as a diagnosis.
 
 Git: Conventional Commits (feat/fix/docs/refactor/test/chore), small PRs, never push to main directly, update docs/tracker.md.

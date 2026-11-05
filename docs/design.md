@@ -157,6 +157,14 @@ Numbers: in Bangla mode use Bangla digits (১২৩) for prices, dates and dist
 | Empty state | Illustration + one-line message + single CTA |
 | Toast / Snackbar | Bottom, 3 s, bilingual |
 | Language switch | "বাংলা | EN" segmented control in settings and web header |
+| Role switcher | Segmented control / sheet at top of Profile: পোষা প্রাণীর মালিক · উদ্ধারকারী · শেল্টার · ভেট; shows "যাচাই চলছে" for pending roles |
+| Urgency selector | 4 large chips with icon + text: কম · মাঝারি · বেশি (`green-800` text on `green-100`) and খুব জরুরি (`red`, white bold ≥ 18 px) — never color alone |
+| Status tracker | Horizontal 4-step stepper (জমা · দেখা হচ্ছে · উদ্ধার চলছে · শেষ) or (জমা · দেখা হচ্ছে · অনুমোদিত/বাতিল); done steps `green-600`, current `green-500` ring, upcoming black 38% |
+| Adoption card | Photo, name, species icon, age, district (no exact address), "টিকা দেওয়া" / verified-shelter ✔ badges, ♡ save (P1) |
+| Rescue case card | Photo, kind (আহত/হারানো/পরিত্যক্ত), urgency chip, area, time since report, distance (rescuer only), Accept / Decline buttons |
+| Serial chip | "সিরিয়াল ১২ · সন্ধ্যা ৫টা–৯টা"; shows remaining serials "আর ৮টি বাকি" |
+| AI chat bubble | Assistant bubbles `green-50` with a small "এআই" label; fixed disclaimer bar "এটি চিকিৎসকের পরামর্শের বিকল্প নয়"; emergency reply uses a `red` banner with Call + Map buttons; booking proposals as a card with **হ্যাঁ, বুক করুন** / **না** |
+| Call screen | Full-screen `green-900`, avatar, name, timer; mute / speaker / camera / end (end button `red`) |
 
 ---
 
@@ -180,13 +188,25 @@ Category grid (icon + Bangla label + English sub-label in small text optional), 
 Hero photo carousel → name + verified → open status + hours → action row (Call · Directions · Share) → services with prices → doctors → reviews → sticky bottom **বুক করুন** button.
 
 ### 8.5 Booking
-Stepper (৪ ধাপ): service → pet → date/time → payment. Date picker shows Bangla weekday names; slots as chips; disabled slots greyed.
+Stepper (৪ ধাপ): service → pet → date/time or serial → payment. Date picker shows Bangla weekday names; slots as chips; disabled slots greyed. Clinics using serials show session chips with the next serial number instead of time slots.
 
 ### 8.6 Pet Profile & Health
 Tabs: সারসংক্ষেপ · টিকা · চিকিৎসা · রিমাইন্ডার. Vaccine timeline with status colors.
 
 ### 8.7 Provider Dashboard (web)
-Left sidebar navigation, today's bookings table, calendar view, quick stats cards (today, this week, earnings, rating).
+Left sidebar navigation, today's bookings table (or today's serial list), calendar view, quick stats cards (today, this week, earnings, rating).
+
+### 8.8 Report an Animal (প্রাণী রিপোর্ট)
+One screen, minimal typing: kind (3 big icon buttons) → camera-first photo → map with draggable pin + area text → urgency selector → big **জমা দিন** button. Reachable from Home quick actions and Services. After submit: status tracker + "আমরা দেখছি" message.
+
+### 8.9 Rescue Case (rescuer / shelter)
+Header with urgency chip and status; map with exact pin (only for these roles) and **পথ দেখুন**; photo strip; timeline of updates; sticky bottom bar: নোট/ছবি যোগ করুন · অবস্থা বদলান · ফলাফল লিখুন. Shelter queue sorts urgent reports first with a `red` left strip on খুব জরুরি.
+
+### 8.10 Adoption
+Listing grid (2 columns on mobile, 4 on web) with filter chips প্রজাতি · বয়স · জেলা; detail page with photo carousel, facts, shelter card, sticky **আবেদন করুন**. Application form is a single scrollable page with large radio cards for home type. My applications show the status tracker. Handover screen: two confirm checkmarks (giver / adopter) and a success state "অভিনন্দন! এখন থেকে মিনু আপনার".
+
+### 8.11 AI Assistant (P1)
+Chat screen with suggested questions in Bangla, hold-to-talk mic button (≥ 56 px), disclaimer bar always visible, quick "ভেটের সঙ্গে কথা বলুন" hand-off button.
 
 ---
 
@@ -220,10 +240,16 @@ Left sidebar navigation, today's bookings table, calendar view, quick stats card
 | Emergency | জরুরি সেবা | Emergency |
 | Vaccine due | টিকার সময় হয়েছে | Vaccine due |
 | Success | বুকিং সফল হয়েছে! | Booking confirmed! |
+| Report an animal | প্রাণী রিপোর্ট করুন | Report an animal |
+| Report submitted | রিপোর্ট জমা হয়েছে, আমরা দেখছি | Report submitted, we're on it |
+| Adopt | আবেদন করুন | Apply to adopt |
+| Application status | আবেদন দেখা হচ্ছে | Application under review |
+| Serial | আপনার সিরিয়াল ১২ | Your serial: 12 |
+| AI disclaimer | আমি এআই, ডাক্তার নই। এটি চিকিৎসকের পরামর্শের বিকল্প নয়। | I'm an AI, not a vet. This is not a substitute for a vet. |
 
 ---
 
 ## 12. Deliverables for Designers
 
-- Figma file with: foundations (colors, type, spacing), components (both languages), all MVP screens for app (360×800) and web (1440 + 390), prototype for the nearest-vet and booking flows.
+- Figma file with: foundations (colors, type, spacing), components (both languages), all MVP screens for app (360×800) and web (1440 + 390), prototypes for the rescue report, adoption, nearest-vet and booking flows.
 - Every screen designed in **Bangla first**, then checked in English.
