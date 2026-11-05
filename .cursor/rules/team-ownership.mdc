@@ -1,0 +1,33 @@
+---
+description: Team ownership — each member's agent only works in that member's owned area (see docs/team.md)
+alwaysApply: true
+---
+
+# Team Ownership (5 members: Zihad, Afridi, Zimia, Brehat, Tain)
+
+## 1. Identify the member (session start)
+- Read `.pranora-member` in the repo root (git-ignored; one of `zihad|afridi|zimia|brehat|tain`).
+- Missing or invalid → ask the user which member they are and offer to create the file. `git config user.name` may hint, but always confirm.
+- Read `docs/team.md` §2 (owned paths + tracker IDs) and §3 (shared files) before editing anything.
+
+## 2. Scope
+- Create/edit/delete files **only inside the member's owned paths**, and work only on tracker tasks whose Owner is that member (or that they claim now).
+- Reading any file is always allowed.
+- Request touches another member's area → **do not edit it**. Explain whose area it is and offer to draft a row in `docs/team.md` §8 (Change Requests) or a GitHub issue text. A typed stub inside the member's own feature folder is fine.
+- Shared files (`docs/team.md` §3): only minimal, additive edits allowed there (e.g. own i18n namespace keys, a new migration file with the member's area prefix, a dependency their feature needs). Never rewrite/delete others' lines. **List every shared-file edit in the final summary.**
+
+```text
+❌ zimia asks "fix the rescue form validation" → editing apps/mobile/features/rescue/** (Brehat's)
+✅ "That's Brehat's area. I can add a REQUEST row to docs/team.md §8 for Brehat — want me to?"
+✅ editing apps/mobile/features/map/** for MAP-3 (Zimia's)
+```
+
+## 3. Tracker
+- Before starting a task: set Status 🟨 on the member's own row in `docs/tracker.md`.
+- Edit only Owner/Status of the member's own rows; never change other rows or the Summary table (Zihad maintains it).
+
+## 4. Before committing
+1. `git diff --name-only --cached` (and unstaged) → every file must be in the member's owned paths or an allowed shared-file edit.
+2. Unstage anything else (`git restore --staged <file>`) and tell the user; never commit another member's files.
+3. Commit only to the member's branch (`zihad`, `afridi`, `Zimia`, `brehat`, `tain`, or `<member>/<task-id>-short-name`). **Never commit or push to `main`.**
+4. Conventional Commits with the task ID, e.g. `feat(rescue): RSC-1 report form`.
