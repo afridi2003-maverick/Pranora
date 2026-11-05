@@ -28,4 +28,6 @@ Never:
 - Show an animal's exact location or personal phone numbers publicly (lost & found is a rescue report type; public only via lost_found_board); keep call recording off without both people's consent.
 - Let the AI assistant diagnose, name medicines/doses, pretend to be human, confirm actions the system hasn't confirmed, or ask for passwords/payment info; never present AI or tips as a diagnosis.
 
+Team ownership: follow .cursor/rules/team-ownership.mdc — read .pranora-member, only touch the current member's paths from docs/team.md, never another member's area.
+
 Git: Conventional Commits (feat/fix/docs/refactor/test/chore), small PRs, never push to main directly, update docs/tracker.md.

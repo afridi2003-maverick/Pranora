@@ -172,7 +172,8 @@ pnpm dev                        # web on http://localhost:3000 + Expo dev server
 | [Design Brief](docs/design.md) | Brand, colors, Bangla typography, components |
 | [Schema](docs/schema.md) | Database tables, PostGIS functions, RLS |
 | [Rules](docs/rules.md) | Coding, i18n, git and security rules |
-| [Tracker](docs/tracker.md) | Tasks, status and decisions |
+| [Tracker](docs/tracker.md) | Tasks, owners, status and decisions |
+| [Team](docs/team.md) | Who owns what, workload balance, change requests |
 
 ---
 
@@ -186,20 +187,26 @@ pnpm dev                        # web on http://localhost:3000 + Expo dev server
 
 ## 🤝 Contributing
 
-1. Create a branch from `dev` (for example `feature/map-filters`), or use your personal branch (for example `zihad`).
-2. Follow [docs/rules.md](docs/rules.md) and use Conventional Commits (`feat(map): add open-now filter`).
-3. Add every new UI string to **both** `bn` and `en`.
-4. Open a PR, get one review, keep CI green, and update [tracker.md](docs/tracker.md).
+1. Create a git-ignored `.pranora-member` file in the repo root with your member id (`zihad`, `afridi`, `zimia`, `brehat` or `tain`) — see [`.pranora-member.example`](.pranora-member.example). Your Cursor agent uses it to stay inside your area.
+2. Check what you own in [docs/team.md](docs/team.md) and claim your task in [tracker.md](docs/tracker.md) (Status 🟨).
+3. Work on your own branch (`zihad`, `afridi`, `Zimia`, `brehat`, `tain`) or `<member>/<task-id>-short-name`; never push to `main`.
+4. Follow [docs/rules.md](docs/rules.md) and use Conventional Commits (`feat(map): MAP-3 open-now filter`).
+5. Add every new UI string to **both** `bn` and `en`, in your own i18n namespace.
+6. Open a PR, get review from the owners of every touched area (CODEOWNERS), keep CI green, and update [tracker.md](docs/tracker.md).
 
 ---
 
 ## 👥 Team
 
-| Name | Branch |
-|---|---|
-| Afridi | `main` |
-| Zimia | `Zimia` |
-| Zihad | `zihad` |
+Ownership and the balanced workload split (proposed) are in [docs/team.md](docs/team.md).
+
+| Name | Branch | Owns |
+|---|---|---|
+| Zihad | `zihad` | Docs, design system, i18n, pets & health records, services catalog, AI assistant |
+| Afridi | `afridi` (merges to `main`) | Repo/CI, core DB & auth, onboarding & roles, notifications, payments, admin panel |
+| Zimia | `Zimia` | Nearest-vet map, clinic data, emergency mode, home visit, grooming, boarding, reviews |
+| Brehat | `brehat` | Rescue (incl. lost & found), adoption, pet shop |
+| Tain | `tain` | Vet booking (slots/serials), vet & shelter dashboards, online consultation, calls |
 
 ---
 

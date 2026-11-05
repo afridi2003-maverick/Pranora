@@ -1,0 +1,47 @@
+# Team: local member id for the Cursor ownership rule
+.pranora-member
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Expo / React Native
+.expo/
+.expo-shared/
+web-build/
+ios/
+android/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & OS / editor files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/

@@ -64,8 +64,10 @@ These rules apply to every contributor (human or AI). A short version lives in [
 
 ## 7. Git Workflow
 
-- Branches: `main` (production), `dev` (integration), personal/feature branches like `zihad`, `feature/map-nearest-vet`, `fix/otp-resend`.
-- Never push directly to `main`. Open a PR → at least 1 review → CI green → squash merge.
+- Branches: `main` (production), `dev` (integration), one branch per member — `zihad`, `afridi`, `Zimia` (existing casing), `brehat`, `tain` — and feature branches `<member>/<task-id>-short-name` (e.g. `brehat/RSC-1-report-form`).
+- **Ownership:** each member (and their AI agent) changes only the paths they own in [team.md](./team.md). Shared files allow only minimal additive edits, which must be flagged in the PR. To change something in another member's area, use a change request ([team.md §8](./team.md#8-change-requests)) or an issue. Agents follow [`.cursor/rules/team-ownership.mdc`](../.cursor/rules/team-ownership.mdc), which reads the git-ignored `.pranora-member` file.
+- Claim a task in [tracker.md](./tracker.md) (Status 🟨 on your own row) before starting. New tasks go to the area owner, or to whoever has the fewest open tasks in that phase.
+- Never push directly to `main`. Open a PR → review by the CODEOWNERS of every touched area → CI green → squash merge (Afridi merges to `main`).
 - Commit messages: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(map): add open-now filter`, `fix(booking): prevent double slot`, `docs: update schema`.
 - Keep PRs small (< 400 lines changed where possible) and link the tracker item ID (e.g. `MAP-3`).
 - Update [tracker.md](./tracker.md) status when a task moves.

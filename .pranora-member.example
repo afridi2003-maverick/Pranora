@@ -1,0 +1,9 @@
+# Copy this file to `.pranora-member` (git-ignored) and keep exactly ONE line:
+# your member id — one of: zihad | afridi | zimia | brehat | tain
+#
+#   PowerShell:  Set-Content .pranora-member zihad
+#   bash:        echo zihad > .pranora-member
+#
+# Your Cursor agent reads it (see .cursor/rules/team-ownership.mdc) and will only
+# change files in your area from docs/team.md.
+zihad
