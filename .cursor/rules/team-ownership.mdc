@@ -22,12 +22,24 @@ alwaysApply: true
 ✅ editing apps/mobile/features/map/** for MAP-3 (Zimia's)
 ```
 
-## 3. Tracker
+## 3. Dependencies & schedule (before starting any task)
+- Read the task's `Sprint` and `Depends on` in `docs/tracker.md` (plan: `docs/schedule.md`).
+- Work only on tasks planned for the **current sprint** (or an earlier, unfinished one), unless the member explicitly says to override.
+- Hard deps (`ID`) must be ✅ (merged to `dev`). Soft deps (`(ID)`) need an agreed contract (`docs/schedule.md` §5) or a contract PR on `dev`; code against it with a typed stub in the member's own `features/<feature>/__stubs__/`, and merge after the provider.
+- Not met → **stop**. Tell the member which task blocks it, who owns it and what contract is missing; offer to draft a `docs/team.md` §8 request. Do not build the other member's part.
+- Merge order, migration timestamps (set at merge time) and the `dev` flow: `docs/schedule.md` §6.
+
+```text
+❌ brehat: "start ADP-6" while ADP-5 (Tain) has no agreed decide_adoption_application contract → coding the review screen
+✅ "ADP-6 is blocked: ADP-3 (yours) isn't ✅ and ADP-5 (Tain) has no contract yet. Draft a §8 request to Tain?"
+```
+
+## 4. Tracker
 - Before starting a task: set Status 🟨 on the member's own row in `docs/tracker.md`.
 - Edit only Owner/Status of the member's own rows; never change other rows or the Summary table (Zihad maintains it).
 
-## 4. Before committing
+## 5. Before committing
 1. `git diff --name-only --cached` (and unstaged) → every file must be in the member's owned paths or an allowed shared-file edit.
 2. Unstage anything else (`git restore --staged <file>`) and tell the user; never commit another member's files.
-3. Commit only to the member's branch (`zihad`, `afridi`, `Zimia`, `brehat`, `tain`, or `<member>/<task-id>-short-name`). **Never commit or push to `main`.**
+3. Commit only to the member's branch (`zihad`, `afridi`, `Zimia`, `brehat`, `tain`, or `<member>/<task-id>-short-name`); PRs go into `dev`. **Never commit or push to `main`.** Rebase on `dev` before pushing.
 4. Conventional Commits with the task ID, e.g. `feat(rescue): RSC-1 report form`.
