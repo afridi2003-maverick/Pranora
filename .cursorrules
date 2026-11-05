@@ -1,0 +1,26 @@
+# Pranora — AI assistant rules (full version: docs/rules.md)
+
+Project: Pranora (প্রাণোরা) — Bangla-first pet care app + website for Bangladesh.
+Stack: Turborepo + pnpm, Expo (React Native) app, Next.js web, Supabase (Postgres + PostGIS, Auth, Storage, Edge Functions), TypeScript strict, Tailwind/NativeWind, TanStack Query, Zod, i18next/next-intl.
+
+Read before working: docs/prd.md, docs/trd.md, docs/app-flow.md, docs/design.md, docs/schema.md, docs/tracker.md.
+
+Always:
+- Bangla (bn) is the default locale; every UI string goes through t() and must be added to BOTH bn.json and en.json.
+- Format money/dates/distances/numbers with packages/i18n formatters (৳, Bangla digits in bn).
+- Bilingual DB fields are *_bn / *_en; read with pickLocale() and fall back if one is missing.
+- TypeScript strict, no `any`; validate input with shared Zod schemas.
+- Schema changes only via supabase/migrations + update docs/schema.md; RLS on every table.
+- PostGIS: geography(Point, 4326), ST_MakePoint(lng, lat) — longitude first.
+- Nearest vet search uses the nearby_clinics RPC; only verified providers are public.
+- Handle loading, empty, error, offline and location-denied states.
+- Keep the emergency button reachable on Home and Map; map results also available as a list.
+- Tap targets >= 48px, Bangla text >= 14px with ~1.6 line height (Hind Siliguri).
+
+Never:
+- Hard-code UI text, commit secrets, or use the Supabase service-role key outside Edge Functions.
+- Trust client-side payment success; only the server IPN decides.
+- Log phone numbers, OTPs, addresses or medical data.
+- Present symptom checker/tips as a diagnosis.
+
+Git: Conventional Commits (feat/fix/docs/refactor/test/chore), small PRs, never push to main directly, update docs/tracker.md.
