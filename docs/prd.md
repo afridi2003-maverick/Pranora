@@ -11,7 +11,7 @@
 Pranora is a Bangla-first pet care platform for Bangladesh, available as a **mobile app (Android/iOS)** and a **responsive website**. It brings three things together in one place:
 
 1. **দত্তক / Adoption** — shelters and approved people list animals; adopters apply; a human always approves; ownership is handed over in the app.
-2. **উদ্ধার / Rescue** — anyone can report an injured, lost or abandoned animal; a rescuer is assigned and the case is tracked to the end.
+2. **উদ্ধার / Rescue** — anyone can report an injured, lost, found or abandoned animal; a rescuer is assigned and the case is tracked to the end. Lost & found pets are part of rescue, not a separate feature.
 3. **পশুচিকিৎসা / Veterinary care** — find vets and clinics (also on a map), book by time slot or serial number, and keep treatment and vaccine records.
 
 It also connects pet owners with groomers, pet shops, boarding and other pet services (services catalog), and adds an AI assistant and owner–vet calls in later phases.
@@ -82,7 +82,7 @@ One person can hold several roles at the same time — for example a pet owner w
 ## 4. Features
 
 Priority: **P0** = MVP launch, **P1** = soon after launch, **P2** = later.
-These follow the source PDF's phases: **প্রথম ধাপ** (needed to launch) = P0, **পরের ধাপ** (after phase 1 works well) = P1, **ভবিষ্যতে** (can be added later) = P2. Features the PDF doesn't list (map, services catalog, shop, grooming …) keep the team's own priorities.
+These follow the source PDF's phases: **প্রথম ধাপ** (needed to launch) = P0, **পরের ধাপ** (after phase 1 works well) = P1, **ভবিষ্যতে** (can be added later) = P2. **P0 is limited to modules 1–4 of the PDF's build order** (account/roles/language/pet profile · rescue · adoption · vet); reminders (module 5) and AI/calls (module 6) are P1. Team extras are P0 only where they are part of those modules (the nearest-vet map is vet search; the services catalog shows only P0 services in the MVP). Exception by team decision: online payments are P1 (the PDF lists them as future).
 
 ### 4.1 Account & Onboarding
 | ID | Feature | Priority |
@@ -106,7 +106,7 @@ These follow the source PDF's phases: **প্রথম ধাপ** (needed to l
 | ID | Feature | Priority |
 |---|---|---|
 | HLT-1 | Vaccine record: which vaccine was given when, and when the next one is due; auto-generated schedule by species/age | P0 |
-| HLT-2 | Reminders in the app + push: vaccine, deworming, flea/tick, medication | P0 |
+| HLT-2 | Reminders in the app + push: vaccine, deworming, flea/tick, medication (build-order module 5) | P1 |
 | HLT-3 | Medical history: **only vets write** visits, diagnoses and treatment; the owner can view it. Owners can upload old paper reports / lab results as separate documents marked "মালিকের আপলোড / Uploaded by owner" | P0 |
 | HLT-4 | Weight & growth chart | P1 |
 | HLT-5 | Export health record as PDF (Bangla/English) | P1 |
@@ -120,7 +120,7 @@ The flagship extra feature. Available on **both app and website**.
 |---|---|---|
 | MAP-1 | Map view showing vets, clinics and pet hospitals around the user's current location | P0 |
 | MAP-2 | List view sorted by distance (km) with "Open now" badge | P0 |
-| MAP-3 | Filters: open now, 24/7, emergency, home visit, species treated, rating, government / private, price range | P0 |
+| MAP-3 | Filters: open now, 24/7, emergency, species treated, government / private, price range (home-visit and rating filters arrive with those features in P1) | P0 |
 | MAP-4 | Search by area name (e.g. "ধানমন্ডি", "Mirpur 10") or division/district/upazila when GPS is off | P0 |
 | MAP-5 | Clinic detail card: name, photo, distance, rating, opening hours, services, fees, doctors | P0 |
 | MAP-6 | One-tap actions: **Call (কল করুন)**, **Directions (পথ দেখুন)** via Google Maps, **Book (বুক করুন)** | P0 |
@@ -132,7 +132,7 @@ The flagship extra feature. Available on **both app and website**.
 | MAP-12 | Offline fallback: last fetched nearby list cached | P2 |
 
 ### 4.5 ⭐ Services Offered by Pranora (সেবাসমূহ)
-A unified services catalog, browsable on app and website, where each service can be booked or ordered.
+A unified services catalog, browsable on app and website, where each service can be booked or ordered. The MVP catalog shows only the P0 services below (vet appointment, vaccination at clinic, emergency, rescue, adoption); other services appear when their phase ships.
 
 | Service | বাংলা | Description | Priority |
 |---|---|---|---|
@@ -140,8 +140,8 @@ A unified services catalog, browsable on app and website, where each service can
 | Home visit | বাসায় ডাক্তার | Request a vet to visit the owner's home | P1 |
 | Online consultation | অনলাইন পরামর্শ | Audio/video call with a vet | P1 |
 | Emergency help | জরুরি সেবা | Nearest open 24-hour clinic + direct call + hotline + ambulance (where available) | P0 |
-| Animal rescue | উদ্ধার | Report an injured, lost or abandoned animal; track the rescue case (§4.7) | P0 |
-| Vaccination | টিকা | Book vaccine at clinic or home | P0 |
+| Animal rescue (incl. lost & found) | উদ্ধার (হারানো/পাওয়া সহ) | Report an injured, lost, found or abandoned animal; track the rescue case (§4.7) | P0 |
+| Vaccination | টিকা | Book vaccine at a clinic (P0); at home with home visit (P1) | P0 |
 | Grooming | গ্রুমিং | Bath, haircut, nail trim — at shop or home | P1 |
 | Pet shop | পেট শপ | Food, medicine, accessories with home delivery | P1 |
 | Boarding / Pet hotel | পেট হোটেল | Stay while the owner travels | P1 |
@@ -149,7 +149,6 @@ A unified services catalog, browsable on app and website, where each service can
 | Training | প্রশিক্ষণ | Obedience and behavior training | P2 |
 | Pet taxi | পেট ট্যাক্সি | Transport to clinic/groomer | P2 |
 | Adoption | দত্তক | Browse, apply, human review, handover (§4.6) | P0 |
-| Lost & Found | হারানো ও প্রাপ্তি | Owners post their own lost/found pets with location alerts (stray/injured animals go through Rescue) | P1 |
 | Community & Tips | কমিউনিটি ও টিপস | Bangla articles, Q&A, forum | P1 |
 | AI assistant (chat & voice) | এআই সহকারী | General care questions, emergency-sign detection, help finding/booking a vet (§4.13) — never a diagnosis | P1 |
 
@@ -170,7 +169,7 @@ A unified services catalog, browsable on app and website, where each service can
 ### 4.7 Rescue (উদ্ধার)
 | ID | Feature | Priority |
 |---|---|---|
-| RSC-1 | Report an injured, lost or abandoned animal: photo, area and urgency level | P0 |
+| RSC-1 | Report an animal — আহত / injured · হারানো / lost · পাওয়া / found · পরিত্যক্ত / abandoned: photo, area and urgency level. Owners can report their own pet as lost (linked to its pet profile, with last-seen time) | P0 |
 | RSC-2 | Report review by admin or shelter; **urgent reports come first** in the queue | P0 |
 | RSC-3 | Assign one rescuer to a case; the rescuer can accept or decline | P0 |
 | RSC-4 | Case page: status, notes and photo updates | P0 |
@@ -179,8 +178,9 @@ A unified services catalog, browsable on app and website, where each service can
 | RSC-7 | Record the outcome: treated, sent to shelter, adopted, etc. | P0 |
 | RSC-8 | Detect duplicate reports of the same animal and merge them | P1 |
 | RSC-9 | Find nearby rescuers by area | P1 |
+| RSC-10 | Public lost & found board (lost/found reports on a map, area rounded to ~1 km, no phone numbers) + alerts to nearby users; "I've seen it" contact goes through the app | P1 |
 
-Privacy: the animal's exact location is visible only to the people who need it (assigned rescuer, reviewing shelter, admins) — never public.
+Privacy: the animal's exact location is visible only to the people who need it (assigned rescuer, reviewing shelter, admins) — never public. Contact phone numbers on lost/found reports are never public.
 
 ### 4.8 Appointment Booking (অ্যাপয়েন্টমেন্ট)
 Designed for Bangladeshi clinics: serial numbers, SMS, bKash/Nagad, BVC registration.
@@ -190,17 +190,17 @@ Designed for Bangladeshi clinics: serial numbers, SMS, bKash/Nagad, BVC registra
 | APT-1 | Pick clinic/vet → service → pet → date & **time slot or serial number**; the same slot/serial can never go to two people | P0 |
 | APT-2 | Booking statuses: pending → confirmed → completed / cancelled / no-show | P0 |
 | APT-3 | Reschedule and cancel until a cut-off time set by the clinic | P0 |
-| APT-4 | Booking reminder 24h and 1h before (push + in-app P0; SMS P1 — see HLT-6) | P0 |
+| APT-4 | Booking reminder 24h and 1h before (push + in-app; SMS with HLT-6) — build-order module 5 | P1 |
 | APT-5 | Digital prescription after visit, saved to pet health record — **written only by the vet, never by AI** | P1 |
 | APT-6 | Vet schedule: weekly hours, holidays/days off, hourly slots **or serial numbers (সিরিয়াল)** | P0 |
 
 ### 4.9 Payments (পেমেন্ট)
 | ID | Feature | Priority |
 |---|---|---|
-| PAY-1 | Cash at clinic / cash on delivery | P0 |
-| PAY-2 | Online payment: bKash, Nagad (plus Rocket, cards) via SSLCommerz | P2 |
-| PAY-3 | Invoices and refunds | P2 |
-| PAY-4 | Provider payouts | P2 |
+| PAY-1 | Cash at clinic (MVP); cash on delivery when the shop launches | P0 |
+| PAY-2 | Online payment: bKash, Nagad (plus Rocket, cards) via SSLCommerz | P1 |
+| PAY-3 | Invoices and refunds | P1 |
+| PAY-4 | Provider payouts | P1 |
 
 ### 4.10 Reviews, Ratings & Reports
 | ID | Feature | Priority |
@@ -209,10 +209,10 @@ Designed for Bangladeshi clinics: serial numbers, SMS, bKash/Nagad, BVC registra
 | REV-2 | Report abusive reviews, fake listings, fake rescue reports or wrong clinic info (one shared report flow) | P1 |
 
 ### 4.11 Notifications
-In-app inbox, push (FCM) and SMS — all **P0** as channels. SMS is used for OTP and critical alerts (urgent rescue reports, booking confirmed); SMS *reminders* for vaccines and appointments are **P1** (HLT-6). All templates in Bangla and English.
+In-app inbox, push (FCM) and SMS — all **P0** as channels. SMS is used for OTP and critical alerts (urgent rescue reports, booking confirmed); Reminders for vaccines and appointments (push and SMS) are **P1** (HLT-2, HLT-6, APT-4). All templates in Bangla and English.
 
 ### 4.12 Provider Dashboard (web + app)
-Profile & clinic info with map pin, opening hours, holidays, services & prices, slot or serial management, booking inbox, visit notes, prescriptions, earnings, reviews. **P0 (vets), P1 (other providers)**
+Profile & clinic info with map pin, opening hours, holidays, services & prices, slot or serial management, booking inbox, visit notes. **P0 (vets)**. Prescriptions, earnings, reviews and other providers' dashboards: **P1**.
 
 Shelters get: rescue report queue, case management, adoption listings, applications and handovers. **P0**
 
@@ -242,10 +242,10 @@ The AI will **never**: diagnose, name a medicine or dose, pretend to be a human,
 | ID | Feature | Priority |
 |---|---|---|
 | ADM-1 | Verify vets (BVC registration, documents) and shelters; verify rescuers and approved adoption listers | P0 |
-| ADM-2 | Remove fake listings or reports; clinic data moderation | P0 |
+| ADM-2 | Remove fake listings or reports; clinic data moderation; block abusive users | P0 |
 | ADM-3 | Urgent rescue report review queue | P0 |
 | ADM-4 | Audit log: who changed what and when | P1 |
-| ADM-5 | User management, content (tips/articles), disputes, analytics | P0 |
+| ADM-5 | Content (tips/articles), disputes, analytics | P1 |
 
 ### 4.16 Safety & Privacy Rules (from the source feature list)
 - Medical information is visible only to the owner and people they have allowed (e.g. their vet).
@@ -298,9 +298,9 @@ The AI will **never**: diagnose, name a medicine or dose, pretend to be a human,
 
 | Phase | Scope |
 |---|---|
-| **MVP (Phase 1)** | Build order from the source feature list: ① account (phone or email), roles, Bangla/English, pet profile → ② rescue: report to closed case → ③ adoption: listing to handover → ④ vet: profile, verification, booking (slot or serial), visit notes, treatment & vaccine records. Plus the team's extras: **nearest vet map**, services catalog, emergency mode, cash payment, in-app/push notifications, provider & shelter dashboards, admin verification and moderation. If time is short, ship ①–④ first. |
-| **Phase 2** | SMS reminders, home visit, prescriptions, reviews, audit log, adoption extras (save, report, follow-up), rescue extras (duplicates, nearby rescuers), AI chat → then owner–vet audio/video calls and AI voice, online consultation, grooming, pet shop (cash on delivery), boarding, lost & found, tips |
-| **Phase 3** | Online payments (bKash, Nagad, cards), smart adoption matching, call recording (with consent), sitting/walking, training, pet taxi, livestock vets, subscriptions |
+| **MVP (Phase 1)** | **Only modules 1–4 of the source build order:** ① account (phone or email), roles, Bangla/English, pet profile → ② rescue: report (incl. lost/found) to closed case → ③ adoption: listing to handover → ④ vet: profile, verification, search (incl. the **nearest-vet map** and emergency button), booking (slot or serial, cancel/reschedule), visit notes, treatment & vaccine records. Supporting pieces those modules need: in-app/push/SMS notification channels (OTP, urgent rescue alerts, booking updates), cash at clinic, vet & shelter dashboards, admin verification and moderation, services catalog showing only P0 services. |
+| **Phase 2** | ⑤ reminders (push + SMS for vaccines and appointments) → ⑥ AI chat, then owner–vet audio/video calls and AI voice. Also: online payments (bKash, Nagad, Rocket, cards via SSLCommerz) with invoices/refunds and payouts, home visit, prescriptions, reviews, audit log, adoption extras (save, report, follow-up), rescue extras (duplicates, nearby rescuers, public lost & found board), online consultation, grooming, pet shop (cash on delivery + online), boarding, tips, admin content & analytics |
+| **Phase 3** | Smart adoption matching, call recording (with consent), sitting/walking, training, pet taxi, livestock vets, subscriptions |
 
 **Before launch:** have a native Bangla speaker review all Bangla text (especially AI messages and SMS), and have a licensed vet check the BVC verification process, the medicine and vaccine lists, and legal requirements.
 

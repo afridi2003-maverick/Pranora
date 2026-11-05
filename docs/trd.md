@@ -149,7 +149,7 @@ Same RPC with `p_open_now => true, p_emergency => true`, radius starting at 10 k
 ## 5. Services Catalog — Technical Design
 
 - `service_categories` (vet, grooming, shop, boarding, …) and `services` (bilingual name, description, icon, `booking_type`).
-- `booking_type` decides the flow: `slot` (appointments by time), `serial` (appointments by serial number), `home_visit`, `order` (shop), `date_range` (boarding), `instant` (emergency/online consult), `listing` (adoption, lost & found — these open their own flows, see §6).
+- `booking_type` decides the flow: `slot` (appointments by time), `serial` (appointments by serial number), `home_visit`, `order` (shop), `date_range` (boarding), `instant` (emergency/online consult), `listing` (adoption — opens its own flow, see §6). Rescue, including lost & found, is not a bookable service; its catalog tile opens the rescue report flow.
 - Providers link to services through `provider_services` with their own price and duration.
 - The same catalog drives the app's Services tab, the website `/services` pages and map layer filters.
 
@@ -164,14 +164,15 @@ Same RPC with `p_open_now => true, p_emergency => true`, radius starting at 10 k
 ## 6. Rescue & Adoption — Technical Design
 
 ### 6.1 Rescue flow
-1. Any logged-in user inserts `animal_reports` (photo upload to private `rescue-media`, EXIF stripped by the `media-process` Edge Function, location from GPS or a map pin).
+1. Any logged-in user inserts `animal_reports` with kind `injured`, `lost`, `found` or `abandoned` (lost & found is part of rescue; an owner reporting their own lost pet links `pet_id` and `last_seen_at`) (photo upload to private `rescue-media`, EXIF stripped by the `media-process` Edge Function, location from GPS or a map pin).
 2. Insert trigger: if `urgency in ('high','critical')`, call Edge Function `rescue-alert` → push + SMS to on-duty reviewers (verified shelters in that district, else admins) immediately. If still `submitted` after `app_config.rescue_escalation_minutes` (default 15), a `pg_cron` job escalates to all admins.
 3. Review queue = `animal_reports` ordered by `urgency desc, created_at`. `review_animal_report` creates a `rescue_cases` row.
 4. `assign_rescuer` offers the case to one rescuer (partial unique index = one active assignment); `respond_to_assignment` accepts or declines (decline → back to the queue).
 5. Rescuer/shelter add `rescue_case_updates` (notes, photos, status). A vet treating the animal writes `medical_records` with `rescue_case_id`.
 6. `close_rescue_case` requires an `outcome`; if the animal stays in care it gets a `pets` profile (custodian = rescuer or shelter), which can later be listed for adoption.
 7. The reporter only calls `my_report_status` — no notes, no rescuer identity, no other data.
-8. P1: duplicate detection suggests reports within 300 m, same species, within 48 h → reviewer merges; `nearby_rescuers` uses `ST_DWithin` on `rescuer_profiles`.
+8. P1: duplicate detection suggests reports within 300 m, same species, within 48 h → reviewer merges (also matches a `found` report to an open `lost` one); `nearby_rescuers` uses `ST_DWithin` on `rescuer_profiles`.
+9. P1 (RSC-10): public lost & found board reads the `lost_found_board` view (no phone, no reporter, location snapped to ~1 km). "আমি দেখেছি / I've seen it" sends an in-app notification to the reporter, who decides whether to share their number. New lost/found reports push an alert to users whose saved address is within 3 km.
 
 ### 6.2 Adoption flow
 1. Listings are created from a `pets` row by a verified `shelter` or `adoption_lister`; public pages (`/adoption`, SEO) read them with the anon key — district/upazila only, never an exact point.
@@ -206,8 +207,8 @@ Same RPC with `p_open_now => true, p_emergency => true`, radius starting at 10 k
 
 | Job | Schedule | Implementation |
 |---|---|---|
-| Vaccine / deworming reminders | Daily 9:00 AM Dhaka | `pg_cron` → Edge Function `send-reminders` (push + in-app P0; SMS P1) |
-| Booking reminders | Every 15 min | `pg_cron` → `send-booking-reminders` (push + in-app P0; SMS P1) |
+| Vaccine / deworming reminders (P1) | Daily 9:00 AM Dhaka | `pg_cron` → Edge Function `send-reminders` (push + in-app + SMS) |
+| Booking reminders (P1) | Every 15 min | `pg_cron` → `send-booking-reminders` (push + in-app + SMS) |
 | Urgent rescue report alert | On insert | Trigger → `rescue-alert` (push + SMS) |
 | Rescue escalation | Every 5 min | `pg_cron`: urgent reports still `submitted` after 15 min → all admins |
 | Adoption follow-up | Daily | `pg_cron` → `send-followups` (7 and 30 days after handover, P1) |
@@ -215,19 +216,20 @@ Same RPC with `p_open_now => true, p_emergency => true`, radius starting at 10 k
 | Clinic "open now" | Computed in query | No job needed |
 | Expire pending bookings | Every 30 min | SQL function |
 
-Channels: in-app `notifications` table (Realtime), push (Expo) and SMS — all available from P0. SMS is used for OTP and critical alerts (urgent rescue, booking confirmed); SMS reminders start in P1 to control cost.
+Channels: in-app `notifications` table (Realtime), push (Expo) and SMS — all available from P0. In the MVP, SMS is used only for OTP and critical alerts (urgent rescue, booking confirmed); reminders (push and SMS) start in P1 (build-order module 5).
 
 ---
 
 ## 10. Payments
 
-Phase 1 is cash only (PAY-1). Online payment (bKash, Nagad, cards) is P2 per the source feature list:
+The MVP is cash only (PAY-1, cash at clinic). Online payment — bKash, Nagad, Rocket and cards via SSLCommerz — starts in **P1** (team decision; the source PDF lists it as future), together with invoices/refunds and provider payouts. The pet shop (P1) supports cash on delivery and online payment at checkout:
 
 1. Client creates booking/order with `payment_status = 'pending'`.
 2. Edge Function `payments-init` creates an SSLCommerz session → returns gateway URL.
 3. App opens it in an in-app browser; web redirects.
 4. SSLCommerz calls `payments-ipn` webhook → validate with SSLCommerz validation API → update `payments` and booking/order.
 5. Never trust client-side success redirects.
+6. Refunds go through the SSLCommerz refund API from Edge Function `payments-refund` (admin- or policy-triggered); invoices are generated as bilingual PDFs; provider payouts are calculated weekly from paid, completed bookings and paid out manually by the team at first (bKash/bank), recorded in the admin panel.
 
 ---
 
@@ -263,7 +265,7 @@ Most reads/writes go through the Supabase client with RLS. Logic that must be tr
 | `create_booking` (SQL RPC) | Slot/serial locking, prevents double booking |
 | `review_animal_report`, `assign_rescuer`, `respond_to_assignment`, `close_rescue_case`, `my_report_status` (SQL RPC) | Rescue workflow |
 | `decide_adoption_application`, `confirm_handover` (SQL RPC) | Adoption workflow (human decisions only) |
-| `payments-init`, `payments-ipn` | Payment flow (P2) |
+| `payments-init`, `payments-ipn`, `payments-refund` | Payment flow (P1) |
 | `send-sms`, `send-reminders`, `rescue-alert`, `send-followups` | Notifications |
 | `media-process` | Strip EXIF/GPS from uploaded photos, resize |
 | `verify-provider` | Admin approval workflow (vets, shelters, rescuers, listers) |
@@ -279,7 +281,7 @@ Most reads/writes go through the Supabase client with RLS. Logic that must be tr
 - OTP: max 5 requests per phone per hour; captcha (Cloudflare Turnstile) on web.
 - File uploads: images ≤ 5 MB, PDFs ≤ 10 MB, MIME validated; private buckets for medical files with signed URLs.
 - User location is never stored precisely unless the user saves an address or files an animal report.
-- An animal's exact location and personal phone numbers are never returned by public queries (adoption = district/upazila only; lost & found via `lost_found_public`; rescue reports visible only to reviewer, assigned rescuer and admins). Uploaded photos have EXIF/GPS stripped.
+- An animal's exact location and personal phone numbers are never returned by public queries (adoption = district/upazila only; lost & found via the `lost_found_board` view; rescue reports visible only to reviewer, assigned rescuer and admins). Uploaded photos have EXIF/GPS stripped.
 - Medical records: written only by vets, readable by the owner and people they allowed.
 - Audit log (P1) on verification, moderation, adoption and rescue tables.
 - Secrets in Supabase/Vercel/EAS secrets; `.env` never committed.

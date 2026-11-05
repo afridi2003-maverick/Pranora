@@ -161,7 +161,9 @@ Numbers: in Bangla mode use Bangla digits (১২৩) for prices, dates and dist
 | Urgency selector | 4 large chips with icon + text: কম · মাঝারি · বেশি (`green-800` text on `green-100`) and খুব জরুরি (`red`, white bold ≥ 18 px) — never color alone |
 | Status tracker | Horizontal 4-step stepper (জমা · দেখা হচ্ছে · উদ্ধার চলছে · শেষ) or (জমা · দেখা হচ্ছে · অনুমোদিত/বাতিল); done steps `green-600`, current `green-500` ring, upcoming black 38% |
 | Adoption card | Photo, name, species icon, age, district (no exact address), "টিকা দেওয়া" / verified-shelter ✔ badges, ♡ save (P1) |
-| Rescue case card | Photo, kind (আহত/হারানো/পরিত্যক্ত), urgency chip, area, time since report, distance (rescuer only), Accept / Decline buttons |
+| Rescue case card | Photo, kind (আহত/হারানো/পাওয়া/পরিত্যক্ত), urgency chip, area, time since report, distance (rescuer only), Accept / Decline buttons |
+| Lost/found card (P1 board) | Photo, "হারানো" or "পাওয়া" label (text + icon, not color alone), species, approximate area "মিরপুর ১০-এর কাছে", last seen time, **আমি দেখেছি** button; never shows a phone number |
+| Payment method picker (P1) | Radio cards: ক্যাশ · bKash · Nagad · Rocket · কার্ড, with provider logos and Bangla labels |
 | Serial chip | "সিরিয়াল ১২ · সন্ধ্যা ৫টা–৯টা"; shows remaining serials "আর ৮টি বাকি" |
 | AI chat bubble | Assistant bubbles `green-50` with a small "এআই" label; fixed disclaimer bar "এটি চিকিৎসকের পরামর্শের বিকল্প নয়"; emergency reply uses a `red` banner with Call + Map buttons; booking proposals as a card with **হ্যাঁ, বুক করুন** / **না** |
 | Call screen | Full-screen `green-900`, avatar, name, timer; mute / speaker / camera / end (end button `red`) |
@@ -171,7 +173,7 @@ Numbers: in Bangla mode use Bangla digits (১২৩) for prices, dates and dist
 ## 8. Key Screens
 
 ### 8.1 Home
-Header with greeting + notification bell → pet carousel → reminder card → quick actions grid (2×3) → next booking → tips → emergency FAB.
+Header with greeting + notification bell → pet carousel → next vaccine due (reminder card from P1) → quick actions grid (2×3) → next booking / report / application status → tips (P1) → emergency FAB.
 
 ### 8.2 ⭐ Map (Nearest Vet)
 - Full-screen map; search bar on top "এলাকা বা ক্লিনিক খুঁজুন"; filter chips under it.
@@ -188,7 +190,7 @@ Category grid (icon + Bangla label + English sub-label in small text optional), 
 Hero photo carousel → name + verified → open status + hours → action row (Call · Directions · Share) → services with prices → doctors → reviews → sticky bottom **বুক করুন** button.
 
 ### 8.5 Booking
-Stepper (৪ ধাপ): service → pet → date/time or serial → payment. Date picker shows Bangla weekday names; slots as chips; disabled slots greyed. Clinics using serials show session chips with the next serial number instead of time slots.
+Stepper (৪ ধাপ): service → pet → date/time or serial → payment (cash in MVP; bKash/Nagad/Rocket/cards from P1). Date picker shows Bangla weekday names; slots as chips; disabled slots greyed. Clinics using serials show session chips with the next serial number instead of time slots.
 
 ### 8.6 Pet Profile & Health
 Tabs: সারসংক্ষেপ · টিকা · চিকিৎসা · রিমাইন্ডার. Vaccine timeline with status colors.
@@ -197,7 +199,7 @@ Tabs: সারসংক্ষেপ · টিকা · চিকিৎসা ·
 Left sidebar navigation, today's bookings table (or today's serial list), calendar view, quick stats cards (today, this week, earnings, rating).
 
 ### 8.8 Report an Animal (প্রাণী রিপোর্ট)
-One screen, minimal typing: kind (3 big icon buttons) → camera-first photo → map with draggable pin + area text → urgency selector → big **জমা দিন** button. Reachable from Home quick actions and Services. After submit: status tracker + "আমরা দেখছি" message.
+One screen, minimal typing: kind (4 big icon buttons: আহত · হারানো · পাওয়া · পরিত্যক্ত; "হারানো" lets owners pick their own pet and last-seen time) → camera-first photo → map with draggable pin + area text → urgency selector → big **জমা দিন** button. Reachable from Home quick actions and Services. After submit: status tracker + "আমরা দেখছি" message.
 
 ### 8.9 Rescue Case (rescuer / shelter)
 Header with urgency chip and status; map with exact pin (only for these roles) and **পথ দেখুন**; photo strip; timeline of updates; sticky bottom bar: নোট/ছবি যোগ করুন · অবস্থা বদলান · ফলাফল লিখুন. Shelter queue sorts urgent reports first with a `red` left strip on খুব জরুরি.

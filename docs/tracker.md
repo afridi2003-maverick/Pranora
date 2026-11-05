@@ -13,9 +13,9 @@ _Last updated: 2026-11-06_
 | Phase | Total | Done | Progress |
 |---|---|---|---|
 | Phase 0 — Planning & Setup | 13 | 8 | 62% |
-| Phase 1 — MVP | 64 | 0 | 0% |
-| Phase 2 | 29 | 0 | 0% |
-| Phase 3 | 9 | 0 | 0% |
+| Phase 1 — MVP | 62 | 0 | 0% |
+| Phase 2 | 34 | 0 | 0% |
+| Phase 3 | 7 | 0 | 0% |
 
 ---
 
@@ -39,7 +39,7 @@ _Last updated: 2026-11-06_
 
 ## Phase 1 — MVP (P0)
 
-Build order from the source feature list: account & roles → rescue → adoption → vet. If time is short, finish these four first.
+MVP = only modules 1–4 of the source build order: account & roles → rescue (incl. lost & found) → adoption → vet (incl. nearest-vet map). Reminders (module 5) and AI/calls (module 6) are Phase 2.
 
 ### Foundation
 | ID | Task | Status |
@@ -69,14 +69,13 @@ Build order from the source feature list: account & roles → rescue → adoptio
 | PET-1 | Add / edit / delete pets | ⬜ |
 | PET-5 | One profile for life: rescued animal profile, ownership transfer keeps records | ⬜ |
 | HLT-1 | Vaccine record + schedule auto-generation | ⬜ |
-| HLT-2 | Reminders (push + in-app) with pg_cron | ⬜ |
 | HLT-3 | Medical history (vet-written, owner read-only) + owner uploads | ⬜ |
 | HLT-7 | Vet visit notes (findings + treatment) | ⬜ |
 
 ### Rescue (উদ্ধার)
 | ID | Task | Status |
 |---|---|---|
-| RSC-1 | Report an animal: kind, photos (EXIF stripped), location, urgency | ⬜ |
+| RSC-1 | Report an animal (injured / lost / found / abandoned): photos (EXIF stripped), location, urgency; lost links own pet + last seen | ⬜ |
 | RSC-2 | Review queue for admin / shelter, urgent first | ⬜ |
 | RSC-3 | Assign rescuer; accept / decline | ⬜ |
 | RSC-4 | Case page: status, notes, photo updates | ⬜ |
@@ -101,7 +100,7 @@ Build order from the source feature list: account & roles → rescue → adoptio
 | MAP-1a | App map screen (react-native-maps) | ⬜ |
 | MAP-1b | Web map page (Google Maps, split view) | ⬜ |
 | MAP-2 | Distance-sorted list / bottom sheet | ⬜ |
-| MAP-3 | Filters (open now, 24/7, emergency, home visit, species, fee, govt) | ⬜ |
+| MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | ⬜ |
 | MAP-4 | Area search + division/district/upazila picker | ⬜ |
 | MAP-5 | Clinic detail page | ⬜ |
 | MAP-6 | Call / Directions / Book actions | ⬜ |
@@ -121,9 +120,8 @@ Build order from the source feature list: account & roles → rescue → adoptio
 | APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | ⬜ |
 | APT-2 | Status lifecycle + provider confirm | ⬜ |
 | APT-3 | Reschedule / cancel until clinic cut-off | ⬜ |
-| APT-4 | Booking reminders (push + in-app) | ⬜ |
 | APT-6 | Vet schedule: weekly hours, holidays, slots or serials | ⬜ |
-| PAY-1 | Cash payment | ⬜ |
+| PAY-1 | Cash at clinic | ⬜ |
 
 ### Provider, Shelter & Admin
 | ID | Task | Status |
@@ -153,7 +151,12 @@ Build order from the source feature list: account & roles → rescue → adoptio
 
 | ID | Task | Status |
 |---|---|---|
+| HLT-2 | Reminders (push + in-app) with pg_cron | ⬜ |
+| APT-4 | Booking reminders 24h / 1h | ⬜ |
 | HLT-6 | SMS reminders (vaccine + appointment) | ⬜ |
+| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | ⬜ |
+| PAY-3 | Invoices & refunds | ⬜ |
+| PAY-4 | Provider payouts | ⬜ |
 | SVC-HOME | Home visit request | ⬜ |
 | APT-5 | Digital prescription (vet only) | ⬜ |
 | SVC-ONL | Online consultation | ⬜ |
@@ -172,12 +175,12 @@ Build order from the source feature list: account & roles → rescue → adoptio
 | ADP-9 | Post-adoption follow-up | ⬜ |
 | RSC-8 | Duplicate report detection + merge | ⬜ |
 | RSC-9 | Nearby rescuer search | ⬜ |
+| RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | ⬜ |
 | SVC-GRM | Grooming booking | ⬜ |
-| SVC-SHOP | Pet shop + cart + orders (cash on delivery) | ⬜ |
+| SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | ⬜ |
 | SVC-BRD | Boarding (date range) | ⬜ |
 | REV-1 | Reviews & ratings | ⬜ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | ⬜ |
-| SVC-LF | Lost & found with map | ⬜ |
 | SVC-TIPS | Articles / tips (bn) | ⬜ |
 | MAP-8/9 | Radius slider + clustering | ⬜ |
 | MAP-10 | Service layers on map | ⬜ |
@@ -187,8 +190,6 @@ Build order from the source feature list: account & roles → rescue → adoptio
 
 | ID | Task | Status |
 |---|---|---|
-| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | ⬜ |
-| PAY-3 | Invoices & refunds | ⬜ |
 | ADP-10 | Smart adoption matching | ⬜ |
 | CALL-4 | Call recording (both must consent) | ⬜ |
 | SVC-SIT | Pet sitting & walking | ⬜ |
@@ -207,12 +208,13 @@ Build order from the source feature list: account & roles → rescue → adoptio
 | 2026-11-06 | Extra feature: nearest veterinary on map + services catalog, on app and website. |
 | 2026-11-06 | Stack: Expo + Next.js monorepo, Supabase with PostGIS. |
 | 2026-11-06 | Color palette: 10-step green scale + white, black, red (emergency only). Primary `#2F7B53`. See [design.md §3](./design.md#3-color-palette). |
-| 2026-11-06 | Docs aligned with [PetCare_BD_Feature_List_Bangla.pdf](./PetCare_BD_Feature_List_Bangla.pdf) ("PetCare BD" = working title; name stays Pranora). Added rescue, full adoption, serial-number booking, multi-role users, AI assistant, calls, audit log; priorities follow the PDF phases (e.g. home visit → P1, online payment → P2, SMS reminders → P1). Map and services catalog kept as team extras. |
+| 2026-11-06 | Docs aligned with [PetCare_BD_Feature_List_Bangla.pdf](./PetCare_BD_Feature_List_Bangla.pdf) ("PetCare BD" = working title; name stays Pranora). Added rescue, full adoption, serial-number booking, multi-role users, AI assistant, calls, audit log; priorities follow the PDF phases (e.g. home visit → P1, online payment → P2 (later changed to P1, see below), SMS reminders → P1). Map and services catalog kept as team extras. |
+| 2026-11-06 | MVP trimmed to modules 1–4 of the PDF build order (account/roles/pet profile, rescue, adoption, vet). Nearest-vet map stays P0 as vet search; services catalog shows only P0 services. Push/SMS reminders, booking reminders, tips, admin content/analytics and non-vet services are P1. |
+| 2026-11-06 | Lost & Found merged into rescue: `lost`/`found` are rescue report types; `lost_found_posts` dropped; public `lost_found_board` view (no phone, ~1 km area) is P1 (RSC-10). |
+| 2026-11-06 | Online payments moved earlier: bKash, Nagad, Rocket, cards via SSLCommerz plus invoices/refunds and provider payouts are P1 (was P2). MVP stays cash at clinic. |
 
 ## Blockers / Open Questions
 
-- MVP is now larger (rescue + adoption are P0 per the PDF, on top of the map and services catalog). Confirm the team can ship this, or trim to the PDF's "1–4 first" order.
-- Lost & Found (owners' own pets) overlaps with rescue reports of kind "lost" — keep both or merge?
 - Criteria for verifying rescuers and "approved individuals" who can list for adoption (NID? references?).
 - AI vendor with good Bangla support, and Bangla speech-to-text / text-to-speech for AI voice.
 - Source for initial clinic data (DLS list, partnerships)?

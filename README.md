@@ -21,12 +21,14 @@ Pranora brings **pet adoption, rescue of injured animals and veterinary care** t
 
 The feature list comes from [PetCare_BD_Feature_List_Bangla.pdf](docs/PetCare_BD_Feature_List_Bangla.pdf) (working title "PetCare BD").
 
+**MVP** = modules 1–4 of that list's build order: account, roles & pet profile → rescue (incl. lost & found) → adoption → vet care (incl. the nearest-vet map). Reminders, online payments, AI assistant, calls and the other pet services come in the next phases — see [tracker.md](docs/tracker.md).
+
 ---
 
 ## ⭐ Highlight Features
 
 ### 🚑 Rescue — উদ্ধার
-- Anyone can report an injured, lost or abandoned animal with photo, area and urgency
+- Anyone can report an injured, lost, found or abandoned animal with photo, area and urgency — lost & found is part of rescue
 - Urgent reports reach a human reviewer immediately; one rescuer is assigned and can accept or decline
 - Case page with notes and photos; the reporter sees only the status (জমা · দেখা হচ্ছে · উদ্ধার চলছে · শেষ)
 - Exact location is shown only to the people who need it
@@ -40,12 +42,14 @@ The feature list comes from [PetCare_BD_Feature_List_Bangla.pdf](docs/PetCare_BD
 ### 📍 Nearest Veterinary on Map — নিকটস্থ পশু চিকিৎসক
 Available on both the app and the website.
 - See vets, clinics and pet hospitals near you on a live map, sorted by distance
-- **এখন খোলা** (open now), **২৪/৭**, **জরুরি** (emergency), **বাসায় ভিজিট** (home visit), species and government/private filters
+- **এখন খোলা** (open now), **২৪/৭**, **জরুরি** (emergency), species, fee and government/private filters (**বাসায় ভিজিট** / home visit filter in the next phase)
 - One tap to **কল করুন** (call), **পথ দেখুন** (directions) or **বুক করুন** (book)
 - **Emergency mode** — only open clinics, nearest first, big call button
 - No GPS? Search by area (ধানমন্ডি, Mirpur 10) or division → district → upazila
 
 ### 🧰 Services — সেবাসমূহ
+The MVP catalog shows vet appointment, vaccination, emergency, rescue and adoption; the rest are added in later phases.
+
 | | Service | সেবা |
 |---|---|---|
 | 🩺 | Vet appointment (clinic) | ক্লিনিকে ডাক্তার দেখানো |
@@ -60,8 +64,7 @@ Available on both the app and the website.
 | 🎓 | Training | প্রশিক্ষণ |
 | 🚕 | Pet taxi | পেট ট্যাক্সি |
 | 🏡 | Adoption | দত্তক |
-| 🚑 | Animal rescue | উদ্ধার |
-| 🔎 | Lost & found | হারানো ও প্রাপ্তি |
+| 🚑 | Animal rescue (incl. lost & found) | উদ্ধার (হারানো/পাওয়া সহ) |
 | 📚 | Tips & community | টিপস ও কমিউনিটি |
 | 🤖 | AI assistant (chat & voice) | এআই সহকারী |
 
@@ -69,11 +72,11 @@ Available on both the app and the website.
 - 👥 One account, several roles — e.g. pet owner **and** rescuer; login with mobile number or email
 - 🐶 Multiple pet profiles with QR pet ID — one profile for life, even after adoption
 - 🎫 Book by time slot or **serial number (সিরিয়াল)**; cancel/reschedule until the clinic's cut-off
-- 💉 Auto vaccine schedule + reminders (push now, SMS next phase)
+- 💉 Auto vaccine schedule; push + SMS reminders in the next phase
 - 📋 Medical history and visit notes written by vets — export as PDF
 - 💬 AI assistant for general care questions — never diagnoses or prescribes (next phase)
 - 📞 Owner–vet audio & video calls; recording off by default (next phase)
-- 💳 Cash first; bKash, Nagad, Rocket, cards (SSLCommerz) later
+- 💳 Cash at clinic in the MVP; bKash, Nagad, Rocket, cards (SSLCommerz) in the next phase
 - 🏥 Dashboards for vets, clinics, shops and shelters
 - 🛡️ Verified vets (BVC registration check) and shelters; admin moderation and audit log
 
@@ -89,7 +92,7 @@ Available on both the app and the website.
 | Backend | Supabase — PostgreSQL + **PostGIS**, Auth (phone OTP), Storage, Realtime, Edge Functions |
 | Maps | Google Maps (react-native-maps, @vis.gl/react-google-maps), Places; Barikoi optional |
 | i18n | i18next / next-intl — Bangla default, English |
-| Payments | Cash first; SSLCommerz (bKash, Nagad, Rocket, cards) later |
+| Payments | Cash in MVP; SSLCommerz (bKash, Nagad, Rocket, cards) from Phase 2 |
 | Notifications | Expo Push / FCM, local SMS gateway |
 | Calls & AI (Phase 2) | Agora / Daily.co audio + video; LLM API with Bangla STT/TTS via Edge Functions |
 | Quality | TypeScript strict, Zod, Vitest, Playwright, Maestro, Sentry, PostHog |

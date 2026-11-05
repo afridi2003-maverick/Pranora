@@ -12,9 +12,9 @@ All screens exist on mobile app and website unless marked **(app)** or **(web)**
 
 | Tab | বাংলা | Contents |
 |---|---|---|
-| Home | হোম | Greeting, my pets, upcoming reminders, quick actions (incl. প্রাণী রিপোর্ট করুন and দত্তক), emergency button |
-| Map | ম্যাপ | Nearest vets & services on map + list |
-| Services | সেবা | All services catalog (incl. দত্তক / Adoption and উদ্ধার / Rescue) |
+| Home | হোম | Greeting, my pets, quick actions (incl. প্রাণী রিপোর্ট করুন and দত্তক), upcoming reminders (P1), emergency button |
+| Map | ম্যাপ | Nearest vets on map + list (other services as layers from P1) |
+| Services | সেবা | Services catalog — MVP shows only P0 services: ডাক্তার দেখান · টিকা · জরুরি সেবা · উদ্ধার (হারানো/পাওয়া সহ) · দত্তক |
 | Bookings | বুকিং | Upcoming / past appointments & orders, my adoption applications, my animal reports |
 | Profile | প্রোফাইল | My pets, health records, my roles, settings, language |
 
@@ -45,7 +45,7 @@ Overview · Verification (vets, shelters, rescuers, adoption listers) · Urgent 
 flowchart TD
   S[Splash] --> L{First launch?}
   L -- Yes --> LANG[ভাষা নির্বাচন / Choose language<br/>বাংলা default · English]
-  LANG -->   INTRO[3 intro slides:<br/>উদ্ধার ও দত্তক · নিকটস্থ ডাক্তার · টিকার রিমাইন্ডার]
+  LANG -->   INTRO[3 intro slides:<br/>উদ্ধার ও দত্তক · নিকটস্থ ডাক্তার · টিকার রেকর্ড]
   INTRO --> METHOD
   L -- No --> SESS{Logged in?}
   SESS -- Yes --> HOME[Home]
@@ -72,11 +72,11 @@ Browsing adoption listings, the map and services works without login; login is a
 
 1. Greeting: "শুভ সকাল, রাফি 👋"
 2. My pets carousel → tap to open pet profile; "+" to add
-3. Upcoming reminders card (e.g. "মিনুর র‍্যাবিস টিকা — ৩ দিন বাকি") → **বুক করুন / Mark done**
-4. Quick actions: নিকটস্থ ডাক্তার · অ্যাপয়েন্টমেন্ট · প্রাণী রিপোর্ট করুন · দত্তক · পেট শপ · গ্রুমিং
+3. Next vaccine due (from the vaccine record) → **বুক করুন**; from P1 this becomes the reminders card (e.g. "মিনুর র‍্যাবিস টিকা — ৩ দিন বাকি") with **Mark done**
+4. Quick actions (MVP): নিকটস্থ ডাক্তার · অ্যাপয়েন্টমেন্ট · প্রাণী রিপোর্ট করুন · হারানো প্রাণী · দত্তক · জরুরি; পেট শপ and গ্রুমিং are added in P1
 5. Next booking card; status of my latest animal report / adoption application
 6. Rescuer mode only: "নতুন কেস" card with accept / decline
-7. Tips / articles (Bangla)
+7. Tips / articles (Bangla) — P1
 8. Emergency button
 
 ---
@@ -131,16 +131,16 @@ flowchart TD
   GRID --> SHOP[পেট শপ]
   GRID --> BRD[পেট হোটেল]
   GRID --> ADP[দত্তক]
-  GRID --> RSC[উদ্ধার / প্রাণী রিপোর্ট]
-  GRID --> LF[হারানো ও প্রাপ্তি]
+  GRID --> RSC[উদ্ধার / প্রাণী রিপোর্ট<br/>আহত · হারানো · পাওয়া · পরিত্যক্ত]
   GRID --> EMG[জরুরি সেবা] --> EMAP[Emergency map §4]
   PICK & VAC & GRM & BRD --> PLIST[Provider list near me<br/>list / map toggle]
   PLIST --> PDET[Provider detail] --> BOOKF[Booking flow by booking_type]
   SHOP --> PRODUCTS[Products → cart → checkout]
   ADP --> ADLIST[Adoption flow §11]
   RSC --> RFLOW[Rescue flow §10]
-  LF --> LFLIST[Lost/found posts on map → post new]
 ```
+
+MVP grid shows only P0 services (ডাক্তার দেখান · টিকা · জরুরি সেবা · উদ্ধার · দত্তক). Grooming, pet shop, boarding and the rest appear when their phase ships.
 
 Each service page shows: what it is, price range, how it works (3 steps), providers near me, FAQs — all bilingual.
 
@@ -160,7 +160,7 @@ flowchart TD
   B4M -- No --> B4S[সময় বেছে নিন / Pick a time slot]
   B4M -- Yes --> B4N[সিরিয়াল নিন / Take a serial<br/>e.g. 'সন্ধ্যা ৫টা–৯টা · আপনার সিরিয়াল ১২']
   B4S & B4N --> B5[সমস্যা লিখুন / Describe problem + photos optional]
-  B5 --> B6[পেমেন্ট: ক্যাশ P0 · bKash · Nagad · কার্ড P2]
+  B5 --> B6[পেমেন্ট: ক্যাশ P0 · bKash · Nagad · Rocket · কার্ড P1]
   B6 --> B7[Review & confirm]
   B7 --> B8{Online payment?}
   B8 -- Yes --> GW[SSLCommerz gateway] --> IPN{Success?}
@@ -168,7 +168,7 @@ flowchart TD
   IPN -- Yes --> OK
   B8 -- No --> OK[বুকিং সম্পন্ন ✅<br/>status: pending]
   OK --> CONF[Provider confirms → push + SMS]
-  CONF --> REM[Reminders 24h & 1h]
+  CONF --> REM[Reminders 24h & 1h · P1]
   REM --> VISIT[Visit done → vet marks completed<br/>+ visit note · prescription P1]
   VISIT --> REC[Saved to pet health record]
   REC --> RATE[রেটিং দিন / Rate · P1, only after completed]
@@ -176,7 +176,7 @@ flowchart TD
 
 Booking statuses: `pending → confirmed → in_progress → completed`; side exits `cancelled_by_owner`, `cancelled_by_provider`, `no_show`, `expired`.
 
-Cancel / reschedule buttons are shown until the clinic's cut-off (e.g. "অ্যাপয়েন্টমেন্টের ২ ঘণ্টা আগে পর্যন্ত বাতিল করা যাবে"); after that the screen shows the clinic's call button instead. Reminders: push + in-app (P0), SMS (P1).
+Cancel / reschedule buttons are shown until the clinic's cut-off (e.g. "অ্যাপয়েন্টমেন্টের ২ ঘণ্টা আগে পর্যন্ত বাতিল করা যাবে"); after that the screen shows the clinic's call button instead. Reminders (push, in-app and SMS) arrive in P1. Online payment (P1) is offered only when the clinic accepts it; cash stays available.
 
 ---
 
@@ -188,7 +188,8 @@ Cancel / reschedule buttons are shown until the clinic's cut-off (e.g. "অ্�
  ├─ টিকা / Vaccines: schedule (done ✅ / due ⏰ / overdue 🔴) → mark done / book
  ├─ চিকিৎসা ইতিহাস / Medical history: vet visit notes & prescriptions (read-only for owner)
  │    └─ আমার আপলোড / My uploads: old reports, lab results (labelled "মালিকের আপলোড")
- ├─ রিমাইন্ডার / Reminders: add custom (medicine, deworming, grooming)
+ ├─ রিমাইন্ডার / Reminders (P1): add custom (medicine, deworming, grooming)
+ ├─ হারিয়ে গেছে? / Report lost → rescue report of kind "lost", pre-filled from this profile
  ├─ ওজন / Weight chart
  ├─ ইতিহাস / Journey: rescued → treated → adopted (if the pet came through Pranora)
  └─ শেয়ার / Export PDF
@@ -223,7 +224,7 @@ Shelter dashboard: rescue report queue (urgent first) · cases · adoption listi
 
 ## 9. Settings
 
-Language (বাংলা / English) · My roles (add rescuer / shelter / vet role → verification) · Notifications (push / SMS toggles) · Saved addresses · Payment methods (P2) · AI: share pet info with assistant (P1, off by default) · Call recording consent (P2, off by default) · Privacy · Help & support (call / WhatsApp / FAQ) · Terms & privacy policy · Logout · Delete account.
+Language (বাংলা / English) · My roles (add rescuer / shelter / vet role → verification) · Notifications (push / SMS toggles) · Saved addresses · Payment methods (P1) · AI: share pet info with assistant (P1, off by default) · Call recording consent (P2, off by default) · Privacy · Help & support (call / WhatsApp / FAQ) · Terms & privacy policy · Logout · Delete account.
 
 ---
 
@@ -231,8 +232,11 @@ Language (বাংলা / English) · My roles (add rescuer / shelter / vet ro
 
 ```mermaid
 flowchart TD
-  R0[প্রাণী রিপোর্ট করুন / Report an animal] --> R1[কী হয়েছে? আহত · হারানো · পরিত্যক্ত<br/>Injured · Lost · Abandoned]
-  R1 --> R2[ছবি তুলুন / Add photos]
+  R0[প্রাণী রিপোর্ট করুন / Report an animal] --> R1[কী হয়েছে? আহত · হারানো · পাওয়া · পরিত্যক্ত<br/>Injured · Lost · Found · Abandoned]
+  R1 --> LFQ{Lost or found?}
+  LFQ -- Lost, my pet --> LP[Pick my pet · last seen time · contact number not public]
+  LFQ -- Found / other --> R2
+  LP --> R2[ছবি তুলুন / Add photos]
   R2 --> R3[জায়গা / Location: GPS or pin on map + area note]
   R3 --> R4[জরুরি মাত্রা / Urgency: কম · মাঝারি · বেশি · খুব জরুরি]
   R4 --> R5[জমা দিন / Submit]
@@ -258,7 +262,11 @@ flowchart TD
 
 **Case page (rescuer / shelter / admin):** map with exact location (only these roles), photos, timeline of updates, add note/photo, change status, call reporter via masked call button (number not shown), record outcome.
 
-**Report again / same animal (P1):** before submit, show "কাছাকাছি একই রকম রিপোর্ট আছে" if a similar report exists nearby.
+**Report again / same animal (P1):** before submit, show "কাছাকাছি একই রকম রিপোর্ট আছে" if a similar report exists nearby (also matches a "found" report to an open "lost" one).
+
+**Lost & found is part of rescue:** there is no separate Lost & Found feature. Lost/found reports go through the same queue and case page; the case closes with outcome "মালিকের কাছে ফেরত / returned to owner" when the pet is reunited.
+
+**Lost & found board (P1, RSC-10):** public map/list of open lost and found reports — area rounded to ~1 km, no phone numbers or reporter names. "আমি দেখেছি / I've seen it" sends an in-app message to the reporter, who chooses whether to share their number. Nearby users get an alert for new reports.
 
 ---
 

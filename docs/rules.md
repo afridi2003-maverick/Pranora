@@ -13,9 +13,9 @@ These rules apply to every contributor (human or AI). A short version lives in [
 5. Never present the AI assistant or tips as a diagnosis — always show "এটি চিকিৎসকের পরামর্শের বিকল্প নয় / This is not a substitute for a vet".
 6. **AI never**: diagnoses, names a medicine or dose, writes prescriptions, pretends to be human, says something is done before the system confirms it, or asks for passwords, OTPs or payment details. AI must never call adoption-decision RPCs.
 7. **Humans decide adoptions** — approve/reject is always a human action. Diagnoses and prescriptions only by a qualified vet; medical records are written only by vets.
-8. **Location & phone privacy** — an animal's exact location and personal phone numbers are never shown publicly. Rescue locations are visible only to the reviewer, assigned rescuer and admins; adoption shows district/upazila only. Strip EXIF/GPS from uploaded photos.
+8. **Location & phone privacy** — an animal's exact location and personal phone numbers are never shown publicly. Rescue locations are visible only to the reviewer, assigned rescuer and admins; adoption shows district/upazila only; lost & found (a rescue report type) is public only through the `lost_found_board` view (~1 km area, no phone). Strip EXIF/GPS from uploaded photos.
 9. **Call recording is off by default** and needs both participants' consent.
-10. Source of truth for features: [prd.md](./prd.md), aligned with [PetCare_BD_Feature_List_Bangla.pdf](./PetCare_BD_Feature_List_Bangla.pdf).
+10. Source of truth for features: [prd.md](./prd.md), aligned with [PetCare_BD_Feature_List_Bangla.pdf](./PetCare_BD_Feature_List_Bangla.pdf). **MVP (P0) = only modules 1–4 of the PDF's build order**; don't pull P1/P2 work into MVP PRs without updating the tracker.
 
 ## 2. Code Style
 

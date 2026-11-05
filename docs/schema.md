@@ -52,7 +52,7 @@ create type adoption_application_status as enum ('submitted', 'under_review', 'a
 create type home_type                   as enum ('own_house', 'rented_house', 'own_flat', 'rented_flat', 'other');
 
 -- Rescue
-create type animal_report_kind as enum ('injured', 'lost', 'abandoned');
+create type animal_report_kind as enum ('injured', 'lost', 'found', 'abandoned');  -- lost & found is part of rescue
 create type urgency_level      as enum ('low', 'medium', 'high', 'critical');
 create type rescue_status      as enum ('submitted', 'under_review', 'assigned', 'rescue_in_progress',
                                         'closed', 'rejected', 'duplicate');
@@ -563,8 +563,11 @@ create table animal_reports (
   id uuid primary key default gen_random_uuid(),
   reporter_id uuid not null references profiles(id),
   kind animal_report_kind not null,
+  pet_id uuid references pets(id),                   -- kind = 'lost': the owner's own pet profile
   species species_type not null default 'other',
   urgency urgency_level not null,
+  last_seen_at timestamptz,                          -- lost / found
+  contact_phone text,                                -- lost / found; never public, shared with a responder only by the reporter
   description text,
   photos text[] not null default '{}',               -- private `rescue-media` bucket, EXIF stripped
   location geography(Point, 4326) not null,          -- exact; never public
@@ -582,6 +585,17 @@ create table animal_reports (
 -- urgency enum order is low < … < critical, so "desc" puts urgent reports first (RSC-2)
 create index animal_reports_queue_idx    on animal_reports (status, urgency desc, created_at);
 create index animal_reports_location_gix on animal_reports using gist (location);
+
+-- Public lost & found board (RSC-10, P1): no phone number, no reporter, location snapped to a ~1 km grid.
+-- Owned by the migration role, so it reads past animal_reports RLS by design.
+create view lost_found_board as
+select id, kind, species, description, photos, last_seen_at, created_at,
+       st_snaptogrid(location::geometry, 0.01)::geography as approx_location
+from animal_reports
+where kind in ('lost', 'found')
+  and status not in ('closed', 'rejected', 'duplicate');
+
+grant select on lost_found_board to anon, authenticated;
 
 create table rescue_cases (
   id uuid primary key default gen_random_uuid(),
@@ -703,7 +717,7 @@ create table adoption_followups (    -- ADP-9
 );
 ```
 
-### 4.11 Reviews, Moderation, Community, Lost & Found
+### 4.11 Reviews, Moderation & Community
 
 ```sql
 create table reviews (
@@ -732,33 +746,6 @@ create table content_reports (
   created_at timestamptz not null default now(),
   unique (reporter_id, target_type, target_id)
 );
-
--- Owners' own lost/found pets (P1). Stray, injured or abandoned animals use animal_reports.
-create table lost_found_posts (
-  id uuid primary key default gen_random_uuid(),
-  posted_by uuid not null references profiles(id),
-  kind text not null check (kind in ('lost', 'found')),
-  pet_id uuid references pets(id),
-  species species_type not null,
-  description text,
-  photos text[] not null default '{}',
-  last_seen_at timestamptz,
-  location geography(Point, 4326) not null,          -- exact; public sees only the snapped point below
-  contact_phone text,                                -- never public; shared with a responder only by the poster
-  is_resolved boolean not null default false,
-  created_at timestamptz not null default now()
-);
-
-create index lost_found_location_gix on lost_found_posts using gist (location);
-
--- Public read model: no phone number, location snapped to a ~1 km grid
-create view lost_found_public as
-select id, kind, species, description, photos, last_seen_at, created_at,
-       st_snaptogrid(location::geometry, 0.01)::geography as approx_location
-from lost_found_posts
-where not is_resolved;
-
-grant select on lost_found_public to anon, authenticated;
 
 create table articles (
   id uuid primary key default gen_random_uuid(),
@@ -1022,14 +1009,13 @@ Pass a different `p_types` array to reuse it for groomers, pet shops, boarding a
 | `bookings` | Owner; staff of that provider; admins | Owner creates (via `create_booking`); provider updates status |
 | `payments` | Owner; admins | Edge Functions only (service role) |
 | `reviews` | Public (not hidden) | Author of a completed booking |
-| `animal_reports` | Reporter (own row); verified shelters & admins (review queue); assigned rescuer | Any logged-in user inserts; status changes via RPCs only |
+| `animal_reports` | Reporter (own row); verified shelters & admins (review queue); assigned rescuer. Public (anon too) sees lost/found reports only through `lost_found_board` (no phone, ~1 km area) | Any logged-in user inserts (`pet_id` only for own pets); status changes via RPCs only |
 | `rescue_cases`, `rescue_assignments`, `rescue_case_updates` | Assigned rescuer, case shelter, admins — **not** the reporter (uses `my_report_status`) | Via RPCs; updates by assigned rescuer / case shelter / admins |
 | `adoption_listings` | Public (anon too) when `available`/`reserved`; poster, shelter staff, admins always | Verified `shelter` staff or verified `adoption_lister`; admins can set `removed` |
 | `adoption_applications` | Applicant; listing poster / shelter staff; admins | Applicant inserts / withdraws; decision via `decide_adoption_application` only |
 | `adoption_handovers`, `adoption_followups` | Both parties; admins | Via RPCs only |
 | `adoption_favorites` | Own | Own |
 | `content_reports` | Reporter (own); admins | Any logged-in user inserts; admins update |
-| `lost_found_posts` | Poster; admins (public reads `lost_found_public`) | Poster; admins |
 | `articles` | Public | Admins |
 | `ai_conversations`, `ai_messages` | Own | Own (inserts via `ai-chat` Edge Function) |
 | `call_sessions` | Caller and callee; admins | Via `calls-create` Edge Function; recording consent only by each participant for their own flag |
