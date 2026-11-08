@@ -115,7 +115,7 @@ The MVP catalog shows only the 🟢 services; the others appear when their phase
 
 **Before launch:** a native Bangla speaker reviews all Bangla text (especially AI and SMS messages), and a licensed vet reviews the BVC verification process, medicine and vaccine lists, and legal rules.
 
-Task-level status: [docs/tracker.md](docs/tracker.md).
+Week-by-week plan (1-week sprints, MVP launch planned for the end of sprint 8): [docs/schedule.md](docs/schedule.md). It shows who works on what each week, the dependencies between tasks, the critical path and where members' work joins up. Task-level status: [docs/tracker.md](docs/tracker.md).
 
 ---
 
@@ -260,7 +260,7 @@ Five members, each owning one area with both frontend and backend work. The spli
 
 | Member | Phase 0 | MVP | Phase 2 | Phase 3 | Total |
 |---|---|---|---|---|---|
-| Zihad | 1 | 12 | 7 | 1 | 21 |
+| Zihad | 1 | 13 | 7 | 1 | 22 |
 | Afridi | 1 | 13 | 7 | 1 | 22 |
 | Zimia | 1 | 13 | 7 | 2 | 23 |
 | Brehat | 1 | 13 | 7 | 1 | 22 |
@@ -270,7 +270,8 @@ Five members, each owning one area with both frontend and backend work. The spli
 - read `.pranora-member` to know who you are;
 - only edit files in your area from [team.md](docs/team.md), and refuse to touch anyone else's;
 - make only small, flagged additions to shared files;
-- check `git diff` before committing, and commit only to your own branch.
+- start a task only if it's planned for the current sprint and its dependencies are done (or have an agreed contract), otherwise say what blocks it and who owns that;
+- check `git diff` before committing, and commit only to your own branch (PRs go into `dev`).
 
 To change another member's area, add a request in [team.md §8](docs/team.md#8-change-requests) or open an issue.
 
@@ -287,7 +288,8 @@ To change another member's area, add a request in [team.md §8](docs/team.md#8-c
 | [Design Brief](docs/design.md) | Brand, colors, Bangla typography, components, key screens |
 | [Schema](docs/schema.md) | Database tables, PostGIS functions, RLS, storage |
 | [Rules](docs/rules.md) | Product, coding, i18n, git, ownership and security rules |
-| [Tracker](docs/tracker.md) | Tasks, owners, sizes, status and decisions |
+| [Tracker](docs/tracker.md) | Tasks, owners, sizes, sprint, dependencies, status and decisions |
+| [Schedule](docs/schedule.md) | Sprint plan per member, milestones, critical path, integration points, merge order |
 | [Team](docs/team.md) | Who owns what, shared files, workload balance, change requests |
 
 ---
@@ -295,12 +297,12 @@ To change another member's area, add a request in [team.md §8](docs/team.md#8-c
 ## 🤝 Contributing
 
 1. **Set up your identity:** create the git-ignored `.pranora-member` with your id (see [`.pranora-member.example`](.pranora-member.example)).
-2. **Claim a task:** pick one of *your* rows in [tracker.md](docs/tracker.md), set Status 🟨 and commit.
+2. **Claim a task:** pick one of *your* rows in [tracker.md](docs/tracker.md) planned for the current sprint, check its `Depends on` (hard deps ✅, soft deps have an agreed contract — [schedule.md](docs/schedule.md)), set Status 🟨 and commit.
 3. **Use your own branch:** `zihad`, `afridi`, `Zimia`, `brehat`, `tain`, or `<member>/<task-id>-short-name` (e.g. `brehat/RSC-1-report-form`). Never push to `main`.
 4. **Stay in your area:** change only your paths from [team.md](docs/team.md); flag any shared-file edit in the PR.
 5. **Bilingual always:** every UI string goes in **both** `bn` and `en`, in your own i18n namespace; use the shared formatters for ৳, dates and distances.
 6. **Commit with Conventional Commits and the task ID:** `feat(map): MAP-3 open-now filter`, `fix(booking): APT-1a prevent double serial`.
-7. **Open a PR:** reviewed by the CODEOWNERS of every touched area, CI green, tracker updated → Afridi merges to `main`.
+7. **Open a PR into `dev`:** rebased on `dev`, reviewed by the CODEOWNERS of every touched area, CI green, tracker updated, merged in the sprint's merge order → Afridi releases `dev` → `main`.
 
 Full rules: [docs/rules.md](docs/rules.md).
 

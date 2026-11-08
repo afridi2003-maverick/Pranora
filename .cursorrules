@@ -3,7 +3,7 @@
 Project: Pranora (প্রাণোরা) — Bangla-first pet care app + website for Bangladesh: adoption, animal rescue and vet care (+ nearest-vet map and services catalog). Feature source: docs/PetCare_BD_Feature_List_Bangla.pdf (working title "PetCare BD").
 Stack: Turborepo + pnpm, Expo (React Native) app, Next.js web, Supabase (Postgres + PostGIS, Auth, Storage, Edge Functions), TypeScript strict, Tailwind/NativeWind, TanStack Query, Zod, i18next/next-intl.
 
-Read before working: docs/prd.md, docs/trd.md, docs/app-flow.md, docs/design.md, docs/schema.md, docs/tracker.md.
+Read before working: docs/prd.md, docs/trd.md, docs/app-flow.md, docs/design.md, docs/schema.md, docs/tracker.md, docs/schedule.md.
 
 Always:
 - Bangla (bn) is the default locale; every UI string goes through t() and must be added to BOTH bn.json and en.json.
@@ -29,5 +29,6 @@ Never:
 - Let the AI assistant diagnose, name medicines/doses, pretend to be human, confirm actions the system hasn't confirmed, or ask for passwords/payment info; never present AI or tips as a diagnosis.
 
 Team ownership: follow .cursor/rules/team-ownership.mdc — read .pranora-member, only touch the current member's paths from docs/team.md, never another member's area.
+Schedule: before starting a task, check its Sprint and Depends on in docs/tracker.md — hard deps ✅, soft deps have an agreed contract (docs/schedule.md); otherwise stop and say what blocks it and who owns it.
 
-Git: Conventional Commits (feat/fix/docs/refactor/test/chore), small PRs, never push to main directly, update docs/tracker.md.
+Git: Conventional Commits (feat/fix/docs/refactor/test/chore), small PRs into dev, never push to main directly, update docs/tracker.md.

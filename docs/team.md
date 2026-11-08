@@ -1,7 +1,7 @@
 # Pranora — Team & Ownership
 
 Who owns which part of the codebase, so every member (and their AI agent) only changes their own part.
-Related: [tracker.md](./tracker.md) · [rules.md](./rules.md) · Cursor rule [`.cursor/rules/team-ownership.mdc`](../.cursor/rules/team-ownership.mdc) · [`.github/CODEOWNERS`](../.github/CODEOWNERS)
+Related: [tracker.md](./tracker.md) · [schedule.md](./schedule.md) (who works when, dependencies, integration points) · [rules.md](./rules.md) · Cursor rule [`.cursor/rules/team-ownership.mdc`](../.cursor/rules/team-ownership.mdc) · [`.github/CODEOWNERS`](../.github/CODEOWNERS)
 
 > ⚠️ **Proposed — the team should confirm or edit.** The split below is a proposal, balanced so that everyone gets the same amount of work (সমান ভাগ). Change it through the process in §7.
 
@@ -17,7 +17,7 @@ Related: [tracker.md](./tracker.md) · [rules.md](./rules.md) · Cursor rule [`.
 | Brehat | `brehat` | TBD | `brehat` | Rescue & adoption | Rescue reports & cases (incl. lost & found), adoption listings → applications → handover, pet shop |
 | Tain | `tain` | TBD | `tain` | Vet booking & dashboards | Booking (slots/serials), vet & shelter dashboards, review queues, online consultation, calls |
 
-Feature branches: `<member>/<task-id>-short-name`, e.g. `brehat/RSC-1-report-form`, `zimia/MAP-3-filters`. Open PRs into the member branch or `dev`; only Afridi merges to `main`.
+Feature branches: `<member>/<task-id>-short-name`, e.g. `brehat/RSC-1-report-form`, `zimia/MAP-3-filters`. PRs go into `dev` (integration) in the sprint's merge order ([schedule.md §6](./schedule.md#6-branches-merge-order--checkpoints)); only Afridi merges `dev` → `main`.
 
 Everyone gets **both frontend and backend** work: each member writes the migrations, RLS policies, pgTAP tests, RPCs, Edge Functions, app screens and web pages for **their own modules**. Afridi owns only the shared core (base schema, RLS helpers, auth, notifications, payments).
 
@@ -32,7 +32,7 @@ Apps use the same feature folder names on both platforms:
 
 | Area (owner) | Features & routes | Packages | Supabase | Tracker IDs |
 |---|---|---|---|---|
-| **Zihad** — product, design & pet health | features `pets`, `health`, `services`, `ai`, `tips`, `sitting`; routes `pets`, `health`, `services`, `assistant`, `tips` | `packages/ui/**`, `packages/i18n/**` (framework, formatters, `common.json` approvals), `packages/api/src/{pets,health,services,ai,tips}/**`, `packages/validation/src/{pets,health,services,ai}.ts` | migrations `*_pets_*`, `*_health_*`, `*_services_*`, `*_ai_*`, `*_content_*`; functions `ai-chat`, `generate-health-pdf`; seeds `seed/services.sql`, `seed/vaccines.sql`; tests `tests/{pets,health,services,ai}_*` | `DOC-*`, `DES-*`, `I18N-*`, `PET-*`, `HLT-1/3/7`, `SVC-1`, `SVC-TIPS`, `SVC-SIT`, `AI-*`, `DB-3`, `DB-7`, `REL-2`, `REL-4` + `docs/**` |
+| **Zihad** — product, design & pet health | features `pets`, `health`, `services`, `ai`, `tips`, `sitting`; routes `pets`, `health`, `services`, `assistant`, `tips` | `packages/ui/**`, `packages/i18n/**` (framework, formatters, `common.json` approvals), `packages/api/src/{pets,health,services,ai,tips}/**`, `packages/validation/src/{pets,health,services,ai}.ts` | migrations `*_pets_*`, `*_health_*`, `*_services_*`, `*_ai_*`, `*_content_*`; functions `ai-chat`, `generate-health-pdf`; seeds `seed/services.sql`, `seed/vaccines.sql`; tests `tests/{pets,health,services,ai}_*` | `DOC-*`, `DES-*`, `UI-1`, `I18N-*`, `PET-*`, `HLT-1/3/7`, `SVC-1`, `SVC-TIPS`, `SVC-SIT`, `AI-*`, `DB-3`, `DB-7`, `REL-2`, `REL-4` + `docs/**` |
 | **Afridi** — platform & admin | features `auth`, `onboarding`, `roles`, `notifications`, `payments`, `admin`, `moderation`, `settings`, `training`; routes `(auth)`, `onboarding`, `notifications`, `settings`, `checkout`, `admin` | `packages/types/**` (generated), `packages/validation/src/{index,auth,payments,common}.ts`, `packages/api/src/{client,auth,notifications,payments,admin}/**` | migrations `*_core_*`, `*_auth_*`, `*_notifications_*`, `*_payments_*`, `*_moderation_*`, `*_audit_*`; functions `send-sms`, `send-reminders`, `payments-*`, `verify-provider`, `media-process`; seeds `seed/locations.sql`; tests harness + `tests/{core,auth,payments}_*`; `supabase/config.toml` | `SET-1`, `DB-1/2/6`, `AUTH-*`, `NOTIF-*`, `ADM-*`, `PAY-2/3/4`, `HLT-2/6`, `REV-2`, `SVC-TRN`, `REL-1`, `REL-3` + `.github/**` |
 | **Zimia** — vet discovery | features `map`, `clinics`, `emergency`, `home-visit`, `grooming`, `boarding`, `reviews`, `livestock`; routes `map`, `vets`, `clinics`, `emergency`, `grooming`, `boarding` | `packages/api/src/{map,clinics,reviews}/**`, `packages/validation/src/{map,clinics,reviews}.ts` | migrations `*_providers_*`, `*_map_*`, `*_reviews_*`; SQL `nearby_clinics`, `is_location_open`; seeds `seed/clinics.sql`; tests `tests/{providers,map,reviews}_*` | `SET-3`, `DB-4`, `MAP-*`, `SVC-2`, `SVC-HOME`, `SVC-GRM`, `SVC-BRD`, `REV-1`, `LIV-1`, `REL-5` |
 | **Brehat** — rescue & adoption | features `rescue`, `adoption`, `lost-found`, `shop`; routes `rescue`, `report`, `adoption`, `lost-found`, `shop` | `packages/api/src/{rescue,adoption,shop}/**`, `packages/validation/src/{rescue,adoption,shop}.ts` | migrations `*_rescue_*`, `*_adoption_*`, `*_shop_*`; functions `rescue-alert`, `send-followups`; tests `tests/{rescue,adoption,shop}_*` | `SET-2`, `DB-8`, `DB-9`, `RSC-*` (except `RSC-2`), `ADP-*` (except `ADP-5`), `SVC-SHOP` |
@@ -75,22 +75,24 @@ Counts match [tracker.md](./tracker.md) exactly. Done Phase 0 docs (DOC-1…8, Z
 
 | Member | Phase 0 (open) | MVP (P0) | Phase 2 (P1) | Phase 3 (P2) | Total tasks | Effort points |
 |---|---|---|---|---|---|---|
-| Zihad | 1 | 12 | 7 | 1 | 21 | 44 |
+| Zihad | 1 | 13 | 7 | 1 | 22 | 47 |
 | Afridi | 1 | 13 | 7 | 1 | 22 | 47 |
 | Zimia | 1 | 13 | 7 | 2 | 23 | 44 |
 | Brehat | 1 | 13 | 7 | 1 | 22 | 43 |
 | Tain | 1 | 12 | 6 | 2 | 21 | 44 |
-| **Total** | **5** | **63** | **34** | **7** | **109** | **222** |
+| **Total** | **5** | **64** | **34** | **7** | **110** | **225** |
 
 Per-phase effort points (S = 1, M = 2, L = 3):
 
 | Member | Phase 0 | MVP | Phase 2 | Phase 3 |
 |---|---|---|---|---|
-| Zihad | 3 | 25 | 14 | 2 |
+| Zihad | 3 | 28 | 14 | 2 |
 | Afridi | 3 | 27 | 15 | 2 |
 | Zimia | 1 | 26 | 13 | 4 |
 | Brehat | 2 | 25 | 13 | 3 |
 | Tain | 2 | 26 | 12 | 4 |
+
+UI-1 (design tokens + base components) was added to Zihad on 2026-11-06. Per sprint, everyone plans ~6 points ([schedule.md §3](./schedule.md#3-sprint-plan-sprint--member)).
 
 **Balance rules**
 - In each phase, nobody may have more than 2 tasks or 3 effort points above anyone else.
@@ -101,14 +103,26 @@ Per-phase effort points (S = 1, M = 2, L = 3):
 
 ## 5. Working Process
 
-1. **Claim before you start:** set your name in the task's Owner column (if it isn't already) and Status to 🟨 in `tracker.md`, commit on your branch.
+1. **Claim before you start:** pick a task planned for the current sprint ([schedule.md](./schedule.md)) whose hard dependencies are ✅ and soft dependencies have an agreed contract; set your name in the Owner column (if it isn't already) and Status to 🟨 in `tracker.md`, commit on your branch.
 2. Work only in your owned paths (§2). Reading any file is always fine.
 3. Create `.pranora-member` (git-ignored) in the repo root with your member id, so your Cursor agent knows who you are. See `.pranora-member.example`.
 4. Before committing, run `git diff --name-only` (or `git status`) and make sure every changed file is in your area or is a flagged shared-file edit.
 5. Commit to your own branch only (`zihad`, `afridi`, `Zimia`, `brehat`, `tain` or `<member>/<task-id>-…`). Never push to `main`.
-6. PR → CODEOWNERS review by the owner of every touched area → CI green → Afridi merges.
+6. PR into `dev` → CODEOWNERS review by the owner of every touched area → CI green → merge in the sprint's merge order; Afridi merges `dev` → `main` at releases.
 
-## 6. Handoff
+## 6. Handoff & Integration
+
+Every task's dependencies are in the tracker's `Depends on` column. The integration points between members are listed in [schedule.md §5](./schedule.md#5-integration-points--contracts): each says who defines the contract (provider), who uses it, the sprint it is due, and the checkpoint where both parts are merged. Main integration owners:
+
+| Integration | Provider (defines contract) | Consumers |
+|---|---|---|
+| i18n + UI kit | Zihad | everyone |
+| Base schema, session & roles, notifications | Afridi | everyone |
+| Pets & ownership transfer, visit notes | Zihad | Tain (booking, vet dashboard), Brehat (lost report, adoption) |
+| Clinics / `nearby_clinics` | Zimia | Tain (booking), Zihad (AI) |
+| Booking RPCs, calls | Tain | Zimia (Book button, home visit/grooming/boarding), Afridi (payments), Zihad (AI) |
+| Rescue & adoption RPCs | Brehat | Tain (queues, ADP-5 decision), Afridi (admin) |
+| Payments (`PaymentProvider`, IPN) | Afridi | Tain (checkout, consultation), Brehat (shop) |
 
 When a task depends on someone else's work, for example rescue alerts (Brehat) needing the notification channels (Afridi):
 - The consumer writes what they need in §8 (API/RPC name, inputs, outputs).

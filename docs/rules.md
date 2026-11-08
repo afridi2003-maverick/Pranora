@@ -67,7 +67,12 @@ These rules apply to every contributor (human or AI). A short version lives in [
 - Branches: `main` (production), `dev` (integration), one branch per member — `zihad`, `afridi`, `Zimia` (existing casing), `brehat`, `tain` — and feature branches `<member>/<task-id>-short-name` (e.g. `brehat/RSC-1-report-form`).
 - **Ownership:** each member (and their AI agent) changes only the paths they own in [team.md](./team.md). Shared files allow only minimal additive edits, which must be flagged in the PR. To change something in another member's area, use a change request ([team.md §8](./team.md#8-change-requests)) or an issue. Agents follow [`.cursor/rules/team-ownership.mdc`](../.cursor/rules/team-ownership.mdc), which reads the git-ignored `.pranora-member` file.
 - Claim a task in [tracker.md](./tracker.md) (Status 🟨 on your own row) before starting. New tasks go to the area owner, or to whoever has the fewest open tasks in that phase.
-- Never push directly to `main`. Open a PR → review by the CODEOWNERS of every touched area → CI green → squash merge (Afridi merges to `main`).
+- **Dependencies & schedule** ([schedule.md](./schedule.md)): work only on tasks planned for the current 1-week sprint. Before starting, every hard dependency (`ID` in `Depends on`) must be ✅ merged to `dev`, and every soft dependency (`(ID)`) must have an agreed contract (schedule.md §5). Code against a typed stub in your own feature folder, and merge after the provider. If a dependency isn't ready, mark the task ⛔ and tell its owner.
+- **Flow:** member/feature branch → PR into **`dev`** (integration, deployed to staging) → CODEOWNERS review → CI green → squash merge in the sprint's merge order (providers/contracts first, migrations → RPCs → UI). Release PR `dev` → `main` only by Afridi at milestones.
+- **Sync:** rebase on `dev` at sprint start, daily before pushing, and before opening a PR. The sprint-end checkpoint merges, resets the DB and runs pgTAP + E2E on staging.
+- **Migrations:** `YYYYMMDDHHMMSS_<area>_<description>.sql`. The timestamp is set at merge time (rename to the current UTC time if `dev` has a newer one). Merge one migration PR at a time, with `pnpm db:types` regenerated in the same PR. Never edit a migration that is already on `dev`.
+- Phase 2 work merged before its release stays behind an `app_config` feature flag (off in production).
+- Never push directly to `main`.
 - Commit messages: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(map): add open-now filter`, `fix(booking): prevent double slot`, `docs: update schema`.
 - Keep PRs small (< 400 lines changed where possible) and link the tracker item ID (e.g. `MAP-3`).
 - Update [tracker.md](./tracker.md) status when a task moves.
