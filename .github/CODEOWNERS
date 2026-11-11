@@ -1,6 +1,5 @@
 # Pranora code owners — mirrors docs/team.md §2–3 (proposed split; team to confirm).
-# Last matching line wins. Unknown GitHub handles are commented out: replace @TBD-<name>
-# with the real handle and uncomment. Until then those paths fall back to Afridi + Zihad.
+# Last matching line wins.
 
 # Default + shared files: Afridi + Zihad
 *                                   @afridi2003-maverick @zihad2003
@@ -38,6 +37,36 @@
 /supabase/functions/verify-provider/ @afridi2003-maverick
 /supabase/functions/media-process/  @afridi2003-maverick
 
+# ---------- Zimia — vet discovery ----------
+/apps/*/features/map/               @zimia-zannat-samia
+/apps/*/features/clinics/           @zimia-zannat-samia
+/apps/*/features/emergency/         @zimia-zannat-samia
+/apps/*/features/home-visit/        @zimia-zannat-samia
+/apps/*/features/grooming/          @zimia-zannat-samia
+/apps/*/features/boarding/          @zimia-zannat-samia
+/apps/*/features/reviews/           @zimia-zannat-samia
+/apps/*/features/livestock/         @zimia-zannat-samia
+
+# ---------- Brehat — rescue & adoption ----------
+/apps/*/features/rescue/            @brihothdey-ctrl
+/apps/*/features/adoption/          @brihothdey-ctrl
+/apps/*/features/lost-found/        @brihothdey-ctrl
+/apps/*/features/shop/              @brihothdey-ctrl
+/supabase/functions/rescue-alert/   @brihothdey-ctrl
+/supabase/functions/send-followups/ @brihothdey-ctrl
+
+# ---------- Tain — vet booking & dashboards ----------
+/apps/*/features/booking/           @taintabassum
+/apps/*/features/provider/          @taintabassum
+/apps/*/features/shelter/           @taintabassum
+/apps/*/features/consult/           @taintabassum
+/apps/*/features/calls/             @taintabassum
+/apps/*/features/pet-taxi/          @taintabassum
+/apps/web/app/*/provider/           @taintabassum
+/apps/web/app/*/shelter/            @taintabassum
+/supabase/functions/calls-create/   @taintabassum
+/supabase/functions/send-booking-reminders/ @taintabassum
+
 # ---------- Shared files (Afridi + Zihad) — keep last so they win ----------
 /package.json                       @afridi2003-maverick @zihad2003
 /pnpm-lock.yaml                     @afridi2003-maverick @zihad2003
@@ -51,36 +80,6 @@
 /docs/schema.md                     @afridi2003-maverick @zihad2003
 /supabase/migrations/               @afridi2003-maverick @zihad2003
 /packages/i18n/locales/             @afridi2003-maverick @zihad2003
-
-# ---------- Zimia — vet discovery (handle TBD) ----------
-# /apps/*/features/map/             @TBD-zimia
-# /apps/*/features/clinics/         @TBD-zimia
-# /apps/*/features/emergency/       @TBD-zimia
-# /apps/*/features/home-visit/      @TBD-zimia
-# /apps/*/features/grooming/        @TBD-zimia
-# /apps/*/features/boarding/        @TBD-zimia
-# /apps/*/features/reviews/         @TBD-zimia
-# /apps/*/features/livestock/       @TBD-zimia
-
-# ---------- Brehat — rescue & adoption (handle TBD) ----------
-# /apps/*/features/rescue/          @TBD-brehat
-# /apps/*/features/adoption/        @TBD-brehat
-# /apps/*/features/lost-found/      @TBD-brehat
-# /apps/*/features/shop/            @TBD-brehat
-# /supabase/functions/rescue-alert/ @TBD-brehat
-# /supabase/functions/send-followups/ @TBD-brehat
-
-# ---------- Tain — vet booking & dashboards (handle TBD) ----------
-# /apps/*/features/booking/         @TBD-tain
-# /apps/*/features/provider/        @TBD-tain
-# /apps/*/features/shelter/         @TBD-tain
-# /apps/*/features/consult/         @TBD-tain
-# /apps/*/features/calls/           @TBD-tain
-# /apps/*/features/pet-taxi/        @TBD-tain
-# /apps/web/app/*/provider/         @TBD-tain
-# /apps/web/app/*/shelter/          @TBD-tain
-# /supabase/functions/calls-create/ @TBD-tain
-# /supabase/functions/send-booking-reminders/ @TBD-tain
 
 # Per-area migrations, seeds, tests, packages/api/src/<feature> and
 # packages/validation/src/<feature>.ts follow docs/team.md §2 (file-name

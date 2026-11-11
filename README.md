@@ -252,9 +252,9 @@ Five members, each owning one area with both frontend and backend work. The spli
 |---|---|---|---|
 | Zihad | [@zihad2003](https://github.com/zihad2003) | `zihad` | Docs, design system, i18n, pets & health records, services catalog, AI assistant |
 | Afridi | [@afridi2003-maverick](https://github.com/afridi2003-maverick) | `afridi` (merges to `main`) | Repo/CI, core DB & auth, onboarding & roles, notifications, payments, admin panel |
-| Zimia | TBD | `Zimia` | Nearest-vet map, clinic data, emergency mode, home visit, grooming, boarding, reviews |
-| Brehat | TBD | `brehat` | Rescue (incl. lost & found), adoption, pet shop |
-| Tain | TBD | `tain` | Vet booking (slots/serials), vet & shelter dashboards, online consultation, calls |
+| Zimia | [@zimia-zannat-samia](https://github.com/zimia-zannat-samia) | `Zimia` | Nearest-vet map, clinic data, emergency mode, home visit, grooming, boarding, reviews |
+| Brehat | [@brihothdey-ctrl](https://github.com/brihothdey-ctrl) | `brehat` | Rescue (incl. lost & found), adoption, pet shop |
+| Tain | [@taintabassum](https://github.com/taintabassum) | `tain` | Vet booking (slots/serials), vet & shelter dashboards, online consultation, calls |
 
 **Workload (সমান ভাগ)** — open tasks per phase, matching the tracker:
 
