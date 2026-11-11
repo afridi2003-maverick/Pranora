@@ -13,9 +13,9 @@ Related: [tracker.md](./tracker.md) · [schedule.md](./schedule.md) (who works w
 |---|---|---|---|---|---|
 | Zihad | `zihad` | [@zihad2003](https://github.com/zihad2003) | `zihad` | Product, design & pet health | Docs, design system, i18n, pets & health records, services catalog, AI assistant, tips |
 | Afridi | `afridi` | [@afridi2003-maverick](https://github.com/afridi2003-maverick) (repo owner) | `afridi` | Platform & admin | Repo/CI, core DB + auth + RLS framework, onboarding & roles, notifications, payments, admin panel, audit log, releases and merges to `main` |
-| Zimia | `zimia` | TBD | `Zimia` (existing — keep the casing) | Vet discovery | Nearest-vet map, clinic data, emergency mode, provider lists, home visit, grooming, boarding, reviews |
-| Brehat | `brehat` | TBD | `brehat` | Rescue & adoption | Rescue reports & cases (incl. lost & found), adoption listings → applications → handover, pet shop |
-| Tain | `tain` | TBD | `tain` | Vet booking & dashboards | Booking (slots/serials), vet & shelter dashboards, review queues, online consultation, calls |
+| Zimia | `zimia` | [@zimia-zannat-samia](https://github.com/zimia-zannat-samia) | `Zimia` (existing — keep the casing) | Vet discovery | Nearest-vet map, clinic data, emergency mode, provider lists, home visit, grooming, boarding, reviews |
+| Brehat | `brehat` | [@brihothdey-ctrl](https://github.com/brihothdey-ctrl) | `brehat` | Rescue & adoption | Rescue reports & cases (incl. lost & found), adoption listings → applications → handover, pet shop |
+| Tain | `tain` | [@taintabassum](https://github.com/taintabassum) | `tain` | Vet booking & dashboards | Booking (slots/serials), vet & shelter dashboards, review queues, online consultation, calls |
 
 Feature branches: `<member>/<task-id>-short-name`, e.g. `brehat/RSC-1-report-form`, `zimia/MAP-3-filters`. PRs go into `dev` (integration) in the sprint's merge order ([schedule.md §6](./schedule.md#6-branches-merge-order--checkpoints)); only Afridi merges `dev` → `main`.
 
