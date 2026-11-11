@@ -991,6 +991,62 @@ Pass a different `p_types` array to reuse it for groomers, pet shops, boarding a
 | `confirm_handover(handover_id)` | Called by giver or adopter; when both have confirmed, `complete_adoption_handover()` transfers `pets.owner_id`, clears `shelter_id`, writes `pet_ownership_history`, sets the listing `adopted` and schedules `adoption_followups` |
 | `audit_row_change()` | Trigger function writing `audit_logs` (ADM-4) |
 
+### 5.4 Booking RPC Signatures & Route Contracts (Tain — Contracts 6 & 7)
+
+#### 1. `available_slots(p_location_id uuid, p_vet_id uuid, p_date date)`
+Returns available time slots (when `schedule_mode = 'slot'`) or session serials (when `schedule_mode = 'serial'`) for a given date and provider location.
+- **Input Parameters:**
+  - `p_location_id uuid not null`: Provider location ID
+  - `p_vet_id uuid`: Specific vet ID (or null for any available vet)
+  - `p_date date not null`: Query date (`YYYY-MM-DD`)
+- **Returns:** `jsonb`
+  - `mode`: `'slot' | 'serial'`
+  - `date`: string (`YYYY-MM-DD`)
+  - `locationId`: uuid
+  - `vetId`: uuid (nullable)
+  - `slots`: array of `{ startsAt: timestamptz, endsAt: timestamptz, isAvailable: boolean, capacity: int, remainingCapacity: int }`
+  - `serials`: array of `{ serialNo: int, sessionStart: timestamptz, sessionEnd: timestamptz, isAvailable: boolean }`
+  - `nextAvailableSerial`: int (nullable)
+- **Rules:**
+  1. Checks `availability_exceptions` where `location_id = p_location_id` and `date = p_date` and `is_closed = true`. Returns closed session if exception exists.
+  2. Reads `availability_rules` for weekday `extract(dow from p_date)`.
+  3. Deducts existing bookings with status in `('pending', 'confirmed')`.
+
+#### 2. `create_booking(...)`
+Creates a booking atomically with double-booking prevention and short code generation.
+- **Input Parameters:**
+  - `p_pet_id uuid`: Target pet (nullable for general advice or first checkup)
+  - `p_location_id uuid not null`: Provider location
+  - `p_vet_id uuid`: Assigned vet (nullable if clinic auto-assigns)
+  - `p_provider_service_id uuid not null`: Selected provider service
+  - `p_type booking_type not null`: `'slot' | 'serial' | 'home_visit' | 'online'`
+  - `p_starts_at timestamptz`: Start timestamp for slot / session start for serial
+  - `p_ends_at timestamptz`: End timestamp (calculated from service duration)
+  - `p_serial_no smallint`: Serial number (if type = 'serial')
+  - `p_address_id uuid`: Delivery / visit address (for home visits)
+  - `p_problem_note text`: Problem description
+  - `p_attachments text[]`: Uploaded photo paths (stripped of EXIF)
+  - `p_payment_method payment_method`: `'cash' | 'bkash' | 'nagad' | 'rocket' | 'card'`
+- **Returns:** `jsonb` (`{ "bookingId": uuid, "code": text, "status": "pending", "serialNo": int, "startsAt": timestamptz }`)
+- **Concurrency & Invariants:**
+  - Locks rule row (`select ... for update`) to serialize concurrent allocations.
+  - Automatically generates short alphanumeric booking code: `PRN-` + 6 uppercase characters (e.g. `PRN-24K7Q9`).
+  - Partial unique indexes `bookings_no_double_slot` and `bookings_no_double_serial` guarantee no double booking.
+
+#### 3. `cancel_booking(p_booking_id uuid, p_reason text)`
+- **Input Parameters:** `p_booking_id uuid not null`, `p_reason text not null`
+- **Validation:** Allowed only if `now() <= starts_at - (provider_locations.cancel_cutoff_hours * interval '1 hour')`.
+- **Status Change:** Updates `status` to `'cancelled_by_owner'`.
+
+#### 4. `reschedule_booking(p_booking_id uuid, p_starts_at timestamptz, p_ends_at timestamptz, p_serial_no smallint, p_reason text)`
+- **Validation:** Allowed only before `cancel_cutoff_hours`; checks target slot/serial availability.
+- **Status Change:** Updates `starts_at`, `ends_at`, `serial_no`, and sets `status = 'pending'`.
+
+#### 5. Route Contract (Integration 6: Map ↔ Booking)
+- **Route:** `/book` (web: `/app/[locale]/book`, mobile: `/book`)
+- **Query parameters:** `?locationId=<uuid>&vetId=<uuid>&serviceId=<uuid>&bookingType=<type>&date=<YYYY-MM-DD>`
+- Handled by Zimia (MAP-6 "বুক করুন" button) and Tain (APT-1 booking screen).
+
 ---
 
 ## 6. Row Level Security (summary)
