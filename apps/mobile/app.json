@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Pranora",
+    "slug": "pranora",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "pranora",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#2F7B53"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "bd.com.pranora.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2F7B53"
+      },
+      "package": "bd.com.pranora.app"
+    },
+    "plugins": ["expo-router"]
+  }
+}
+

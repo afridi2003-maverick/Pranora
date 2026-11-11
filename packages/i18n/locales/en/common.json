@@ -1,0 +1,19 @@
+{
+  "appName": "Pranora",
+  "tagline": "Complete care for your pet, all in one place",
+  "emergency": "Emergency Help",
+  "actions": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "call": "Call",
+    "directions": "Directions",
+    "book": "Book"
+  },
+  "states": {
+    "loading": "Loading...",
+    "empty": "No items found",
+    "error": "Something went wrong. Please try again."
+  }
+}
+
