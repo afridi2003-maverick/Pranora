@@ -2,7 +2,6 @@ import type {
   NearbyClinicsQueryInput,
   NearbyClinicResult,
   ProviderType,
-  SpeciesType,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -158,3 +157,4 @@ export function calculateDistanceMeters(
 
   return Math.round(R * c);
 }
+

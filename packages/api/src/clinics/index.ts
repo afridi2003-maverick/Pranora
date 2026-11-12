@@ -16,14 +16,25 @@ export interface ClinicFullDetail {
 }
 
 /**
+ * Helper to query tables that will be formally added to Database types in DB-4 (S2)
+ */
+function getUntypedDb(client: TypedSupabaseClient) {
+  return client as unknown as {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    from: (table: string) => any;
+  };
+}
+
+/**
  * Fetches provider location and basic provider details by location ID (MAP-5)
  */
 export async function getClinicById(
   client: TypedSupabaseClient,
   locationId: string
 ): Promise<ClinicFullDetail | null> {
-  const { data: locationData, error: locError } = await client
-    .from('provider_locations' as unknown as 'profiles')
+  const db = getUntypedDb(client);
+  const { data: locationData, error: locError } = await db
+    .from('provider_locations')
     .select('*, providers(*)')
     .eq('id', locationId)
     .single();
@@ -96,8 +107,9 @@ export async function getClinicHours(
   client: TypedSupabaseClient,
   locationId: string
 ): Promise<LocationHours[]> {
-  const { data, error } = await client
-    .from('location_hours' as unknown as 'profiles')
+  const db = getUntypedDb(client);
+  const { data, error } = await db
+    .from('location_hours')
     .select('*')
     .eq('location_id', locationId)
     .order('weekday', { ascending: true })
@@ -124,8 +136,9 @@ export async function getClinicVets(
   client: TypedSupabaseClient,
   locationId: string
 ): Promise<VetProfile[]> {
-  const { data, error } = await client
-    .from('location_vets' as unknown as 'profiles')
+  const db = getUntypedDb(client);
+  const { data, error } = await db
+    .from('location_vets')
     .select('vet_id, vets(*)')
     .eq('location_id', locationId);
 
@@ -163,8 +176,9 @@ export async function getClinicServices(
   client: TypedSupabaseClient,
   locationId: string
 ): Promise<ProviderService[]> {
-  const { data, error } = await client
-    .from('provider_services' as unknown as 'profiles')
+  const db = getUntypedDb(client);
+  const { data, error } = await db
+    .from('provider_services')
     .select('*, services(slug, name_bn, name_en)')
     .eq('location_id', locationId)
     .eq('is_active', true);
