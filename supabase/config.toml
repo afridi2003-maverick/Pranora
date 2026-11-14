@@ -38,10 +38,50 @@ pop3_port = 54327
 enabled = true
 file_size_limit = "50MiB"
 
+[storage.buckets.avatars]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.provider-media]
+public = true
+file_size_limit = "10MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.medical]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp", "application/pdf"]
+
+[storage.buckets.documents]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp", "application/pdf"]
+
+[storage.buckets.adoption-media]
+public = true
+file_size_limit = "10MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.rescue-media]
+public = false
+file_size_limit = "15MiB"
+allowed_mime_types = ["image/png", "image/jpeg", "image/webp"]
+
+[storage.buckets.call-recordings]
+public = false
+file_size_limit = "50MiB"
+allowed_mime_types = ["audio/webm", "audio/mp4", "audio/ogg", "audio/mpeg"]
+
 [auth]
 enabled = true
 site_url = "http://127.0.0.1:3000"
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+additional_redirect_urls = [
+  "https://127.0.0.1:3000",
+  "http://localhost:3000",
+  "https://*.vercel.app",
+  "https://pranora.com.bd"
+]
 jwt_expiry = 3600
 enable_signup = true
 
