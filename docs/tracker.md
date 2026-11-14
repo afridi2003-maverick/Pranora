@@ -39,7 +39,7 @@ Per-member workload: [team.md §4](./team.md#4-workload-balance). Who works on w
 | DOC-7 | README + tracker | Zihad | — | — | — | ✅ |
 | DOC-8 | Align all docs with the PetCare BD feature list PDF | Zihad | — | — | — | ✅ |
 | SET-1 | Turborepo + pnpm monorepo scaffold (apps/mobile, apps/web, packages/*) | Afridi | L | S1 | — | ✅ |
-| SET-2 | Supabase projects (staging, prod — Singapore) + local Docker | Brehat | M | S1 | (SET-1) | ⬜ |
+| SET-2 | Supabase projects (staging, prod — Singapore) + local Docker | Brehat | M | S1 | (SET-1) | ✅ |
 | SET-3 | Google Maps API keys (restricted) | Zimia | S | S1 | — | ✅ |
 | SET-4 | GitHub Actions CI (lint, typecheck, test) | Tain | M | S1 | SET-1 | ✅ |
 | DES-1 | Figma foundations + components (bn/en) | Zihad | L | S1 | — | ⬜ |
