@@ -56,7 +56,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | UI-1 | `packages/ui`: design tokens (green scale, type, spacing) + base components (Button, Input, Card, ListItem, EmergencyButton, loading/empty/error states) for app & web | Zihad | L | S2 | SET-1, (DES-1) | ✅ |
 | DB-1 | Migrations: enums, locations, profiles, user_roles, addresses | Afridi | L | S1 | SET-1, (SET-2) | ✅ |
 | DB-2 | Seed divisions / districts / upazilas | Afridi | S | S2 | DB-1 | ✅ |
-| DB-3 | Migrations: pets, breeds, ownership history, health tables, pet_documents | Zihad | L | S2 | DB-1, (DB-6) | ⬜ |
+| DB-3 | Migrations: pets, breeds, ownership history, health tables, pet_documents | Zihad | L | S2 | DB-1, (DB-6) | ✅ |
 | DB-4 | Migrations: providers, locations, hours, vets, services | Zimia | M | S2 | DB-1, (DB-6) | ⬜ |
 | DB-5 | Migrations: bookings, availability (slots + serials) | Tain | M | S2 | DB-1, (DB-3), (DB-4) | ⬜ |
 | DB-6 | RLS framework: `has_role`/`is_admin` helpers, pgTAP harness, core-table policies (each owner adds policies + tests for their own tables) | Afridi | L | S2 | DB-1 | ✅ |
