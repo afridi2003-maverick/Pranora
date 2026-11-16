@@ -2,7 +2,6 @@ import type { RoleStatus, UserRole } from '@pranora/types';
 import type { TypedSupabaseClient } from '../client';
 
 export interface VerificationRequest {
-  id: string;
   user_id: string;
   role: UserRole;
   status: RoleStatus;

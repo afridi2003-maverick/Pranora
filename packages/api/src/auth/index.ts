@@ -2,10 +2,12 @@ import type { UserRole, RoleStatus } from '@pranora/types';
 import type { TypedSupabaseClient } from '../client';
 
 export interface UserRoleRecord {
-  id: string;
   user_id: string;
   role: UserRole;
   status: RoleStatus;
+  verified_at?: string | null;
+  verified_by?: string | null;
+  created_at?: string;
 }
 
 export async function getUserRoles(
