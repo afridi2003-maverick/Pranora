@@ -1,0 +1,26 @@
+{
+  "pageTitle": "বিজ্ঞপ্তি",
+  "empty": "কোনো বিজ্ঞপ্তি নেই",
+  "markAllRead": "সব পড়া হিসেবে চিহ্নিত করুন",
+  "types": {
+    "booking_confirmed": "বুকিং নিশ্চিত হয়েছে",
+    "booking_cancelled": "বুকিং বাতিল হয়েছে",
+    "booking_reminder": "বুকিং স্মরণিকা",
+    "vaccine_due": "টিকার সময় হয়েছে",
+    "rescue_assigned": "উদ্ধার নিযুক্ত করা হয়েছে",
+    "rescue_update": "উদ্ধারের আপডেট",
+    "adoption_update": "দত্তকের আপডেট",
+    "urgent_rescue": "জরুরি উদ্ধার রিপোর্ট",
+    "otp": "OTP কোড",
+    "system": "সিস্টেম বিজ্ঞপ্তি"
+  },
+  "otp": {
+    "message": "আপনার Pranora OTP: {{code}}। ৫ মিনিটের মধ্যে ব্যবহার করুন। কাউকে শেয়ার করবেন না।",
+    "subject": "Pranora OTP যাচাইকরণ"
+  },
+  "urgentRescue": {
+    "title": "জরুরি উদ্ধার রিপোর্ট",
+    "body": "{{area}}-এ {{species}} — অবিলম্বে মনোযোগ দিন",
+    "escalated": "কেসটি এস্কেলেট করা হয়েছে — {{minutes}} মিনিট কোনো সাড়া নেই"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "pageTitle": "Adoption",
+  "browse": {
+    "title": "Available for Adoption",
+    "filters": {
+      "species": "Species",
+      "age": "Age",
+      "district": "District",
+      "clear": "Clear Filters"
+    },
+    "empty": "No animals available for adoption right now",
+    "loginForMore": "Log in to see more details"
+  },
+  "listing": {
+    "create": "Create Listing",
+    "edit": "Edit Listing",
+    "withdraw": "Withdraw Listing",
+    "status": {
+      "draft": "Draft",
+      "available": "Available",
+      "reserved": "Reserved",
+      "adopted": "Adopted",
+      "withdrawn": "Withdrawn",
+      "removed": "Removed"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "photos": "Photos",
+      "fee": "Adoption fee (if any)",
+      "requirements": "Applicant requirements",
+      "district": "District",
+      "upazila": "Upazila"
+    },
+    "verifiedOnly": "Only verified shelters and approved individuals may create listings",
+    "humanDecides": "Decisions are always made by humans"
+  },
+  "application": {
+    "apply": "Apply to Adopt",
+    "myApplications": "My Applications",
+    "status": {
+      "submitted": "Submitted",
+      "underReview": "Under Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "fields": {
+      "homeType": "Home Type",
+      "hasYard": "Has a yard",
+      "otherPets": "Has other pets",
+      "experience": "Experience with pets",
+      "reason": "Reason for adopting",
+      "references": "References"
+    },
+    "homeType": {
+      "own_house": "Own House",
+      "rented_house": "Rented House",
+      "own_flat": "Own Flat",
+      "rented_flat": "Rented Flat",
+      "other": "Other"
+    }
+  },
+  "handover": {
+    "title": "Adoption Handover",
+    "confirm": "Confirm Handover",
+    "profileTransferred": "Profile transferred to new owner",
+    "oneHandoverOnly": "Only one handover per listing"
+  }
+}

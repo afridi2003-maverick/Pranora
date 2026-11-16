@@ -1047,6 +1047,19 @@ Creates a booking atomically with double-booking prevention and short code gener
 - **Query parameters:** `?locationId=<uuid>&vetId=<uuid>&serviceId=<uuid>&bookingType=<type>&date=<YYYY-MM-DD>`
 - Handled by Zimia (MAP-6 "বুক করুন" button) and Tain (APT-1 booking screen).
 
+### 5.5 Pet & Health Functions (Zihad — DB-3)
+
+#### 1. `register_pet_ownership(p_pet_id uuid)`
+- **Purpose:** Initializes ownership history when a pet profile is first created.
+- **Access:** Security definer; callable by authenticated users.
+- **Logic:** Looks up `owner_id` on `pets` and records an initial row in `pet_ownership_history` with `reason = 'registered'`.
+
+#### 2. `generate_vaccine_schedule(p_pet_id uuid, p_template_id integer)`
+- **Purpose:** Generates upcoming vaccination due dates from a species vaccine template.
+- **Access:** Security definer; callable by authenticated users.
+- **Logic:** Computes the first due date from `coalesce(pets.date_of_birth, current_date) + (first_dose_age_weeks * 7)` and loops over the template dose count, populating `vaccinations` with scheduled dates.
+
+
 ---
 
 ## 6. Row Level Security (summary)

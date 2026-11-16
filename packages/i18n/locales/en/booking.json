@@ -1,0 +1,53 @@
+{
+  "pageTitle": "Booking",
+  "book": "Book",
+  "selectService": "Select Service",
+  "selectPet": "Select Pet",
+  "selectDate": "Select Date",
+  "selectSlot": "Select Time Slot",
+  "serialMode": "Take a Serial Number",
+  "serialInfo": "Your serial: {{number}}",
+  "confirmBooking": "Confirm Booking",
+  "myBookings": "My Bookings",
+  "upcoming": "Upcoming",
+  "past": "Past",
+  "noBookings": "No bookings yet",
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelledByOwner": "Cancelled by you",
+    "cancelledByProvider": "Cancelled by clinic",
+    "noShow": "No Show",
+    "expired": "Expired"
+  },
+  "cancel": {
+    "label": "Cancel Booking",
+    "confirm": "Are you sure? This booking will be cancelled.",
+    "cutoffWarning": "The clinic's cancellation deadline has passed"
+  },
+  "reschedule": {
+    "label": "Reschedule",
+    "confirm": "Confirm New Time"
+  },
+  "payment": {
+    "method": "Payment Method",
+    "cash": "Cash at Clinic",
+    "bkash": "bKash",
+    "nagad": "Nagad",
+    "rocket": "Rocket",
+    "card": "Card",
+    "amount": "Amount",
+    "fee": "Fee"
+  },
+  "summary": {
+    "clinic": "Clinic",
+    "service": "Service",
+    "pet": "Pet",
+    "date": "Date",
+    "time": "Time",
+    "serial": "Serial",
+    "vet": "Vet"
+  }
+}

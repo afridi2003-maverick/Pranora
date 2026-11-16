@@ -1,0 +1,68 @@
+{
+  "pageTitle": "স্বাস্থ্য রেকর্ড",
+  "vaccines": {
+    "label": "টিকা",
+    "add": "টিকা যোগ করুন",
+    "schedule": "টিকার সময়সূচি",
+    "dueOn": "{{date}}-এ প্রদেয়",
+    "overdueBy": "{{days}} দিন দেরি হয়েছে",
+    "givenOn": "{{date}}-এ দেওয়া হয়েছে",
+    "nextDue": "পরবর্তী টিকা",
+    "upToDate": "টিকা আপ টু ডেট",
+    "overdue": "টিকার মেয়াদ পার হয়েছে",
+    "types": {
+      "rabies": "জলাতঙ্ক",
+      "dhpp": "DHPP",
+      "bordetella": "বোর্ডেটেলা",
+      "leptospirosis": "লেপ্টোস্পাইরোসিস",
+      "fvrcp": "FVRCP",
+      "felv": "FeLV",
+      "deworming": "কৃমিনাশক",
+      "fleaTick": "মাছি ও টিক প্রতিরোধ",
+      "custom": "অন্যান্য"
+    }
+  },
+  "medicalHistory": {
+    "label": "চিকিৎসার ইতিহাস",
+    "vetWritten": "পশু চিকিৎসক কর্তৃক লিখিত",
+    "ownerReadOnly": "শুধু পড়ার অনুমতি",
+    "noRecords": "কোনো রেকর্ড নেই",
+    "addRecord": "রেকর্ড যোগ করুন",
+    "diagnosis": "রোগ নির্ণয়",
+    "treatment": "চিকিৎসা",
+    "prescription": "প্রেসক্রিপশন",
+    "notes": "নোট",
+    "visitDate": "পরিদর্শনের তারিখ"
+  },
+  "vetNotes": {
+    "label": "চিকিৎসকের নোট",
+    "findings": "পরীক্ষার ফলাফল",
+    "treatment": "চিকিৎসা",
+    "followUp": "ফলো-আপ"
+  },
+  "reminders": {
+    "label": "স্মরণিকা",
+    "set": "স্মরণিকা সেট করুন",
+    "vaccine": "টিকার স্মরণিকা",
+    "deworming": "কৃমিনাশক স্মরণিকা",
+    "checkup": "স্বাস্থ্য পরীক্ষার স্মরণিকা",
+    "medicine": "ওষুধের স্মরণিকা",
+    "fleaTick": "মাছি ও টিক প্রতিরোধ স্মরণিকা"
+  },
+  "disclaimer": "এটি চিকিৎসকের পরামর্শের বিকল্প নয়",
+  "weightLog": {
+    "label": "ওজনের রেকর্ড",
+    "current": "বর্তমান ওজন",
+    "add": "ওজন যোগ করুন"
+  },
+  "documents": {
+    "label": "নথিপত্র",
+    "add": "নথি যোগ করুন",
+    "types": {
+      "vaccineCard": "টিকার কার্ড",
+      "prescription": "প্রেসক্রিপশন",
+      "labReport": "ল্যাব রিপোর্ট",
+      "other": "অন্যান্য"
+    }
+  }
+}

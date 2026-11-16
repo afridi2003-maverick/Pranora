@@ -1,0 +1,31 @@
+{
+  "pageTitle": "সেবাসমূহ",
+  "catalog": {
+    "title": "সব সেবা",
+    "subtitle": "আপনার পোষা প্রাণীর জন্য যা প্রয়োজন"
+  },
+  "types": {
+    "vet_appointment": "পশু ডাক্তার দেখানো",
+    "vaccination": "টিকা",
+    "emergency": "জরুরি সেবা",
+    "rescue": "উদ্ধার সেবা",
+    "adoption": "দত্তক",
+    "grooming": "গ্রুমিং",
+    "boarding": "বোর্ডিং",
+    "home_visit": "বাড়িতে ডাক্তার",
+    "online_consult": "অনলাইন পরামর্শ",
+    "pet_shop": "পেট শপ",
+    "training": "প্রশিক্ষণ",
+    "sitting": "পেট সিটিং",
+    "taxi": "পেট ট্যাক্সি"
+  },
+  "phase": {
+    "mvp": "এখনই পাওয়া যায়",
+    "coming": "শীঘ্রই আসছে"
+  },
+  "tips": {
+    "title": "পরামর্শ ও নিবন্ধ",
+    "readMore": "আরও পড়ুন",
+    "disclaimer": "এটি চিকিৎসকের পরামর্শের বিকল্প নয়"
+  }
+}

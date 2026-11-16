@@ -1,0 +1,53 @@
+{
+  "pageTitle": "বুকিং",
+  "book": "বুক করুন",
+  "selectService": "সেবা বেছে নিন",
+  "selectPet": "পোষা প্রাণী বেছে নিন",
+  "selectDate": "তারিখ বেছে নিন",
+  "selectSlot": "সময় বেছে নিন",
+  "serialMode": "সিরিয়াল নম্বর নিন",
+  "serialInfo": "আপনার সিরিয়াল: {{number}}",
+  "confirmBooking": "বুকিং নিশ্চিত করুন",
+  "myBookings": "আমার বুকিং",
+  "upcoming": "আসন্ন",
+  "past": "অতীত",
+  "noBookings": "কোনো বুকিং নেই",
+  "status": {
+    "pending": "অপেক্ষামান",
+    "confirmed": "নিশ্চিত হয়েছে",
+    "inProgress": "চলছে",
+    "completed": "সম্পন্ন",
+    "cancelledByOwner": "আপনি বাতিল করেছেন",
+    "cancelledByProvider": "ক্লিনিক বাতিল করেছে",
+    "noShow": "উপস্থিত হননি",
+    "expired": "মেয়াদ শেষ"
+  },
+  "cancel": {
+    "label": "বুকিং বাতিল করুন",
+    "confirm": "আপনি কি নিশ্চিত? বুকিং বাতিল হয়ে যাবে।",
+    "cutoffWarning": "ক্লিনিকের বাতিলের সময়সীমা পার হয়ে গেছে"
+  },
+  "reschedule": {
+    "label": "নতুন সময় নিন",
+    "confirm": "নতুন সময় নিশ্চিত করুন"
+  },
+  "payment": {
+    "method": "পেমেন্টের পদ্ধতি",
+    "cash": "ক্লিনিকে নগদ",
+    "bkash": "বিকাশ",
+    "nagad": "নগদ",
+    "rocket": "রকেট",
+    "card": "কার্ড",
+    "amount": "পরিমাণ",
+    "fee": "ফি"
+  },
+  "summary": {
+    "clinic": "ক্লিনিক",
+    "service": "সেবা",
+    "pet": "পোষা প্রাণী",
+    "date": "তারিখ",
+    "time": "সময়",
+    "serial": "সিরিয়াল",
+    "vet": "চিকিৎসক"
+  }
+}

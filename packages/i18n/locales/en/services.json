@@ -1,0 +1,31 @@
+{
+  "pageTitle": "Services",
+  "catalog": {
+    "title": "All Services",
+    "subtitle": "Everything your pet needs"
+  },
+  "types": {
+    "vet_appointment": "Vet Appointment",
+    "vaccination": "Vaccination",
+    "emergency": "Emergency Help",
+    "rescue": "Animal Rescue",
+    "adoption": "Adoption",
+    "grooming": "Grooming",
+    "boarding": "Boarding",
+    "home_visit": "Home Visit",
+    "online_consult": "Online Consultation",
+    "pet_shop": "Pet Shop",
+    "training": "Training",
+    "sitting": "Pet Sitting",
+    "taxi": "Pet Taxi"
+  },
+  "phase": {
+    "mvp": "Available now",
+    "coming": "Coming soon"
+  },
+  "tips": {
+    "title": "Tips & Articles",
+    "readMore": "Read More",
+    "disclaimer": "This is not a substitute for a vet's advice"
+  }
+}
