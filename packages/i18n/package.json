@@ -11,15 +11,26 @@
     "./formatters": "./src/formatters.ts",
     "./locale": "./src/locale.ts",
     "./keys": "./src/keys.ts",
+    "./persistence": "./src/persistence.ts",
+    "./context": "./src/context.tsx",
     "./locales/*": "./locales/*"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@pranora/types": "workspace:*"
   },
   "devDependencies": {
+    "@types/react": "^18.3.18",
     "typescript": "^5.8.0"
   }
 }
