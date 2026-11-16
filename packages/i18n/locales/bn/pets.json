@@ -1,0 +1,62 @@
+{
+  "pageTitle": "পোষা প্রাণী",
+  "add": "পোষা প্রাণী যোগ করুন",
+  "edit": "পোষা প্রাণী সম্পাদনা করুন",
+  "delete": "পোষা প্রাণী মুছুন",
+  "deleteConfirm": "আপনি কি নিশ্চিত? এই প্রোফাইলটি মুছে ফেলা হবে।",
+  "profile": "প্রোফাইল",
+  "myPets": "আমার পোষা প্রাণী",
+  "noPets": "কোনো পোষা প্রাণী নেই",
+  "noPetsDesc": "এখনই একটি পোষা প্রাণীর প্রোফাইল তৈরি করুন।",
+  "fields": {
+    "name": "নাম",
+    "namePlaceholder": "আপনার পোষা প্রাণীর নাম",
+    "species": "প্রজাতি",
+    "breed": "জাত",
+    "breedUnknown": "অজানা",
+    "gender": "লিঙ্গ",
+    "birthDate": "জন্ম তারিখ",
+    "birthDateApprox": "আনুমানিক জন্ম তারিখ",
+    "color": "রং",
+    "weight": "ওজন (কেজি)",
+    "microchipId": "মাইক্রোচিপ নম্বর",
+    "photo": "ছবি",
+    "isNeutered": "নিউটার/স্পে করা হয়েছে",
+    "notes": "বিশেষ নোট"
+  },
+  "species": {
+    "dog": "কুকুর",
+    "cat": "বিড়াল",
+    "bird": "পাখি",
+    "rabbit": "খরগোশ",
+    "fish": "মাছ",
+    "cow": "গরু",
+    "goat": "ছাগল",
+    "poultry": "হাঁস-মুরগি",
+    "other": "অন্যান্য"
+  },
+  "gender": {
+    "male": "পুরুষ",
+    "female": "স্ত্রী",
+    "unknown": "অজানা"
+  },
+  "age": {
+    "label": "বয়স",
+    "years_one": "{{count}} বছর",
+    "years_other": "{{count}} বছর",
+    "months_one": "{{count}} মাস",
+    "months_other": "{{count}} মাস",
+    "lessThanMonth": "১ মাসের কম",
+    "approx": "আনুমানিক"
+  },
+  "ownership": {
+    "currentOwner": "বর্তমান মালিক",
+    "history": "মালিকানার ইতিহাস",
+    "transferredOn": "হস্তান্তরিত: {{date}}",
+    "oneProfileForLife": "এই প্রোফাইলটি সারাজীবনের জন্য"
+  },
+  "qr": {
+    "label": "QR পরিচয়পত্র",
+    "download": "ডাউনলোড করুন"
+  }
+}

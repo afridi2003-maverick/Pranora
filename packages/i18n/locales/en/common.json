@@ -2,18 +2,109 @@
   "appName": "Pranora",
   "tagline": "Complete care for your pet, all in one place",
   "emergency": "Emergency Help",
+  "language": {
+    "bangla": "বাংলা",
+    "english": "English",
+    "switchTo": "বাংলায় দেখুন",
+    "current": "Current language: English"
+  },
+  "nav": {
+    "home": "Home",
+    "map": "Map",
+    "rescue": "Rescue",
+    "adoption": "Adoption",
+    "services": "Services",
+    "profile": "Profile",
+    "notifications": "Notifications"
+  },
   "actions": {
     "confirm": "Confirm",
     "cancel": "Cancel",
     "save": "Save",
     "call": "Call",
     "directions": "Directions",
-    "book": "Book"
+    "book": "Book",
+    "retry": "Try Again",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "share": "Share",
+    "report": "Report",
+    "close": "Close",
+    "skip": "Skip",
+    "allow": "Allow",
+    "deny": "Deny",
+    "upload": "Upload",
+    "viewAll": "View All",
+    "readMore": "Read More",
+    "getHelp": "Get Help",
+    "continue": "Continue",
+    "submit": "Submit",
+    "apply": "Apply",
+    "accept": "Accept",
+    "decline": "Decline",
+    "approve": "Approve",
+    "reject": "Reject"
   },
   "states": {
     "loading": "Loading...",
     "empty": "No items found",
-    "error": "Something went wrong. Please try again."
+    "error": "Something went wrong. Please try again.",
+    "noInternet": "No internet connection",
+    "noResults": "No results found",
+    "success": "Success",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "submitting": "Submitting...",
+    "updating": "Updating..."
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "network": "Network connection error",
+    "unauthorized": "You do not have access",
+    "notFound": "Not found",
+    "serverError": "Server error",
+    "timeout": "Request timed out",
+    "required": "This field is required",
+    "invalidPhone": "Enter a valid phone number",
+    "invalidEmail": "Enter a valid email address",
+    "tooShort": "Too short",
+    "tooLong": "Too long"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "now": "Now",
+    "minutesAgo": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago",
+    "just": "Just now",
+    "open": "Open",
+    "closed": "Closed",
+    "opensAt": "Opens at {{time}}",
+    "closesAt": "Closes at {{time}}",
+    "open247": "Open 24/7",
+    "openNow": "Open Now"
+  },
+  "units": {
+    "km": "km",
+    "m": "m",
+    "kg": "kg",
+    "g": "g",
+    "currency": "৳",
+    "years": "years",
+    "months": "months",
+    "weeks": "weeks",
+    "days": "days"
+  },
+  "disclaimer": {
+    "notVetAdvice": "This is not a substitute for a vet's advice",
+    "humanDecides": "Decisions are always made by humans, not AI"
   }
 }
-

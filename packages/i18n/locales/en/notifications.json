@@ -1,0 +1,26 @@
+{
+  "pageTitle": "Notifications",
+  "empty": "No notifications",
+  "markAllRead": "Mark all as read",
+  "types": {
+    "booking_confirmed": "Booking confirmed",
+    "booking_cancelled": "Booking cancelled",
+    "booking_reminder": "Booking reminder",
+    "vaccine_due": "Vaccine due",
+    "rescue_assigned": "Rescue assigned",
+    "rescue_update": "Rescue update",
+    "adoption_update": "Adoption update",
+    "urgent_rescue": "Urgent rescue report",
+    "otp": "OTP Code",
+    "system": "System notification"
+  },
+  "otp": {
+    "message": "Your Pranora OTP: {{code}}. Use within 5 minutes. Never share it.",
+    "subject": "Pranora OTP Verification"
+  },
+  "urgentRescue": {
+    "title": "Urgent Rescue Report",
+    "body": "{{species}} in {{area}} — needs immediate attention",
+    "escalated": "Case escalated — no response in {{minutes}} minutes"
+  }
+}

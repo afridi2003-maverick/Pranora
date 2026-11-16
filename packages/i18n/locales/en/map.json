@@ -1,0 +1,60 @@
+{
+  "pageTitle": "Map & Clinics",
+  "nearbyVets": "Nearby Vets",
+  "searchArea": "Search Area",
+  "searchPlaceholder": "Dhanmondi, Mirpur 10...",
+  "useMyLocation": "Use My Location",
+  "locationDenied": "Location permission denied. Search by area name.",
+  "noGps": "GPS is off. Search by area name.",
+  "noResults": "No clinics found in this area",
+  "offline": "No internet connection. Cannot load nearby clinics.",
+  "filters": {
+    "openNow": "Open Now",
+    "open247": "24/7",
+    "emergency": "Emergency",
+    "species": "Species",
+    "fee": "Fee",
+    "govt": "Government",
+    "private": "Private"
+  },
+  "emergency": {
+    "mode": "Emergency Mode",
+    "modeDesc": "Only clinics open now or 24/7, nearest first",
+    "call": "Emergency Call",
+    "button": "Emergency Help",
+    "activate": "Activate Emergency Mode"
+  },
+  "clinic": {
+    "open": "Open",
+    "closed": "Closed",
+    "open247": "Open 24/7",
+    "emergency": "Emergency services available",
+    "govt": "Government",
+    "verified": "Verified",
+    "bvcRegistered": "BVC Registered",
+    "fee": "Consultation Fee",
+    "feeRange": "৳{{min}}–{{max}}",
+    "distance": "{{distance}} away",
+    "call": "Call",
+    "directions": "Directions",
+    "book": "Book",
+    "detail": "View Details",
+    "services": "Services",
+    "hours": "Hours",
+    "vets": "Vets"
+  },
+  "booking": {
+    "mode": {
+      "slot": "Time Slot",
+      "serial": "Serial Number"
+    }
+  },
+  "picker": {
+    "division": "Division",
+    "district": "District",
+    "upazila": "Upazila",
+    "selectDivision": "Select Division",
+    "selectDistrict": "Select District",
+    "selectUpazila": "Select Upazila"
+  }
+}

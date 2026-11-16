@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src"
+    "baseUrl": ".",
+    "paths": {
+      "@pranora/types": ["../types/src/index.ts"]
+    },
+    "skipLibCheck": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "../types/src/**/*"]
 }
-

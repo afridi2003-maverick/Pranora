@@ -1,0 +1,64 @@
+{
+  "pageTitle": "Rescue",
+  "report": {
+    "title": "Report an Animal",
+    "subtitle": "For injured, lost, found or abandoned animals",
+    "types": {
+      "injured": "Injured",
+      "lost": "Lost",
+      "found": "Found",
+      "abandoned": "Abandoned"
+    },
+    "urgency": {
+      "label": "Urgency",
+      "critical": "Critical (seriously injured)",
+      "high": "High (needs immediate help)",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "fields": {
+      "photos": "Photos",
+      "photosHint": "EXIF / GPS data will be automatically removed",
+      "location": "Location",
+      "locationHint": "Tap on the map or use your current location",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the animal's condition in detail",
+      "species": "Species",
+      "lastSeen": "Last seen (for lost pets)",
+      "myPet": "Link to my pet"
+    },
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "submitted": "Report submitted"
+  },
+  "status": {
+    "label": "Case Status",
+    "submitted": "Submitted",
+    "reviewing": "Under Review",
+    "inProgress": "Rescue in Progress",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "case": {
+    "title": "Case Details",
+    "assignedRescuer": "Assigned Rescuer",
+    "updates": "Updates",
+    "outcome": "Outcome",
+    "close": "Close Case",
+    "notes": "Case Notes",
+    "photos": "Photo Updates"
+  },
+  "myReports": {
+    "title": "My Reports",
+    "empty": "You haven't filed any reports yet"
+  },
+  "rescuer": {
+    "accept": "Accept Rescue Assignment",
+    "decline": "Decline Assignment",
+    "assigned": "You have been assigned"
+  },
+  "alert": {
+    "urgent": "Urgent report! Needs immediate attention.",
+    "escalated": "Case has been escalated"
+  }
+}

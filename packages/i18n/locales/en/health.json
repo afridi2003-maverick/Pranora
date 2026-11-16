@@ -1,0 +1,68 @@
+{
+  "pageTitle": "Health Records",
+  "vaccines": {
+    "label": "Vaccines",
+    "add": "Add Vaccine",
+    "schedule": "Vaccine Schedule",
+    "dueOn": "Due {{date}}",
+    "overdueBy": "Overdue by {{days}} days",
+    "givenOn": "Given {{date}}",
+    "nextDue": "Next Vaccine Due",
+    "upToDate": "Vaccines up to date",
+    "overdue": "Vaccine overdue",
+    "types": {
+      "rabies": "Rabies",
+      "dhpp": "DHPP",
+      "bordetella": "Bordetella",
+      "leptospirosis": "Leptospirosis",
+      "fvrcp": "FVRCP",
+      "felv": "FeLV",
+      "deworming": "Deworming",
+      "fleaTick": "Flea & Tick Prevention",
+      "custom": "Other"
+    }
+  },
+  "medicalHistory": {
+    "label": "Medical History",
+    "vetWritten": "Written by vet",
+    "ownerReadOnly": "Read-only for owner",
+    "noRecords": "No records yet",
+    "addRecord": "Add Record",
+    "diagnosis": "Diagnosis",
+    "treatment": "Treatment",
+    "prescription": "Prescription",
+    "notes": "Notes",
+    "visitDate": "Visit Date"
+  },
+  "vetNotes": {
+    "label": "Vet Notes",
+    "findings": "Findings",
+    "treatment": "Treatment",
+    "followUp": "Follow-up"
+  },
+  "reminders": {
+    "label": "Reminders",
+    "set": "Set Reminder",
+    "vaccine": "Vaccine Reminder",
+    "deworming": "Deworming Reminder",
+    "checkup": "Check-up Reminder",
+    "medicine": "Medicine Reminder",
+    "fleaTick": "Flea & Tick Reminder"
+  },
+  "disclaimer": "This is not a substitute for a vet's advice",
+  "weightLog": {
+    "label": "Weight Log",
+    "current": "Current Weight",
+    "add": "Add Weight"
+  },
+  "documents": {
+    "label": "Documents",
+    "add": "Add Document",
+    "types": {
+      "vaccineCard": "Vaccine Card",
+      "prescription": "Prescription",
+      "labReport": "Lab Report",
+      "other": "Other"
+    }
+  }
+}

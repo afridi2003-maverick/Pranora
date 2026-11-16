@@ -1,0 +1,19 @@
+{
+  "pageTitle": "AI Assistant",
+  "greeting": "I'm the Pranora assistant. Ask me anything about your pet.",
+  "placeholder": "Type your question...",
+  "send": "Send",
+  "thinking": "Thinking...",
+  "disclaimer": "This is not a substitute for a vet's advice",
+  "emergencyDetected": "Your pet may be in danger. Contact a vet immediately.",
+  "goToMap": "Find Nearby Clinics",
+  "bookingHelp": "Can I help you book an appointment?",
+  "bookingConfirm": "Shall I book this appointment?",
+  "noDiagnosis": "I cannot diagnose. Please consult a vet.",
+  "noMedicine": "I cannot recommend medicine or dosages.",
+  "handoff": "Would you like to speak to a specialist?",
+  "petContext": "May I use your pet's information? (Never without your consent)",
+  "allowContext": "Yes, allow",
+  "denyContext": "No, thanks",
+  "sessionLabel": "Conversation"
+}

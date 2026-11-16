@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Pets",
+  "add": "Add Pet",
+  "edit": "Edit Pet",
+  "delete": "Delete Pet",
+  "deleteConfirm": "Are you sure? This profile will be permanently deleted.",
+  "profile": "Profile",
+  "myPets": "My Pets",
+  "noPets": "No pets yet",
+  "noPetsDesc": "Create a pet profile to get started.",
+  "fields": {
+    "name": "Name",
+    "namePlaceholder": "Your pet's name",
+    "species": "Species",
+    "breed": "Breed",
+    "breedUnknown": "Unknown",
+    "gender": "Gender",
+    "birthDate": "Date of Birth",
+    "birthDateApprox": "Approximate Date of Birth",
+    "color": "Colour",
+    "weight": "Weight (kg)",
+    "microchipId": "Microchip ID",
+    "photo": "Photo",
+    "isNeutered": "Neutered / Spayed",
+    "notes": "Special Notes"
+  },
+  "species": {
+    "dog": "Dog",
+    "cat": "Cat",
+    "bird": "Bird",
+    "rabbit": "Rabbit",
+    "fish": "Fish",
+    "cow": "Cow",
+    "goat": "Goat",
+    "poultry": "Poultry",
+    "other": "Other"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "unknown": "Unknown"
+  },
+  "age": {
+    "label": "Age",
+    "years_one": "{{count}} year",
+    "years_other": "{{count}} years",
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "lessThanMonth": "Less than 1 month",
+    "approx": "approx."
+  },
+  "ownership": {
+    "currentOwner": "Current Owner",
+    "history": "Ownership History",
+    "transferredOn": "Transferred: {{date}}",
+    "oneProfileForLife": "One profile for life"
+  },
+  "qr": {
+    "label": "QR ID Card",
+    "download": "Download"
+  }
+}
