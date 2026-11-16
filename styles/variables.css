@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Color Tokens - Light Mode */
+  --color-green-50: #E1F3E1;
+  --color-green-100: #B8E6B5;
+  --color-green-200: #8CD2A3;
+  --color-green-300: #6BBF8B;
+  --color-green-400: #4BA772;
+  --color-green-500: #3A9A63;
+  --color-green-600: #2F7B53;
+  --color-green-700: #256E4C;
+  --color-green-800: #1D5A3F;
+  --color-green-900: #154537;
+
+  --color-lime-300: #BEF264;
+  --color-lime-400: #A3E635;
+  --color-lime-500: #84CC16;
+
+  --color-emergency-50: #FEF2F2;
+  --color-emergency-500: #EF4444;
+  --color-emergency-600: #DC2626;
+  --color-emergency-700: #B91C1C;
+
+  /* Semantic Theme Roles - Light */
+  --bg-app: #FAFCFA;
+  --surface-card: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-tinted: #E1F3E1;
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --border-glass: rgba(0, 0, 0, 0.08);
+
+  --text-primary: rgba(0, 0, 0, 0.90);
+  --text-secondary: rgba(0, 0, 0, 0.62);
+  --text-disabled: rgba(0, 0, 0, 0.38);
+  --text-inverse: #FFFFFF;
+
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-medium: rgba(0, 0, 0, 0.16);
+  --border-active: #8CD2A3;
+  --border-focus: #2F7B53;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-3: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+  /* Typography */
+  --font-bangla: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  --font-english: 'Inter', system-ui, -apple-system, sans-serif;
+  --line-height-bn: 1.65;
+  --line-height-en: 1.45;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+}
+
+[data-theme="dark"] {
+  /* Semantic Theme Roles - Dark Forest Theme */
+  --bg-app: #0D2018;
+  --surface-card: #15392B;
+  --surface-elevated: #1D4937;
+  --surface-tinted: rgba(47, 123, 83, 0.25);
+  --surface-glass: rgba(21, 57, 43, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.12);
+
+  --text-primary: rgba(255, 255, 255, 0.96);
+  --text-secondary: rgba(255, 255, 255, 0.68);
+  --text-disabled: rgba(255, 255, 255, 0.40);
+  --text-inverse: #0D2018;
+
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-medium: rgba(255, 255, 255, 0.22);
+  --border-active: #4BA772;
+  --border-focus: #A3E635;
+
+  --shadow-1: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 8px 36px rgba(0, 0, 0, 0.60);
+}
