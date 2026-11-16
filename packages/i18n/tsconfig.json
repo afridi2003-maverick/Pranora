@@ -2,9 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "jsx": "react-jsx",
     "paths": {
       "@pranora/types": ["../types/src/index.ts"]
     },
+    "typeRoots": ["../ui/node_modules/@types"],
     "skipLibCheck": true
   },
   "include": ["src/**/*", "../types/src/**/*"]

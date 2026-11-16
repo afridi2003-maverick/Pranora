@@ -347,7 +347,13 @@ importers:
       '@pranora/types':
         specifier: workspace:*
         version: link:../types
+      react:
+        specifier: '>=18.0.0'
+        version: 18.3.1
     devDependencies:
+      '@types/react':
+        specifier: ^18.3.18
+        version: 18.3.31
       typescript:
         specifier: ^5.8.0
         version: 5.9.3

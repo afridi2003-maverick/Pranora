@@ -1,9 +1,11 @@
+import React from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { LocaleProvider } from '@pranora/i18n';
 
 export default function RootLayout() {
   return (
-    <>
+    <LocaleProvider>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -23,7 +25,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-    </>
+    </LocaleProvider>
   );
 }
-
