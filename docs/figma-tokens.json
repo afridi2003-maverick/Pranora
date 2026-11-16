@@ -1,0 +1,168 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "name": "Pranora Design Tokens",
+  "version": "1.0.0",
+  "description": "Figma foundations and design tokens for Pranora (Android, iOS, Web) — Bangla-first",
+  "color": {
+    "green": {
+      "50": { "value": "#E1F3E1", "type": "color", "description": "App background tint, selected chip background, info banners" },
+      "100": { "value": "#B8E6B5", "type": "color", "description": "Hover/pressed backgrounds, progress track, due soon background" },
+      "200": { "value": "#8CD2A3", "type": "color", "description": "Borders on active cards, disabled primary button" },
+      "300": { "value": "#6BBF8B", "type": "color", "description": "Illustrations, map cluster fill, chart secondary" },
+      "400": { "value": "#4BA772", "type": "color", "description": "Icons, open now dot, completed checkmark" },
+      "500": { "value": "#3A9A63", "type": "color", "description": "Map marker, large headings, focus ring (not for small text on white)" },
+      "600": { "value": "#2F7B53", "type": "color", "description": "Primary brand color — buttons, active tab, links, small text on white (WCAG AA 5.2:1)" },
+      "700": { "value": "#256E4C", "type": "color", "description": "Button hover/pressed, selected tab label" },
+      "800": { "value": "#1D5A3F", "type": "color", "description": "Headers on light backgrounds, dark-mode surfaces" },
+      "900": { "value": "#154537", "type": "color", "description": "Footer, dark hero sections, dark-mode background" }
+    },
+    "base": {
+      "white": { "value": "#FFFFFF", "type": "color", "description": "Cards, sheets, text on green-600+ and red" },
+      "black": { "value": "#000000", "type": "color", "description": "Base black for text opacities" },
+      "red": { "value": "#FF0000", "type": "color", "description": "Emergency only — emergency button, emergency map pins, overdue vaccine, errors, destructive actions" }
+    },
+    "text": {
+      "primary": { "value": "rgba(0, 0, 0, 0.87)", "type": "color", "description": "Primary body and heading text (87% black)" },
+      "secondary": { "value": "rgba(0, 0, 0, 0.60)", "type": "color", "description": "Secondary labels and captions (60% black)" },
+      "disabled": { "value": "rgba(0, 0, 0, 0.38)", "type": "color", "description": "Disabled text and hints (38% black)" },
+      "inverse": { "value": "#FFFFFF", "type": "color", "description": "Text on primary and emergency surfaces" }
+    },
+    "border": {
+      "subtle": { "value": "rgba(0, 0, 0, 0.12)", "type": "color", "description": "Card borders, dividers, inactive chip borders" },
+      "active": { "value": "#8CD2A3", "type": "color", "description": "Active card borders (green-200)" },
+      "focus": { "value": "#3A9A63", "type": "color", "description": "Focus ring outline (green-500)" },
+      "emergency": { "value": "#FF0000", "type": "color", "description": "Emergency card borders" }
+    },
+    "semantic": {
+      "primary": { "value": "{color.green.600}", "type": "color" },
+      "primaryHover": { "value": "{color.green.700}", "type": "color" },
+      "emergency": { "value": "{color.base.red}", "type": "color" },
+      "surface": { "value": "{color.base.white}", "type": "color" },
+      "background": { "value": "#FAFCFA", "type": "color", "description": "Subtle green tinted white page background" },
+      "statusPending": { "value": "{color.green.100}", "type": "color" },
+      "statusPendingText": { "value": "{color.green.800}", "type": "color" },
+      "statusConfirmed": { "value": "{color.green.600}", "type": "color" },
+      "statusCompleted": { "value": "{color.green.50}", "type": "color" },
+      "statusCompletedText": { "value": "{color.green.700}", "type": "color" },
+      "statusCancelled": { "value": "rgba(0, 0, 0, 0.12)", "type": "color" },
+      "statusCancelledText": { "value": "rgba(0, 0, 0, 0.60)", "type": "color" }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "bangla": { "value": "Hind Siliguri, Noto Sans Bengali, sans-serif", "type": "fontFamily" },
+      "english": { "value": "Inter, system-ui, sans-serif", "type": "fontFamily" }
+    },
+    "fontWeight": {
+      "regular": { "value": "400", "type": "fontWeight" },
+      "medium": { "value": "500", "type": "fontWeight" },
+      "semibold": { "value": "600", "type": "fontWeight" },
+      "bold": { "value": "700", "type": "fontWeight" }
+    },
+    "scale": {
+      "display": {
+        "fontSize": { "value": "28px", "type": "dimension" },
+        "lineHeight": { "value": "40px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.bold}" }
+      },
+      "h1": {
+        "fontSize": { "value": "24px", "type": "dimension" },
+        "lineHeight": { "value": "34px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.bold}" }
+      },
+      "h2": {
+        "fontSize": { "value": "20px", "type": "dimension" },
+        "lineHeight": { "value": "30px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.semibold}" }
+      },
+      "h3": {
+        "fontSize": { "value": "18px", "type": "dimension" },
+        "lineHeight": { "value": "28px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.semibold}" }
+      },
+      "body": {
+        "fontSize": { "value": "16px", "type": "dimension" },
+        "lineHeight": { "value": "26px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.regular}" }
+      },
+      "bodySmall": {
+        "fontSize": { "value": "14px", "type": "dimension" },
+        "lineHeight": { "value": "22px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.regular}" }
+      },
+      "caption": {
+        "fontSize": { "value": "12px", "type": "dimension" },
+        "lineHeight": { "value": "18px", "type": "dimension" },
+        "fontWeight": { "value": "{typography.fontWeight.medium}" },
+        "description": "Never use below 14px for Bangla body text to avoid clipping vowel diacritics"
+      }
+    }
+  },
+  "spacing": {
+    "1": { "value": "4px", "type": "dimension" },
+    "2": { "value": "8px", "type": "dimension" },
+    "3": { "value": "12px", "type": "dimension" },
+    "4": { "value": "16px", "type": "dimension", "description": "Default screen padding on mobile" },
+    "5": { "value": "20px", "type": "dimension" },
+    "6": { "value": "24px", "type": "dimension", "description": "Tablet padding and section gaps" },
+    "8": { "value": "32px", "type": "dimension" },
+    "10": { "value": "40px", "type": "dimension" }
+  },
+  "borderRadius": {
+    "none": { "value": "0px", "type": "dimension" },
+    "sm": { "value": "4px", "type": "dimension" },
+    "md": { "value": "8px", "type": "dimension", "description": "Inputs, chips, small buttons" },
+    "lg": { "value": "12px", "type": "dimension", "description": "Cards, dialog boxes" },
+    "xl": { "value": "16px", "type": "dimension", "description": "Bottom sheets, large modal dialogs" },
+    "full": { "value": "9999px", "type": "dimension", "description": "Pills, badges, emergency FAB, avatars" }
+  },
+  "boxShadow": {
+    "card": {
+      "value": {
+        "x": "0px",
+        "y": "1px",
+        "blur": "3px",
+        "spread": "0px",
+        "color": "rgba(0, 0, 0, 0.08)"
+      },
+      "type": "boxShadow"
+    },
+    "cardHover": {
+      "value": {
+        "x": "0px",
+        "y": "4px",
+        "blur": "12px",
+        "spread": "0px",
+        "color": "rgba(0, 0, 0, 0.12)"
+      },
+      "type": "boxShadow"
+    },
+    "sheet": {
+      "value": {
+        "x": "0px",
+        "y": "-4px",
+        "blur": "16px",
+        "spread": "0px",
+        "color": "rgba(0, 0, 0, 0.10)"
+      },
+      "type": "boxShadow"
+    },
+    "fab": {
+      "value": {
+        "x": "0px",
+        "y": "4px",
+        "blur": "10px",
+        "spread": "0px",
+        "color": "rgba(255, 0, 0, 0.35)"
+      },
+      "type": "boxShadow"
+    }
+  },
+  "accessibility": {
+    "minTapTarget": { "value": "48px", "type": "dimension" },
+    "minFontSizeBangla": { "value": "14px", "type": "dimension" },
+    "banglaLineHeightFactor": { "value": 1.6, "type": "number" },
+    "maxFontScale": { "value": 1.3, "type": "number" }
+  }
+}
+

@@ -17,7 +17,7 @@ _Last updated: 2026-11-06_
 
 | Phase | Total | Done | Progress |
 |---|---|---|---|
-| Phase 0 — Planning & Setup | 13 | 8 | 62% |
+| Phase 0 — Planning & Setup | 13 | 13 | 100% |
 | Phase 1 — MVP | 64 | 0 | 0% |
 | Phase 2 | 34 | 0 | 0% |
 | Phase 3 | 7 | 0 | 0% |
@@ -42,7 +42,7 @@ Per-member workload: [team.md §4](./team.md#4-workload-balance). Who works on w
 | SET-2 | Supabase projects (staging, prod — Singapore) + local Docker | Brehat | M | S1 | (SET-1) | ✅ |
 | SET-3 | Google Maps API keys (restricted) | Zimia | S | S1 | — | ✅ |
 | SET-4 | GitHub Actions CI (lint, typecheck, test) | Tain | M | S1 | SET-1 | ✅ |
-| DES-1 | Figma foundations + components (bn/en) | Zihad | L | S1 | — | ⬜ |
+| DES-1 | Figma foundations + components (bn/en) | Zihad | L | S1 | — | ✅ |
 
 ## Phase 1 — MVP (P0)
 
