@@ -382,6 +382,45 @@ export interface Database {
         };
         Relationships: [];
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          title_bn: string | null;
+          title_en: string | null;
+          body_bn: string | null;
+          body_en: string | null;
+          data: Json;
+          channel: string;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title_bn?: string | null;
+          title_en?: string | null;
+          body_bn?: string | null;
+          body_en?: string | null;
+          data?: Json;
+          channel?: string;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title_bn?: string | null;
+          title_en?: string | null;
+          body_bn?: string | null;
+          body_en?: string | null;
+          data?: Json;
+          channel?: string;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -397,6 +436,27 @@ export interface Database {
           target_user_id: string;
         };
         Returns: boolean;
+      };
+      notify: {
+        Args: {
+          p_user_id: string;
+          p_template_key: string;
+          p_data?: Json;
+          p_channels?: string[];
+        };
+        Returns: Json;
+      };
+      create_notification: {
+        Args: {
+          p_user_id: string;
+          p_title_bn: string;
+          p_title_en: string;
+          p_body_bn: string;
+          p_body_en: string;
+          p_data?: Json;
+          p_channel?: string;
+        };
+        Returns: string;
       };
     };
     Enums: {
