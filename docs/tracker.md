@@ -145,7 +145,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### Notifications
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| NOTIF-1 | In-app inbox + push + SMS channels (OTP, urgent rescue, booking confirmed) | Afridi | L | S3 | DB-1, UI-1, I18N-1 | ⬜ |
+| NOTIF-1 | In-app inbox + push + SMS channels (OTP, urgent rescue, booking confirmed) | Afridi | L | S3 | DB-1, UI-1, I18N-1 | ✅ |
 
 ### Release
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
