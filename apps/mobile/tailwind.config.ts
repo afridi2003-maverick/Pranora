@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import { colors, fonts } from '@pranora/ui';
+import { colors, fonts } from '@pranora/ui/tokens';
 
 const config: Config = {
   content: [
