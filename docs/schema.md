@@ -1146,3 +1146,59 @@ erDiagram
   profiles ||--o{ ai_conversations : chats
   bookings ||--o{ call_sessions : calls
 ```
+
+
+---
+
+## 7. Seed Data (DB-7)
+
+_Added by zihad, Sprint S3. Migration: `20261118004700_services_seed.sql`_
+
+### 7.1 service_categories (13 rows)
+
+| slug | name_bn | name_en | MVP? |
+|---|---|---|---|
+| `vet` | পশু চিকিৎসা | Veterinary | ✅ |
+| `vaccination` | টিকা | Vaccination | ✅ |
+| `emergency` | জরুরি সেবা | Emergency | ✅ |
+| `rescue` | উদ্ধার ও আশ্রয় | Rescue & Shelter | ✅ |
+| `adoption` | দত্তক | Adoption | ✅ |
+| `grooming` | গ্রুমিং | Grooming | P1 |
+| `boarding` | পেট বোর্ডিং | Boarding | P1 |
+| `home_visit` | হোম ভিজিট | Home Visit | P1 |
+| `online_consult` | অনলাইন পরামর্শ | Online Consult | P1 |
+| `pet_shop` | পেট শপ | Pet Shop | P1 |
+| `training` | ট্রেনিং | Training | P1 |
+| `sitting` | পেট সিটিং | Pet Sitting & Walking | P3 |
+| `taxi` | পেট ট্যাক্সি | Pet Taxi | P3 |
+
+### 7.2 services (21 rows — 9 MVP)
+
+MVP services (`is_mvp = true`): `clinic_visit`, `vaccine_clinic`, `emergency_care`, `rescue_report`, `shelter_intake`, `adopt_pet`, `list_for_adoption`, `home_vet_visit`* (false), `online_vet_consult`* (false).
+
+> `is_mvp` controls visibility in the services tab (SVC-1). Non-MVP services are seeded but hidden behind `is_mvp = false` until Phase 2 feature flag is on.
+
+### 7.3 breeds (44 rows)
+
+Covers: **dog** (15), **cat** (10), **bird** (8), **fish** (6), **other** (5). Each has `name_en` and `name_bn`. Owners may add free text via `pets.breed_other` when their breed is not in the catalog.
+
+### 7.4 vaccine_templates (14 rows)
+
+| species | name_en | first_dose_age_weeks | repeat_every_days | doses |
+|---|---|---|---|---|
+| dog | DHPP (5-in-1) | 6 | 365 | 3 |
+| dog | Rabies | 12 | 365 | 1 |
+| dog | Bordetella | 8 | 365 | 1 |
+| dog | Leptospirosis | 12 | 365 | 2 |
+| dog | Deworming | 2 | 90 | 1 |
+| dog | Flea & Tick Prevention | 8 | 30 | 1 |
+| cat | FVRCP (3-in-1) | 6 | 365 | 3 |
+| cat | Rabies | 12 | 365 | 1 |
+| cat | FeLV | 8 | 365 | 2 |
+| cat | Deworming | 2 | 90 | 1 |
+| bird | Annual Wellness Check | 0 | 365 | 1 |
+| bird | Deworming | 4 | 180 | 1 |
+| fish | Anti-parasite Treatment | 0 | 180 | 1 |
+| other | Deworming | 4 | 90 | 1 |
+
+> `repeat_every_days = null` = single-dose vaccine (none in current set). `doses` = number of doses in primary series; booster is tracked separately via `vaccinations` rows with `due_date`.
