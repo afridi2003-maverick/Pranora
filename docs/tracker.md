@@ -67,7 +67,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### Auth & Onboarding
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| AUTH-1 | Login with phone OTP (SMS hook → BD gateway) or email | Afridi | L | S3 | DB-1, I18N-1, UI-1, (NOTIF-1) | ⬜ |
+| AUTH-1 | Login with phone OTP (SMS hook → BD gateway) or email | Afridi | L | S3 | DB-1, I18N-1, UI-1, (NOTIF-1) | ✅ |
 | AUTH-3 | Language selection on first launch | Afridi | S | S5 | I18N-1, UI-1, (AUTH-1), (I18N-2) | ⬜ |
 | AUTH-4 | Location permission screen | Afridi | S | S4 | I18N-1, UI-1, (AUTH-1) | ⬜ |
 | AUTH-5 | Multi-role selection (owner / rescuer / shelter / vet / provider) + role switcher + role verification request | Afridi | M | S4 | AUTH-1, DB-6 | ⬜ |
