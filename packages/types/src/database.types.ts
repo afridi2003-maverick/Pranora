@@ -457,6 +457,48 @@ export interface Database {
         };
         Relationships: [];
       };
+      reminders: {
+        Row: {
+          id: string;
+          pet_id: string;
+          owner_id: string;
+          type: ReminderType;
+          title: string;
+          remind_at: string;
+          repeat_days: number | null;
+          vaccination_id: string | null;
+          is_done: boolean;
+          last_sent_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          pet_id: string;
+          owner_id?: string;
+          type: ReminderType;
+          title: string;
+          remind_at: string;
+          repeat_days?: number | null;
+          vaccination_id?: string | null;
+          is_done?: boolean;
+          last_sent_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          pet_id?: string;
+          owner_id?: string;
+          type?: ReminderType;
+          title?: string;
+          remind_at?: string;
+          repeat_days?: number | null;
+          vaccination_id?: string | null;
+          is_done?: boolean;
+          last_sent_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       providers: {
         Row: {
           id: string;
