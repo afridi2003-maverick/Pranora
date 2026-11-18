@@ -90,5 +90,51 @@
     "kind": "Report Kind",
     "species": "Species",
     "empty": "No pending urgent reports"
+  },
+  "moderation": {
+    "title": "Content Moderation & Safety",
+    "subtitle": "Review fake listings, spam reports, and moderate clinics or abusive users",
+    "tabs": {
+      "all": "All Reports",
+      "open": "Pending Review",
+      "actioned": "Action Taken",
+      "dismissed": "Dismissed"
+    },
+    "filter_target": {
+      "all": "All Targets",
+      "adoption_listing": "Adoption Listing",
+      "animal_report": "Rescue Report",
+      "provider": "Clinic / Provider",
+      "review": "Review",
+      "user": "User Profile"
+    },
+    "reasons": {
+      "fake": "Fake Listing / Impersonation",
+      "spam": "Spam / Commercial Bot",
+      "abusive": "Abusive or Harassing Behavior",
+      "scam": "Fraud / Payment Scam",
+      "animal_cruelty": "Animal Cruelty or Abuse",
+      "inaccurate_info": "Inaccurate Clinic / Location Info",
+      "duplicate": "Duplicate Listing",
+      "other": "Other Reason"
+    },
+    "actions": {
+      "remove_content": "Remove Content",
+      "block_user": "Block User",
+      "dismiss": "Dismiss Report",
+      "suspend_provider": "Suspend Clinic / Provider",
+      "confirm_action": "Confirm Moderation Action"
+    },
+    "modal": {
+      "title": "Moderate Content",
+      "notes_label": "Moderator Reason / Internal Notes",
+      "notes_placeholder": "Explain the decision (recorded in audit logs)...",
+      "block_user_checkbox": "Block associated user account (prevent further submissions)"
+    },
+    "empty": "No content reports found in this view",
+    "success": {
+      "moderated": "Content successfully moderated and action recorded",
+      "dismissed": "Report dismissed"
+    }
   }
 }

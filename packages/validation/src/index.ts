@@ -9,4 +9,5 @@ export * from './rescue';
 export * from './adoption';
 export * from './services';
 export * from './health';
+export * from './moderation';
 
