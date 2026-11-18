@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
 import { LanguageHeader } from '../../../../components/LanguageHeader';
@@ -59,6 +60,7 @@ const MOCK_USER_PETS: PetRow[] = [
 ];
 
 export default function RescueReportPage() {
+  const router = useRouter();
   const { isBangla } = useLocale();
   const [submittedReportId, setSubmittedReportId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,8 +125,14 @@ export default function RescueReportPage() {
               <span className="font-bold">{submittedReportId}</span>
             </div>
 
-            <div className="flex justify-center gap-3">
-              <Button variant="primary" onClick={handleReset}>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button
+                variant="primary"
+                onClick={() => router.push(`/rescue/status?id=${submittedReportId}`)}
+              >
+                🔍 {isBangla ? 'অগ্রগতি ট্র্যাক করুন' : 'Track Status'}
+              </Button>
+              <Button variant="secondary" onClick={handleReset}>
                 {isBangla ? 'নতুন রিপোর্ট করুন' : 'Submit Another Report'}
               </Button>
             </div>
