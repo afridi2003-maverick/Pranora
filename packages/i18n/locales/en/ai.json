@@ -15,5 +15,15 @@
   "petContext": "May I use your pet's information? (Never without your consent)",
   "allowContext": "Yes, allow",
   "denyContext": "No, thanks",
-  "sessionLabel": "Conversation"
+  "sessionLabel": "Conversation",
+  "quickPrompts": "Common Questions",
+  "promptFood": "What food is safe for my pet?",
+  "promptVaccine": "When should vaccines be given?",
+  "promptGrooming": "How often should I bathe my pet?",
+  "promptEmergencyTest": "Emergency signs & vet help",
+  "petContextBanner": "Share pet context (species & age)",
+  "emergencyBannerTitle": "EMERGENCY DETECTED",
+  "viewEmergencyMap": "Open Emergency Clinic Map",
+  "callVet": "Call a Vet",
+  "emptyStateDesc": "Ask anything about general diet, grooming, vaccinations, and daily pet care."
 }

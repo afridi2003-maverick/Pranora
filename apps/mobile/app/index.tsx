@@ -52,6 +52,16 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => router.push('/assistant' as never)}
+          className="w-full py-3.5 rounded-xl bg-white border border-primary items-center"
+          activeOpacity={0.8}
+        >
+          <Text className="text-primary text-base font-bold">
+            🤖 {isBangla ? 'এআই সহকারী' : 'AI Assistant'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           onPress={() => router.push('/notifications')}
           className="w-full py-3.5 rounded-xl bg-white border border-gray-300 items-center"
           activeOpacity={0.8}
