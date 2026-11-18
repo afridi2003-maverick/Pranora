@@ -1,0 +1,64 @@
+{
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: November 2026",
+    "intro": "Pranora (\"we\", \"our\", or \"us\") is dedicated to protecting your privacy and your pets' information. This Privacy Policy explains how we collect, use, disclose, and safeguard your data when you use our mobile application and website.",
+    "sections": {
+      "collection": {
+        "title": "1. Information We Collect",
+        "content": "We collect information you provide directly to us when creating an account, registering pets, reporting rescue cases, or booking veterinary appointments. This includes: name, phone number, email address, pet details (species, breed, age, health records), and geographic location."
+      },
+      "location": {
+        "title": "2. Location Data & EXIF Privacy",
+        "content": "To provide nearest-vet clinic discovery and emergency help, we access your device's location with your consent. For animal rescue reports, EXIF location metadata is automatically stripped from uploaded photos before publication, and public reports display only an approximate ~1 km area."
+      },
+      "usage": {
+        "title": "3. How We Use Information",
+        "content": "We use your data to: (a) connect you with nearby veterinary clinics and service providers; (b) facilitate animal rescue coordination and adoption handovers; (c) maintain your pet's lifelong health and vaccination schedule; and (d) send essential notifications, appointment updates, and OTPs."
+      },
+      "sharing": {
+        "title": "4. Data Sharing & Third Parties",
+        "content": "We share your information with licensed clinics and verified rescuers only as necessary to fulfill appointments and rescue responses. We do not sell your personal data. Secure payment processing is handled through certified gateways (such as SSLCommerz)."
+      },
+      "security": {
+        "title": "5. Data Security & Your Rights",
+        "content": "We implement industry-standard encryption, Row Level Security (RLS), and secure access controls. You retain the right to access, edit, or delete your pet profiles and account at any time."
+      },
+      "contact": {
+        "title": "6. Contact Us",
+        "content": "For questions or concerns regarding your privacy, contact our Data Protection Officer at privacy@pranora.com.bd (Dhaka, Bangladesh)."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: November 2026",
+    "intro": "Welcome to Pranora. By accessing or using our mobile application and web platform, you agree to be bound by these Terms of Service.",
+    "sections": {
+      "platform": {
+        "title": "1. Platform Nature",
+        "content": "Pranora is a digital technology platform connecting pet owners, rescuers, shelters, and licensed veterinary professionals. Pranora itself does not practice veterinary medicine or provide direct medical diagnoses."
+      },
+      "disclaimer": {
+        "title": "2. Veterinary & Emergency Disclaimer",
+        "content": "Information provided through Pranora, including automated vaccination schedules, tips, articles, and AI assistant suggestions, is strictly for educational and informational purposes. It is NOT a substitute for professional clinical advice, diagnosis, or emergency medical treatment by a licensed veterinary doctor."
+      },
+      "rescue": {
+        "title": "3. Animal Rescue & Adoption Conduct",
+        "content": "Users submitting rescue or lost/found reports must provide accurate and truthful information. Malicious, abusive, or fake reports are strictly prohibited and will lead to immediate account termination. Adoption handovers must comply with animal welfare standards."
+      },
+      "prohibited": {
+        "title": "4. Prohibited Activities",
+        "content": "You agree not to use the platform for: (a) commercial trade or sale of banned/endangered wildlife; (b) harassment of veterinarians or rescue workers; or (c) any unlawful activities in violation of the Animal Welfare Act of Bangladesh."
+      },
+      "liability": {
+        "title": "5. Limitation of Liability",
+        "content": "Pranora is not liable for disputes between pet owners and third-party service providers, clinical outcomes of veterinary treatments, or adoption disputes outside our documented platform procedures."
+      },
+      "governing": {
+        "title": "6. Governing Law",
+        "content": "These Terms are governed by and construed in accordance with the laws of the People's Republic of Bangladesh. Any disputes shall be subject to the exclusive jurisdiction of the courts of Dhaka."
+      }
+    }
+  }
+}

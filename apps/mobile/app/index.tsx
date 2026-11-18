@@ -70,6 +70,21 @@ export default function HomeScreen() {
           🚨 {isBangla ? 'জরুরি সেবা' : 'Emergency Help'}
         </Text>
       </TouchableOpacity>
+
+      {/* Legal Footer Links */}
+      <View className="flex-row gap-4 justify-center mt-2">
+        <TouchableOpacity onPress={() => router.push('/privacy' as never)}>
+          <Text className="text-xs text-gray-500 underline">
+            {isBangla ? 'গোপনীয়তা নীতি' : 'Privacy Policy'}
+          </Text>
+        </TouchableOpacity>
+        <Text className="text-xs text-gray-400">•</Text>
+        <TouchableOpacity onPress={() => router.push('/terms' as never)}>
+          <Text className="text-xs text-gray-500 underline">
+            {isBangla ? 'ব্যবহারের শর্তাবলী' : 'Terms of Service'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
