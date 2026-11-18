@@ -140,7 +140,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ⬜ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |
 | ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ⬜ |
-| ADM-3 | Admin: urgent rescue report queue | Afridi | S | S4 | ADM-1, RSC-1 | ⛔ |
+| ADM-3 | Admin: urgent rescue report queue | Afridi | S | S4 | ADM-1, RSC-1 | ⬜ |
 
 ### Notifications
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
