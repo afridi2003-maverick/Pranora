@@ -20,7 +20,7 @@ import {
   buildTelUrl,
 } from '@pranora/api';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function MobileMapScreen() {
@@ -34,7 +34,7 @@ export default function MobileMapScreen() {
   const [filter24h, setFilter24h] = useState(false);
   const [filterEmergency, setFilterEmergency] = useState(false);
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
-  const [selectedSpecies, setSelectedSpecies] = useState<'all' | 'dog' | 'cat'>('all');
+  const [selectedSpecies] = useState<'all' | 'dog' | 'cat'>('all');
 
   // Clinics state
   const [clinics, setClinics] = useState<NearbyClinicResult[]>([]);
@@ -90,10 +90,6 @@ export default function MobileMapScreen() {
       return true;
     });
   }, [clinics, search, filter24h, filterGovt, isBangla]);
-
-  const selectedClinic = useMemo(() => {
-    return clinics.find((c) => c.locationId === selectedClinicId) || filteredClinics[0];
-  }, [clinics, filteredClinics, selectedClinicId]);
 
   const handleCall = (phone: string | null) => {
     if (phone) {

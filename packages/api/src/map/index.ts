@@ -3,6 +3,7 @@ import type {
   NearbyClinicResult,
   ProviderType,
 } from '@pranora/validation';
+export type { NearbyClinicResult };
 import type { TypedSupabaseClient } from '../client';
 import { getAllMockClinics } from '../clinics/mock';
 
@@ -145,8 +146,8 @@ export async function getNearbyClinicsWithFallback(
     results.push({
       locationId: loc.id,
       providerId: prv.id,
-      nameBn: prv.nameBn,
-      nameEn: prv.nameEn,
+      nameBn: prv.nameBn ?? null,
+      nameEn: prv.nameEn ?? null,
       addressBn: loc.addressBn,
       addressEn: loc.addressEn,
       phone: loc.phone || prv.phone,

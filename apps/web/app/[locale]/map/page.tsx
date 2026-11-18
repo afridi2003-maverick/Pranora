@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { Button, Card, Chip, SearchBar, EmptyState } from '@pranora/ui';
+import { Button, Chip, SearchBar, EmptyState } from '@pranora/ui';
 import {
   getNearbyClinicsWithFallback,
   type NearbyClinicResult,
@@ -485,7 +485,7 @@ export default function WebMapPage() {
             </div>
 
             {/* Interactive Clinic Map Markers */}
-            {displayedClinics.map((c, idx) => {
+            {displayedClinics.map((c) => {
               // Projected relative positions based on Dhaka coordinates offset
               const dx = (c.lng - userCoords.lng) * 4000;
               const dy = (userCoords.lat - c.lat) * 4000;

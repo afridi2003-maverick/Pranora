@@ -1218,6 +1218,7 @@ export interface Database {
       escalate_unreviewed_rescue_reports: {
         Args: Record<string, never>;
         Returns: Json;
+      };
       is_location_open: {
         Args: {
           p_location_id: string;
