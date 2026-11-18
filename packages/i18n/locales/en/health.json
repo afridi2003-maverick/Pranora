@@ -69,10 +69,19 @@
     "deleteDocConfirm": "Are you sure you want to remove this document?"
   },
   "vetNotes": {
-    "label": "Vet Notes",
-    "findings": "Findings",
-    "treatment": "Treatment",
-    "followUp": "Follow-up"
+    "label": "Vet Visit Notes",
+    "findings": "Clinical Findings",
+    "treatment": "Treatment Administered",
+    "followUp": "Follow-up Advice",
+    "submitNote": "Save Visit Note",
+    "addPrescription": "+ Add Medicine",
+    "medicineName": "Medicine",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "duration": "Duration (days)",
+    "instructions": "Instructions",
+    "successToast": "Visit note saved to pet's medical record!",
+    "linkedBooking": "Linked to Appointment #{{id}}"
   },
   "reminders": {
     "label": "Reminders",
