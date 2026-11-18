@@ -8,4 +8,5 @@ export * from './map';
 export * from './clinics';
 export * from './pets';
 export * from './rescue';
+export * from './adoption';
 

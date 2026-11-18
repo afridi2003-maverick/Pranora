@@ -1119,6 +1119,44 @@ Reporter-safe query for tracking their report status without revealing rescuer p
   - `rescue_in_progress` -> 'উদ্ধার চলছে' / 'Rescue In Progress'
   - `closed` -> 'শেষ' / 'Closed'
 
+### 5.7 Adoption RPC Signatures & Contracts (Brehat — Contract 11)
+
+#### 1. `decide_adoption_application(p_application_id uuid, p_approve boolean, p_note text default null)`
+Human reviewer approves or rejects an adoption application (critical path).
+- **Parameters:**
+  - `p_application_id uuid not null`: Application identifier.
+  - `p_approve boolean not null`: True to approve application; false to reject.
+  - `p_note text`: Decision note.
+- **Returns:** `boolean`.
+- **Invariants:**
+  - **Human reviewer only**: Callable by listing poster, shelter staff, or admin. **NEVER callable by AI assistant**.
+  - On approve:
+    - Sets application status to `'approved'`.
+    - Sets listing status to `'reserved'`.
+    - Automatically creates/updates the single handover record in `adoption_handovers`.
+  - On reject: sets application status to `'rejected'`.
+
+#### 2. `confirm_handover(p_handover_id uuid)`
+Two-sided handover confirmation by giver and adopter.
+- **Parameters:** `p_handover_id uuid not null`: Handover identifier.
+- **Returns:** `boolean` (true once both parties have confirmed and handover is completed).
+- **Invariants:**
+  - When giver confirms, sets `giver_confirmed_at = now()`.
+  - When adopter confirms, sets `adopter_confirmed_at = now()`.
+  - When both confirmed:
+    - Sets `completed_at = now()`.
+    - Automatically transfers pet ownership: updates `pets.owner_id = handover.to_user_id` and clears `pets.shelter_id`.
+    - Inserts audit log in `pet_ownership_history` with `reason = 'adoption'`.
+    - Updates listing status to `'adopted'`.
+    - Withdraws all other applications for this listing.
+    - Automatically schedules welfare checkups in `adoption_followups` at 30, 90, and 180 days.
+
+#### 3. `toggle_adoption_favorite(p_listing_id uuid)`
+Toggles saved/favorite status of an adoption listing for the authenticated user.
+- **Parameters:** `p_listing_id uuid not null`.
+- **Returns:** `boolean` (true if added to favorites, false if removed).
+
+
 
 
 ---

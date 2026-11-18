@@ -907,9 +907,233 @@ export interface Database {
         };
         Relationships: [];
       };
+      adoption_listings: {
+        Row: {
+          id: string;
+          pet_id: string;
+          posted_by: string;
+          shelter_id: string | null;
+          species: SpeciesType;
+          age_months: number | null;
+          gender: PetGender;
+          title_bn: string | null;
+          title_en: string | null;
+          description_bn: string | null;
+          description_en: string | null;
+          photos: string[];
+          is_vaccinated: boolean;
+          is_neutered: boolean;
+          district_id: number;
+          upazila_id: number | null;
+          status: AdoptionListingStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          pet_id: string;
+          posted_by: string;
+          shelter_id?: string | null;
+          species: SpeciesType;
+          age_months?: number | null;
+          gender?: PetGender;
+          title_bn?: string | null;
+          title_en?: string | null;
+          description_bn?: string | null;
+          description_en?: string | null;
+          photos?: string[];
+          is_vaccinated?: boolean;
+          is_neutered?: boolean;
+          district_id: number;
+          upazila_id?: number | null;
+          status?: AdoptionListingStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          pet_id?: string;
+          posted_by?: string;
+          shelter_id?: string | null;
+          species?: SpeciesType;
+          age_months?: number | null;
+          gender?: PetGender;
+          title_bn?: string | null;
+          title_en?: string | null;
+          description_bn?: string | null;
+          description_en?: string | null;
+          photos?: string[];
+          is_vaccinated?: boolean;
+          is_neutered?: boolean;
+          district_id?: number;
+          upazila_id?: number | null;
+          status?: AdoptionListingStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      adoption_applications: {
+        Row: {
+          id: string;
+          listing_id: string;
+          applicant_id: string;
+          home_type: HomeType;
+          has_other_pets: boolean;
+          experience: string | null;
+          reason: string;
+          status: AdoptionApplicationStatus;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          decision_note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          applicant_id: string;
+          home_type?: HomeType;
+          has_other_pets?: boolean;
+          experience?: string | null;
+          reason: string;
+          status?: AdoptionApplicationStatus;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          decision_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          listing_id?: string;
+          applicant_id?: string;
+          home_type?: HomeType;
+          has_other_pets?: boolean;
+          experience?: string | null;
+          reason?: string;
+          status?: AdoptionApplicationStatus;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          decision_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      adoption_handovers: {
+        Row: {
+          id: string;
+          listing_id: string;
+          application_id: string;
+          pet_id: string;
+          from_user_id: string;
+          to_user_id: string;
+          giver_confirmed_at: string | null;
+          adopter_confirmed_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          listing_id: string;
+          application_id: string;
+          pet_id: string;
+          from_user_id: string;
+          to_user_id: string;
+          giver_confirmed_at?: string | null;
+          adopter_confirmed_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          listing_id?: string;
+          application_id?: string;
+          pet_id?: string;
+          from_user_id?: string;
+          to_user_id?: string;
+          giver_confirmed_at?: string | null;
+          adopter_confirmed_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      adoption_favorites: {
+        Row: {
+          user_id: string;
+          listing_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          listing_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          listing_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      adoption_followups: {
+        Row: {
+          id: string;
+          handover_id: string;
+          due_on: string;
+          sent_at: string | null;
+          answered_at: string | null;
+          wellbeing: string | null;
+          note: string | null;
+          photos: string[];
+        };
+        Insert: {
+          id?: string;
+          handover_id: string;
+          due_on: string;
+          sent_at?: string | null;
+          answered_at?: string | null;
+          wellbeing?: string | null;
+          note?: string | null;
+          photos?: string[];
+        };
+        Update: {
+          id?: string;
+          handover_id?: string;
+          due_on?: string;
+          sent_at?: string | null;
+          answered_at?: string | null;
+          wellbeing?: string | null;
+          note?: string | null;
+          photos?: string[];
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      decide_adoption_application: {
+        Args: {
+          p_application_id: string;
+          p_approve: boolean;
+          p_note?: string | null;
+        };
+        Returns: boolean;
+      };
+      confirm_handover: {
+        Args: {
+          p_handover_id: string;
+        };
+        Returns: boolean;
+      };
+      toggle_adoption_favorite: {
+        Args: {
+          p_listing_id: string;
+        };
+        Returns: boolean;
+      };
       review_animal_report: {
         Args: {
           p_report_id: string;
