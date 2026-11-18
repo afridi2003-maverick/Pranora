@@ -106,6 +106,8 @@ export async function getPublicAdoptionListings(
     species?: SpeciesType;
     district_id?: number;
     gender?: PetGender;
+    min_age_months?: number;
+    max_age_months?: number;
     limit?: number;
     offset?: number;
   }
@@ -124,6 +126,12 @@ export async function getPublicAdoptionListings(
   }
   if (filters?.gender) {
     query = query.eq('gender', filters.gender);
+  }
+  if (filters?.min_age_months !== undefined) {
+    query = query.gte('age_months', filters.min_age_months);
+  }
+  if (filters?.max_age_months !== undefined) {
+    query = query.lte('age_months', filters.max_age_months);
   }
   if (filters?.limit) {
     query = query.limit(filters.limit);

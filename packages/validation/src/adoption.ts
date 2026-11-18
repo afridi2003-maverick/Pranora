@@ -94,10 +94,14 @@ export type AdoptionFollowupAnswerInput = z.infer<
   typeof AdoptionFollowupAnswerSchema
 >;
 
+export const AdoptionAgeGroupSchema = z.enum(['all', 'baby', 'young', 'adult', 'senior']);
+export type AdoptionAgeGroup = z.infer<typeof AdoptionAgeGroupSchema>;
+
 export const AdoptionFilterSchema = z.object({
   species: SpeciesSchema.optional(),
   district_id: z.number().int().positive().optional(),
   gender: PetGenderSchema.optional(),
+  age_group: AdoptionAgeGroupSchema.optional(),
   status: AdoptionListingStatusSchema.default('available'),
   limit: z.number().int().min(1).max(50).default(20),
   offset: z.number().int().min(0).default(0),
