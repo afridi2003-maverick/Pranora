@@ -9,8 +9,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useLocale, formatPetAge } from '@pranora/i18n';
-import type { PetRow, BreedRow, AddPetPayload } from '@pranora/api';
+import type { PetRow, BreedRow, AddPetPayload, PetOwnershipHistoryRow, OwnershipReason } from '@pranora/api';
 import { PetForm } from './PetForm';
+import { OwnershipTransferModal } from './OwnershipTransferModal';
 
 interface PetListScreenProps {
   pets: PetRow[];
@@ -18,6 +19,13 @@ interface PetListScreenProps {
   onAddPet: (payload: AddPetPayload) => Promise<{ error?: string }>;
   onEditPet: (id: string, payload: AddPetPayload) => Promise<{ error?: string }>;
   onDeletePet: (id: string) => Promise<{ error?: string }>;
+  onTransferPet?: (payload: {
+    pet_id: string;
+    to_user_id: string;
+    reason: OwnershipReason;
+    note?: string;
+  }) => Promise<{ error?: string }>;
+  onFetchHistory?: (petId: string) => Promise<PetOwnershipHistoryRow[]>;
   loading?: boolean;
 }
 
@@ -27,12 +35,27 @@ export function PetListScreen({
   onAddPet,
   onEditPet,
   onDeletePet,
+  onTransferPet,
+  onFetchHistory,
   loading = false,
 }: PetListScreenProps) {
   const { t, locale } = useLocale();
   const [view, setView] = useState<'list' | 'add' | 'edit'>('list');
   const [selectedPet, setSelectedPet] = useState<PetRow | null>(null);
+  const [transferringPet, setTransferringPet] = useState<PetRow | null>(null);
+  const [history, setHistory] = useState<PetOwnershipHistoryRow[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleOpenTransfer = async (pet: PetRow) => {
+    setTransferringPet(pet);
+    if (onFetchHistory) {
+      setLoadingHistory(true);
+      const res = await onFetchHistory(pet.id);
+      setHistory(res);
+      setLoadingHistory(false);
+    }
+  };
 
   const handleStartAdd = () => {
     setSelectedPet(null);
@@ -163,7 +186,16 @@ export function PetListScreen({
                     </Text>
                   </View>
                   <View className="flex-1">
-                    <Text className="text-lg font-bold text-gray-900">{item.name}</Text>
+                    <View className="flex-row items-center gap-2">
+                      <Text className="text-lg font-bold text-gray-900">{item.name}</Text>
+                      {item.rescue_case_id ? (
+                        <View className="bg-green-100 rounded-md px-1.5 py-0.5">
+                          <Text className="text-[10px] font-bold text-green-800">
+                            🛟 {t('pets:ownership.rescuedBadge')}
+                          </Text>
+                        </View>
+                      ) : null}
+                    </View>
                     <Text className="text-xs text-gray-500">
                       {t(`pets:species.${item.species}`)} • {breedName}
                     </Text>
@@ -193,9 +225,19 @@ export function PetListScreen({
                   >
                     <Text className="text-xs font-semibold text-gray-800">{t('pets:edit')}</Text>
                   </TouchableOpacity>
+                  {onTransferPet && (
+                    <TouchableOpacity
+                      onPress={() => handleOpenTransfer(item)}
+                      className="flex-1 py-2 rounded-lg bg-green-50 items-center border border-green-200"
+                    >
+                      <Text className="text-xs font-semibold text-green-800">
+                        🔄 {t('pets:ownership.transferButton')}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity
                     onPress={() => handleConfirmDelete(item)}
-                    className="px-4 py-2 rounded-lg bg-red-50 items-center"
+                    className="px-3 py-2 rounded-lg bg-red-50 items-center"
                   >
                     <Text className="text-xs font-semibold text-red-600">{t('pets:delete')}</Text>
                   </TouchableOpacity>
@@ -203,6 +245,20 @@ export function PetListScreen({
               </View>
             );
           }}
+        />
+      )}
+
+      {onTransferPet && (
+        <OwnershipTransferModal
+          visible={!!transferringPet}
+          pet={transferringPet}
+          history={history}
+          onClose={() => {
+            setTransferringPet(null);
+            setHistory([]);
+          }}
+          onTransfer={onTransferPet}
+          loadingHistory={loadingHistory}
         />
       )}
     </SafeAreaView>

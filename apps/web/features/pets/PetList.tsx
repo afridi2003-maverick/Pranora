@@ -1,15 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocale, formatPetAge } from '@pranora/i18n';
-import { Button, Card, EmptyState, Avatar } from '@pranora/ui';
-import type { PetRow } from '@pranora/api';
+import { Button, Card, EmptyState, Avatar, Chip } from '@pranora/ui';
+import type { PetRow, PetOwnershipHistoryRow, OwnershipReason } from '@pranora/api';
+import { OwnershipTransferModal } from './OwnershipTransferModal';
 
 interface PetListProps {
   pets: PetRow[];
   onAddPet: () => void;
   onEditPet: (pet: PetRow) => void;
   onDeletePet: (pet: PetRow) => void;
+  onTransferPet?: (payload: {
+    pet_id: string;
+    to_user_id: string;
+    reason: OwnershipReason;
+    note?: string;
+  }) => Promise<{ error?: string }>;
+  onFetchHistory?: (petId: string) => Promise<PetOwnershipHistoryRow[]>;
   loading?: boolean;
 }
 
@@ -18,9 +26,24 @@ export function PetList({
   onAddPet,
   onEditPet,
   onDeletePet,
+  onTransferPet,
+  onFetchHistory,
   loading = false,
 }: PetListProps) {
   const { t, locale } = useLocale();
+  const [transferringPet, setTransferringPet] = useState<PetRow | null>(null);
+  const [history, setHistory] = useState<PetOwnershipHistoryRow[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const handleOpenTransfer = async (pet: PetRow) => {
+    setTransferringPet(pet);
+    if (onFetchHistory) {
+      setLoadingHistory(true);
+      const res = await onFetchHistory(pet.id);
+      setHistory(res);
+      setLoadingHistory(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -75,9 +98,19 @@ export function PetList({
                     size="lg"
                   />
                   <div>
-                    <h3 className="font-bold text-lg text-content-primary leading-tight">
-                      {pet.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-lg text-content-primary leading-tight">
+                        {pet.name}
+                      </h3>
+                      {pet.rescue_case_id ? (
+                        <Chip
+                          variant="status"
+                          statusType="completed"
+                          label={`🛟 ${t('pets:ownership.rescuedBadge')}`}
+                          className="text-[11px]"
+                        />
+                      ) : null}
+                    </div>
                     <p className="text-sm text-content-secondary">
                       {t(`pets:species.${pet.species}`)}
                       {breedName ? ` • ${breedName}` : ''}
@@ -122,6 +155,16 @@ export function PetList({
                 >
                   {t('pets:edit')}
                 </Button>
+                {onTransferPet && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 text-primary hover:bg-green-50"
+                    onClick={() => handleOpenTransfer(pet)}
+                  >
+                    🔄 {t('pets:ownership.transferButton')}
+                  </Button>
+                )}
                 <Button
                   variant="danger"
                   size="sm"
@@ -134,6 +177,20 @@ export function PetList({
           );
         })}
       </div>
+
+      {onTransferPet && (
+        <OwnershipTransferModal
+          isOpen={!!transferringPet}
+          pet={transferringPet}
+          history={history}
+          onClose={() => {
+            setTransferringPet(null);
+            setHistory([]);
+          }}
+          onTransfer={onTransferPet}
+          loadingHistory={loadingHistory}
+        />
+      )}
     </div>
   );
 }
