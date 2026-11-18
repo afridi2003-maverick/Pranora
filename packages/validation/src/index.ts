@@ -7,4 +7,6 @@ export * from './clinics';
 export * from './pets';
 export * from './rescue';
 export * from './adoption';
+export * from './services';
+export * from './health';
 

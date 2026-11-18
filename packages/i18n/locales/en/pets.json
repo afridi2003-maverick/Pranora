@@ -53,7 +53,29 @@
     "currentOwner": "Current Owner",
     "history": "Ownership History",
     "transferredOn": "Transferred: {{date}}",
-    "oneProfileForLife": "One profile for life"
+    "oneProfileForLife": "One profile for life",
+    "transferTitle": "Transfer Ownership",
+    "transferButton": "Transfer Pet",
+    "transferDesc": "Transfer this pet profile to another user. All health, vaccine, and medical records will be preserved.",
+    "transferConfirm": "Are you sure you want to transfer ownership of this pet? You will no longer manage this profile.",
+    "recipientUserId": "Recipient User ID (UUID)",
+    "recipientPlaceholder": "e.g. 123e4567-e89b-12d3-a456-426614174000",
+    "reason": "Reason",
+    "reasons": {
+      "registered": "Registration",
+      "rescue_intake": "Rescue Intake",
+      "adoption": "Adoption Handover",
+      "admin_transfer": "Administrative Transfer"
+    },
+    "note": "Transfer Note",
+    "notePlaceholder": "Add any notes or context about this handover...",
+    "transferSuccess": "Ownership transferred successfully!",
+    "rescuedBadge": "Rescued Animal",
+    "rescueCase": "Rescue Case #{{id}}",
+    "noHistory": "No previous ownership transfers recorded.",
+    "from": "From",
+    "to": "To",
+    "selectPet": "Select Pet"
   },
   "qr": {
     "label": "QR ID Card",

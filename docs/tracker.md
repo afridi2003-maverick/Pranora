@@ -76,9 +76,9 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | PET-1 | Add / edit / delete pets | Zihad | M | S3 | DB-3, UI-1, I18N-1, (AUTH-1) | ✅ |
-| PET-5 | One profile for life: rescued animal profile, ownership transfer keeps records | Zihad | M | S4 | PET-1, (DB-8), (AUTH-5) | ⬜ |
-| HLT-1 | Vaccine record + schedule auto-generation | Zihad | L | S4 | PET-1, DB-7 | ⬜ |
-| HLT-3 | Medical history (vet-written, owner read-only) + owner uploads | Zihad | M | S5 | PET-1, (AUTH-5) | ⬜ |
+| PET-5 | One profile for life: rescued animal profile, ownership transfer keeps records | Zihad | M | S4 | PET-1, (DB-8), (AUTH-5) | ✅ |
+| HLT-1 | Vaccine record + schedule auto-generation | Zihad | L | S4 | PET-1, DB-7 | ✅ |
+| HLT-3 | Medical history (vet-written, owner read-only) + owner uploads | Zihad | M | S5 | PET-1, (AUTH-5) | ✅ |
 | HLT-7 | Vet visit notes (findings + treatment) | Zihad | M | S5 | HLT-3, (APT-2) | ⬜ |
 
 ### Rescue (উদ্ধার)
@@ -105,21 +105,21 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### ⭐ Nearest Vet Map
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| MAP-1 | `nearby_clinics` + `is_location_open` SQL functions | Zimia | L | S2 | DB-4 | ⬜ |
-| MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ⬜ |
-| MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ⬜ |
-| MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ⬜ |
+| MAP-1 | `nearby_clinics` + `is_location_open` SQL functions | Zimia | L | S2 | DB-4 | ✅ |
+| MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ✅ |
+| MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ✅ |
+| MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ✅ |
 | MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ⬜ |
 | MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ⬜ |
-| MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ⬜ |
-| MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ⬜ |
+| MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ✅ |
+| MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ✅ |
 | MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ⬜ |
-| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ⬜ |
+| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ✅ |
 
 ### ⭐ Services
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| SVC-1 | Services tab / `/services` page from catalog | Zihad | M | S3 | DB-7, UI-1, I18N-1 | ⬜ |
+| SVC-1 | Services tab / `/services` page from catalog | Zihad | M | S3 | DB-7, UI-1, I18N-1 | ✅ |
 | SVC-2 | Provider list per service (list/map toggle) | Zimia | M | S5 | SVC-1, MAP-2 | ⬜ |
 
 ### Booking
@@ -151,7 +151,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | REL-1 | E2E tests for critical flows (harness + CI; each owner writes their flow's test) | Afridi | L | S7 | SET-4, AUTH-5, APT-3, RSC-7, ADP-6, MAP-7, HLT-7 | ⬜ |
-| REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ⬜ |
+| REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ✅ |
 | REL-3 | Play Store + App Store + pranora.com.bd launch | Afridi | M | S8 | REL-1, REL-2, REL-4, REL-5 | ⬜ |
 | REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ⬜ |
 | REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ⬜ |
