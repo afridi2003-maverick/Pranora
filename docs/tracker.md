@@ -114,7 +114,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ⬜ |
 | MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ⬜ |
 | MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ⬜ |
-| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ⬜ |
+| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ✅ |
 
 ### ⭐ Services
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
