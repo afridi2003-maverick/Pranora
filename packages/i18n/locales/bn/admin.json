@@ -72,5 +72,23 @@
     "new_value": "নতুন মান",
     "filter_all": "সকল টেবিল",
     "empty": "কোনো অডিট রেকর্ড পাওয়া যায়নি"
+  },
+  "rescue_queue": {
+    "title": "জরুরি উদ্ধার কিউ",
+    "subtitle": "বিপন্ন ও আহত প্রাণীদের জরুরি রিপোর্ট পর্যালোচনা ও কেস ওপেন",
+    "critical_badge": "জীবনঝুঁকি (Critical)",
+    "high_badge": "উচ্চ জরুরি (High)",
+    "medium_badge": "সাধারণ",
+    "low_badge": "স্বাভাবিক",
+    "status_submitted": "নতুন রিপোর্ট",
+    "status_under_review": "রিভিউ চলছে",
+    "action_accept": "অনুমোদন ও কেস শুরু",
+    "action_reject": "বাতিল করুন",
+    "reporter": "রিপোর্টার",
+    "location": "স্থান",
+    "phone": "যোগাযোগ",
+    "kind": "ঘটনার ধরন",
+    "species": "প্রাণী",
+    "empty": "কোনো অপেক্ষামান জরুরি রিপোর্ট নেই"
   }
 }

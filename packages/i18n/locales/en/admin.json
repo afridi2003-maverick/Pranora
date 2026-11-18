@@ -72,5 +72,23 @@
     "new_value": "New Value",
     "filter_all": "All Tables",
     "empty": "No audit records found"
+  },
+  "rescue_queue": {
+    "title": "Urgent Rescue Queue",
+    "subtitle": "Review urgent animal reports and dispatch rescue cases",
+    "critical_badge": "Critical",
+    "high_badge": "High",
+    "medium_badge": "Medium",
+    "low_badge": "Low",
+    "status_submitted": "New Report",
+    "status_under_review": "Under Review",
+    "action_accept": "Approve & Open Case",
+    "action_reject": "Dismiss Report",
+    "reporter": "Reporter",
+    "location": "Location",
+    "phone": "Contact",
+    "kind": "Report Kind",
+    "species": "Species",
+    "empty": "No pending urgent reports"
   }
 }

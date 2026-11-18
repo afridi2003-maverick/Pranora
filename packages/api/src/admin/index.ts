@@ -1,14 +1,55 @@
 // packages/api/src/admin/index.ts
-// Owner: Afridi | Tasks: ADM-1, ADM-4
-// Admin verification of vets, shelters, rescuers, adoption listers & Audit Log
+// Owner: Afridi | Tasks: ADM-1, ADM-4, ADM-3
+// Admin verification, audit logs, and urgent rescue queue
 
 import type { TypedSupabaseClient } from '../client';
-import type { Json, UserRole, VerificationStatus } from '@pranora/types';
+import type {
+  AnimalReportKind,
+  Json,
+  RescueStatus,
+  SpeciesType,
+  UrgencyLevel,
+  UserRole,
+  VerificationStatus,
+} from '@pranora/types';
 import { notify } from '../notifications';
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
+
+export interface UrgentRescueReportItem {
+  id: string;
+  reporter_id: string;
+  kind: AnimalReportKind;
+  species: SpeciesType;
+  urgency: UrgencyLevel;
+  last_seen_at: string | null;
+  contact_phone: string | null;
+  description: string | null;
+  photos: string[];
+  area_text: string | null;
+  district_id: number | null;
+  upazila_id: number | null;
+  status: RescueStatus;
+  created_at: string;
+  reporter_name?: string | null;
+  reporter_phone?: string | null;
+}
+
+export interface ListUrgentRescueOptions {
+  urgency?: UrgencyLevel | 'all';
+  status?: RescueStatus | 'all';
+  limit?: number;
+  offset?: number;
+}
+
+export interface ReviewRescueReportParams {
+  reportId: string;
+  accept: boolean;
+  shelterId?: string | null;
+  note?: string;
+}
 
 export interface AuditLogEntry {
   id: number;
@@ -413,6 +454,102 @@ export async function getAuditLogCount(
   }
 
   const { count, error } = await query;
+  if (error) throw error;
+  return count ?? 0;
+}
+
+// ─────────────────────────────────────────────
+// ADM-3: Urgent Rescue Report Queue
+// ─────────────────────────────────────────────
+
+/**
+ * List urgent animal reports for the admin review queue.
+ * Prioritizes high and critical urgency reports.
+ */
+export async function listUrgentRescueReports(
+  client: TypedSupabaseClient,
+  options: ListUrgentRescueOptions = {}
+): Promise<UrgentRescueReportItem[]> {
+  const { urgency = 'all', status = 'all', limit = 50, offset = 0 } = options;
+
+  let query = client
+    .from('animal_reports')
+    .select(
+      `id, reporter_id, kind, species, urgency, last_seen_at, contact_phone,
+       description, photos, area_text, district_id, upazila_id, status, created_at,
+       profiles:reporter_id (
+         full_name, phone
+       )`
+    )
+    .range(offset, offset + limit - 1);
+
+  if (urgency !== 'all') {
+    query = query.eq('urgency', urgency);
+  }
+  if (status !== 'all') {
+    query = query.eq('status', status);
+  }
+
+  // Order: submitted first, then by urgency descending, then by creation
+  query = query
+    .order('status', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    reporter_id: row.reporter_id,
+    kind: row.kind,
+    species: row.species,
+    urgency: row.urgency,
+    last_seen_at: row.last_seen_at,
+    contact_phone: row.contact_phone,
+    description: row.description,
+    photos: row.photos ?? [],
+    area_text: row.area_text,
+    district_id: row.district_id,
+    upazila_id: row.upazila_id,
+    status: row.status,
+    created_at: row.created_at,
+    reporter_name: row.profiles?.full_name ?? null,
+    reporter_phone: row.profiles?.phone ?? null,
+  }));
+}
+
+/**
+ * Review an urgent rescue report (admin or shelter).
+ * Calls Brehat's review_animal_report RPC.
+ */
+export async function reviewRescueReport(
+  client: TypedSupabaseClient,
+  params: ReviewRescueReportParams
+): Promise<string | null> {
+  const { reportId, accept, shelterId = null } = params;
+
+  const { data, error } = await client.rpc('review_animal_report', {
+    p_report_id: reportId,
+    p_accept: accept,
+    p_shelter_id: shelterId,
+  });
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Get count of unreviewed urgent reports (critical/high status submitted).
+ */
+export async function getUrgentRescueQueueCount(
+  client: TypedSupabaseClient
+): Promise<number> {
+  const { count, error } = await client
+    .from('animal_reports')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'submitted')
+    .in('urgency', ['critical', 'high']);
+
   if (error) throw error;
   return count ?? 0;
 }
