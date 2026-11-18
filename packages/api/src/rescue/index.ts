@@ -29,8 +29,25 @@ export interface AnimalReportRow {
   duplicate_of: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
+  escalated_at?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface UrgentRescueAlertResponse {
+  success: boolean;
+  report_id?: string;
+  alerted_count?: number;
+  recipients?: string[];
+  skipped?: string;
+  error?: string;
+}
+
+export interface RescueEscalationResponse {
+  success: boolean;
+  escalated_count: number;
+  escalated_ids: string[];
+  threshold_minutes: number;
 }
 
 export interface LostFoundBoardItem {
@@ -372,3 +389,82 @@ export async function getMyReportStatus(
   if (error) throw error;
   return data as unknown as MyReportStatusResponse;
 }
+
+// ── Urgent Alerts & Escalation (RSC-6) ──────────────────────────────────────
+
+/** Manually or programmatically trigger urgent alert for a report */
+export async function triggerUrgentRescueAlert(
+  client: TypedSupabaseClient,
+  reportId: string
+): Promise<UrgentRescueAlertResponse> {
+  const { data, error } = await client.rpc('notify_urgent_rescue_report', {
+    p_report_id: reportId,
+  });
+
+  if (error) throw error;
+  return (data as unknown as UrgentRescueAlertResponse) ?? { success: true };
+}
+
+/** Trigger 15-minute escalation routine for overdue unreviewed urgent reports */
+export async function escalateUnreviewedRescueReports(
+  client: TypedSupabaseClient
+): Promise<RescueEscalationResponse> {
+  const { data, error } = await client.rpc('escalate_unreviewed_rescue_reports');
+
+  if (error) throw error;
+  return (data as unknown as RescueEscalationResponse) ?? {
+    success: true,
+    escalated_count: 0,
+    escalated_ids: [],
+    threshold_minutes: 15,
+  };
+}
+
+/** List all submitted unreviewed urgent reports, optionally scoped to a district */
+export async function listUnreviewedUrgentReports(
+  client: TypedSupabaseClient,
+  districtId?: number | null
+): Promise<AnimalReportRow[]> {
+  let query = client
+    .from('animal_reports')
+    .select('*')
+    .eq('status', 'submitted')
+    .in('urgency', ['critical', 'high'])
+    .order('urgency', { ascending: false })
+    .order('created_at', { ascending: true });
+
+  if (districtId) {
+    query = query.eq('district_id', districtId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as unknown as AnimalReportRow[];
+}
+
+/** Check escalation countdown status for a report */
+export function calculateEscalationCountdown(
+  createdAtIso: string,
+  thresholdMinutes = 15,
+  escalatedAtIso?: string | null
+): {
+  isOverdue: boolean;
+  minutesElapsed: number;
+  minutesRemaining: number;
+  formattedRemaining: string;
+} {
+  const createdTime = new Date(createdAtIso).getTime();
+  const now = Date.now();
+  const elapsedMs = Math.max(0, now - createdTime);
+  const elapsedMinutes = Math.floor(elapsedMs / (60 * 1000));
+  const remainingMinutes = Math.max(0, thresholdMinutes - elapsedMinutes);
+  const isOverdue = Boolean(escalatedAtIso) || elapsedMinutes >= thresholdMinutes;
+
+  return {
+    isOverdue,
+    minutesElapsed: elapsedMinutes,
+    minutesRemaining: remainingMinutes,
+    formattedRemaining: isOverdue ? '0m' : `${remainingMinutes}m`,
+  };
+}
+

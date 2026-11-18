@@ -13,6 +13,7 @@ import type { RescueCaseFullDetails } from './caseDetailMockData';
 import { CaseUpdateTimeline } from './CaseUpdateTimeline';
 import { AddCaseUpdateForm } from './AddCaseUpdateForm';
 import { CloseCaseOutcomeModal } from './CloseCaseOutcomeModal';
+import { UrgentReportAlertBanner } from './UrgentReportAlertBanner';
 
 interface RescueCaseDetailsProps {
   initialDetails: RescueCaseFullDetails;
@@ -134,6 +135,9 @@ export function RescueCaseDetails({
 
   return (
     <ScrollView className="flex-1 bg-white p-4" showsVerticalScrollIndicator={false}>
+      {/* Urgent Report Alert & 15-min Escalation Banner (RSC-6) */}
+      <UrgentReportAlertBanner report={report} />
+
       {/* 1. Header Card */}
       <View className="bg-white rounded-2xl border border-gray-200 p-4 mb-4 shadow-sm">
         <View className="flex-row items-center justify-between pb-3 border-b border-gray-100 mb-3">

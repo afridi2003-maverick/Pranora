@@ -47,6 +47,7 @@ export const MOCK_CASE_DETAILS: Record<string, RescueCaseFullDetails> = {
       duplicate_of: null,
       reviewed_by: 'user-admin-1',
       reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+      escalated_at: null,
       created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
       updated_at: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
     },

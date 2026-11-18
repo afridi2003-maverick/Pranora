@@ -753,6 +753,7 @@ export interface Database {
           duplicate_of: string | null;
           reviewed_by: string | null;
           reviewed_at: string | null;
+          escalated_at?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -775,6 +776,7 @@ export interface Database {
           duplicate_of?: string | null;
           reviewed_by?: string | null;
           reviewed_at?: string | null;
+          escalated_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -797,6 +799,7 @@ export interface Database {
           duplicate_of?: string | null;
           reviewed_by?: string | null;
           reviewed_at?: string | null;
+          escalated_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -1206,6 +1209,15 @@ export interface Database {
         };
         Returns: string;
       };
+      notify_urgent_rescue_report: {
+        Args: {
+          p_report_id: string;
+        };
+        Returns: Json;
+      };
+      escalate_unreviewed_rescue_reports: {
+        Args: Record<string, never>;
+        Returns: Json;
       is_location_open: {
         Args: {
           p_location_id: string;
