@@ -105,7 +105,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### ⭐ Nearest Vet Map
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| MAP-1 | `nearby_clinics` + `is_location_open` SQL functions | Zimia | L | S2 | DB-4 | ⬜ |
+| MAP-1 | `nearby_clinics` + `is_location_open` SQL functions | Zimia | L | S2 | DB-4 | ✅ |
 | MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ⬜ |
 | MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ⬜ |
 | MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ⬜ |

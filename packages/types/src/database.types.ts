@@ -1206,6 +1206,49 @@ export interface Database {
         };
         Returns: string;
       };
+      is_location_open: {
+        Args: {
+          p_location_id: string;
+          p_at?: string;
+        };
+        Returns: boolean;
+      };
+      nearby_clinics: {
+        Args: {
+          p_lat: number;
+          p_lng: number;
+          p_radius_m?: number;
+          p_open_now?: boolean;
+          p_emergency?: boolean;
+          p_home_visit?: boolean;
+          p_species?: SpeciesType;
+          p_service?: string;
+          p_max_fee?: number;
+          p_types?: ProviderType[];
+          p_limit?: number;
+        };
+        Returns: {
+          location_id: string;
+          provider_id: string;
+          name_bn: string | null;
+          name_en: string | null;
+          address_bn: string | null;
+          address_en: string | null;
+          phone: string | null;
+          type: ProviderType;
+          is_government: boolean;
+          is_24h: boolean;
+          has_emergency: boolean;
+          offers_home_visit: boolean;
+          is_open_now: boolean;
+          rating_avg: number;
+          rating_count: number;
+          fee_from: number | null;
+          lat: number;
+          lng: number;
+          distance_m: number;
+        }[];
+      };
     };
     Enums: {
       user_role: UserRole;
