@@ -12,7 +12,13 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
-import { getClinicFullDetail, type ClinicFullDetail } from '@pranora/api';
+import {
+  getClinicFullDetail,
+  type ClinicFullDetail,
+  buildBookingUrl,
+  buildDirectionsUrl,
+  buildTelUrl,
+} from '@pranora/api';
 
 const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const WEEKDAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -49,7 +55,7 @@ export default function MobileClinicDetailScreen() {
   const handleCall = () => {
     const phone = clinic?.location.phone || clinic?.provider.phone;
     if (phone) {
-      Linking.openURL(`tel:${phone}`).catch(() => {
+      Linking.openURL(buildTelUrl(phone)).catch(() => {
         Alert.alert(isBangla ? 'ভুল' : 'Error', isBangla ? 'কল করা সম্ভব হচ্ছে না' : 'Cannot place call');
       });
     }
@@ -58,7 +64,7 @@ export default function MobileClinicDetailScreen() {
   const handleDirections = () => {
     if (!clinic) return;
     const { lat, lng } = clinic.location;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    const url = buildDirectionsUrl(lat, lng);
     Linking.openURL(url).catch(() => {
       Alert.alert(isBangla ? 'ভুল' : 'Error', isBangla ? 'ম্যাপ খোলা যাচ্ছে না' : 'Cannot open maps');
     });
@@ -78,7 +84,11 @@ export default function MobileClinicDetailScreen() {
 
   const handleBook = (serviceId?: string, vetId?: string) => {
     if (!clinic) return;
-    const path = `/book?locationId=${clinic.location.id}${serviceId ? `&serviceId=${serviceId}` : ''}${vetId ? `&vetId=${vetId}` : ''}`;
+    const path = buildBookingUrl({
+      locationId: clinic.location.id,
+      serviceId,
+      vetId,
+    });
     router.push(path as any);
   };
 

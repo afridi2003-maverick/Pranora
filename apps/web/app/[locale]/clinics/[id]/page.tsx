@@ -4,7 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Chip, EmptyState } from '@pranora/ui';
-import { getClinicFullDetail, type ClinicFullDetail } from '@pranora/api';
+import {
+  getClinicFullDetail,
+  type ClinicFullDetail,
+  buildBookingUrl,
+  buildDirectionsUrl,
+  buildTelUrl,
+} from '@pranora/api';
 
 const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const WEEKDAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -77,14 +83,14 @@ export default function ClinicDetailPage() {
   const handleCall = () => {
     const phone = clinic?.location.phone || clinic?.provider.phone;
     if (phone && typeof window !== 'undefined') {
-      window.location.href = `tel:${phone}`;
+      window.location.href = buildTelUrl(phone);
     }
   };
 
   const handleDirections = () => {
     if (!clinic) return;
     const { lat, lng } = clinic.location;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    const url = buildDirectionsUrl(lat, lng);
     if (typeof window !== 'undefined') {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
@@ -92,11 +98,12 @@ export default function ClinicDetailPage() {
 
   const handleBook = (serviceId?: string, vetId?: string) => {
     if (!clinic) return;
-    const search = new URLSearchParams();
-    search.set('locationId', clinic.location.id);
-    if (serviceId) search.set('serviceId', serviceId);
-    if (vetId) search.set('vetId', vetId);
-    router.push(`/book?${search.toString()}`);
+    const bookingUrl = buildBookingUrl({
+      locationId: clinic.location.id,
+      serviceId,
+      vetId,
+    });
+    router.push(bookingUrl);
   };
 
   const handleReportSubmit = (e: React.FormEvent) => {

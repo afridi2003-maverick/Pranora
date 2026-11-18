@@ -9,6 +9,7 @@ import type { TypedSupabaseClient } from '../client';
 import { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics } from './mock';
 
 export { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics };
+export * from './actions';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;
