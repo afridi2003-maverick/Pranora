@@ -69,10 +69,19 @@
     "deleteDocConfirm": "আপনি কি এই নথিটি মুছে ফেলতে চান?"
   },
   "vetNotes": {
-    "label": "চিকিৎসকের নোট",
+    "label": "চিকিৎসকের ভিজিট নোট",
     "findings": "পরীক্ষার ফলাফল",
-    "treatment": "চিকিৎসা",
-    "followUp": "ফলো-আপ"
+    "treatment": "প্রদত্ত চিকিৎসা",
+    "followUp": "ফলো-আপ পরামর্শ",
+    "submitNote": "ভিজিট নোট সংরক্ষণ করুন",
+    "addPrescription": "+ ওষুধ যোগ করুন",
+    "medicineName": "ওষুধ",
+    "dosage": "মাত্রা",
+    "frequency": "কতবার",
+    "duration": "সময়কাল (দিন)",
+    "instructions": "নির্দেশনা",
+    "successToast": "ভিজিট নোট পোষা প্রাণীর চিকিৎসা রেকর্ডে সংরক্ষিত হয়েছে!",
+    "linkedBooking": "অ্যাপয়েন্টমেন্ট #{{id}}-এর সাথে যুক্ত"
   },
   "reminders": {
     "label": "স্মরণিকা",

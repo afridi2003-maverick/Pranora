@@ -57,6 +57,9 @@ export interface PrescriptionRow {
   instructions: string | null;
 }
 
+export type PrescriptionItemInput = Omit<PrescriptionRow, 'id' | 'medical_record_id'>;
+
+
 export interface MedicalRecordRow {
   id: string;
   pet_id: string;
