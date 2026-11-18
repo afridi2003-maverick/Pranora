@@ -421,6 +421,282 @@ export interface Database {
         };
         Relationships: [];
       };
+      providers: {
+        Row: {
+          id: string;
+          owner_user_id: string;
+          type: ProviderType;
+          name_bn: string | null;
+          name_en: string | null;
+          description_bn: string | null;
+          description_en: string | null;
+          logo_url: string | null;
+          phone: string;
+          whatsapp: string | null;
+          email: string | null;
+          website: string | null;
+          trade_license_no: string | null;
+          is_government: boolean;
+          verification: VerificationStatus;
+          verified_at: string | null;
+          rating_avg: number;
+          rating_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_user_id: string;
+          type: ProviderType;
+          name_bn?: string | null;
+          name_en?: string | null;
+          description_bn?: string | null;
+          description_en?: string | null;
+          logo_url?: string | null;
+          phone: string;
+          whatsapp?: string | null;
+          email?: string | null;
+          website?: string | null;
+          trade_license_no?: string | null;
+          is_government?: boolean;
+          verification?: VerificationStatus;
+          verified_at?: string | null;
+          rating_avg?: number;
+          rating_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          owner_user_id?: string;
+          type?: ProviderType;
+          name_bn?: string | null;
+          name_en?: string | null;
+          description_bn?: string | null;
+          description_en?: string | null;
+          logo_url?: string | null;
+          phone?: string;
+          whatsapp?: string | null;
+          email?: string | null;
+          website?: string | null;
+          trade_license_no?: string | null;
+          is_government?: boolean;
+          verification?: VerificationStatus;
+          verified_at?: string | null;
+          rating_avg?: number;
+          rating_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      provider_locations: {
+        Row: {
+          id: string;
+          provider_id: string;
+          name_bn: string | null;
+          name_en: string | null;
+          address_bn: string | null;
+          address_en: string | null;
+          upazila_id: number | null;
+          location: unknown;
+          phone: string | null;
+          is_24h: boolean;
+          has_emergency: boolean;
+          offers_home_visit: boolean;
+          home_visit_radius_km: number | null;
+          species_treated: SpeciesType[];
+          photos: string[];
+          cancel_cutoff_hours: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          name_bn?: string | null;
+          name_en?: string | null;
+          address_bn?: string | null;
+          address_en?: string | null;
+          upazila_id?: number | null;
+          location: unknown;
+          phone?: string | null;
+          is_24h?: boolean;
+          has_emergency?: boolean;
+          offers_home_visit?: boolean;
+          home_visit_radius_km?: number | null;
+          species_treated?: SpeciesType[];
+          photos?: string[];
+          cancel_cutoff_hours?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          name_bn?: string | null;
+          name_en?: string | null;
+          address_bn?: string | null;
+          address_en?: string | null;
+          upazila_id?: number | null;
+          location?: unknown;
+          phone?: string | null;
+          is_24h?: boolean;
+          has_emergency?: boolean;
+          offers_home_visit?: boolean;
+          home_visit_radius_km?: number | null;
+          species_treated?: SpeciesType[];
+          photos?: string[];
+          cancel_cutoff_hours?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      location_hours: {
+        Row: {
+          id: string;
+          location_id: string;
+          weekday: number;
+          open_time: string;
+          close_time: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          weekday: number;
+          open_time: string;
+          close_time: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          weekday?: number;
+          open_time?: string;
+          close_time?: string;
+        };
+        Relationships: [];
+      };
+      location_vets: {
+        Row: {
+          location_id: string;
+          vet_id: string;
+        };
+        Insert: {
+          location_id: string;
+          vet_id: string;
+        };
+        Update: {
+          location_id?: string;
+          vet_id?: string;
+        };
+        Relationships: [];
+      };
+      provider_services: {
+        Row: {
+          id: string;
+          location_id: string;
+          service_id: number;
+          price: number | null;
+          price_max: number | null;
+          duration_min: number | null;
+          species: SpeciesType[] | null;
+          is_active: boolean;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          service_id: number;
+          price?: number | null;
+          price_max?: number | null;
+          duration_min?: number | null;
+          species?: SpeciesType[] | null;
+          is_active?: boolean;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          service_id?: number;
+          price?: number | null;
+          price_max?: number | null;
+          duration_min?: number | null;
+          species?: SpeciesType[] | null;
+          is_active?: boolean;
+        };
+        Relationships: [];
+      };
+      provider_documents: {
+        Row: {
+          id: string;
+          provider_id: string | null;
+          vet_id: string | null;
+          doc_type: string;
+          file_path: string;
+          status: VerificationStatus;
+          reviewed_by: string | null;
+          review_note: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id?: string | null;
+          vet_id?: string | null;
+          doc_type: string;
+          file_path: string;
+          status?: VerificationStatus;
+          reviewed_by?: string | null;
+          review_note?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string | null;
+          vet_id?: string | null;
+          doc_type?: string;
+          file_path?: string;
+          status?: VerificationStatus;
+          reviewed_by?: string | null;
+          review_note?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      clinic_suggestions: {
+        Row: {
+          id: string;
+          suggested_by: string | null;
+          name: string;
+          phone: string | null;
+          address: string | null;
+          location: unknown;
+          status: VerificationStatus;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          suggested_by?: string | null;
+          name: string;
+          phone?: string | null;
+          address?: string | null;
+          location?: unknown;
+          status?: VerificationStatus;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          suggested_by?: string | null;
+          name?: string;
+          phone?: string | null;
+          address?: string | null;
+          location?: unknown;
+          status?: VerificationStatus;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
