@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { PetListScreen } from '../features/pets';
-import type { PetRow, BreedRow, AddPetPayload } from '@pranora/api';
+import type { PetRow, BreedRow, AddPetPayload, PetOwnershipHistoryRow, OwnershipReason } from '@pranora/api';
 
 const MOCK_BREEDS: BreedRow[] = [
   { id: 1, species: 'dog', name_en: 'Mixed/Deshi', name_bn: 'মিশ্র/দেশি' },
@@ -39,8 +39,8 @@ const INITIAL_MOCK_PETS: PetRow[] = [
   {
     id: 'pet-2',
     owner_id: 'user-1',
-    shelter_id: null,
-    rescue_case_id: null,
+    shelter_id: 'shelter-dhaka-1',
+    rescue_case_id: 'rescue-case-8821',
     name: 'Luna',
     species: 'cat',
     breed_id: 4,
@@ -54,7 +54,7 @@ const INITIAL_MOCK_PETS: PetRow[] = [
     microchip_no: null,
     is_neutered: false,
     allergies: 'Chicken sensitivity',
-    notes: 'Indoor cat',
+    notes: 'Indoor cat, rescued in Dhanmondi',
     public_qr_slug: 'luna-qr-456',
     deleted_at: null,
     created_at: new Date().toISOString(),
@@ -63,8 +63,32 @@ const INITIAL_MOCK_PETS: PetRow[] = [
   },
 ];
 
+const INITIAL_HISTORY: Record<string, PetOwnershipHistoryRow[]> = {
+  'pet-2': [
+    {
+      id: 'hist-1',
+      pet_id: 'pet-2',
+      from_user_id: 'user-rescuer-1',
+      to_user_id: 'user-1',
+      reason: 'adoption',
+      note: 'Adopted through Dhanmondi Shelter handover',
+      created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
+    },
+    {
+      id: 'hist-0',
+      pet_id: 'pet-2',
+      from_user_id: null,
+      to_user_id: 'user-rescuer-1',
+      reason: 'rescue_intake',
+      note: 'Rescued from street injury, treated and registered',
+      created_at: new Date(Date.now() - 60 * 86400000).toISOString(),
+    },
+  ],
+};
+
 export default function PetsScreen() {
   const [pets, setPets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
+  const [historyStore, setHistoryStore] = useState<Record<string, PetOwnershipHistoryRow[]>>(INITIAL_HISTORY);
 
   const handleAddPet = async (payload: AddPetPayload) => {
     const newPet: PetRow = {
@@ -117,6 +141,42 @@ export default function PetsScreen() {
     return {};
   };
 
+  const handleTransferPet = async ({
+    pet_id,
+    to_user_id,
+    reason,
+    note,
+  }: {
+    pet_id: string;
+    to_user_id: string;
+    reason: OwnershipReason;
+    note?: string;
+  }) => {
+    // Simulate transfer: update owner, record history
+    const newRecord: PetOwnershipHistoryRow = {
+      id: `hist-${Date.now()}`,
+      pet_id,
+      from_user_id: 'user-1',
+      to_user_id,
+      reason,
+      note: note ?? null,
+      created_at: new Date().toISOString(),
+    };
+
+    setHistoryStore((prev) => ({
+      ...prev,
+      [pet_id]: [newRecord, ...(prev[pet_id] || [])],
+    }));
+
+    // Remove from current owner's active list
+    setPets((prev) => prev.filter((p) => p.id !== pet_id));
+    return {};
+  };
+
+  const handleFetchHistory = async (petId: string) => {
+    return historyStore[petId] || [];
+  };
+
   return (
     <View className="flex-1 bg-white">
       <PetListScreen
@@ -125,6 +185,8 @@ export default function PetsScreen() {
         onAddPet={handleAddPet}
         onEditPet={handleEditPet}
         onDeletePet={handleDeletePet}
+        onTransferPet={handleTransferPet}
+        onFetchHistory={handleFetchHistory}
       />
     </View>
   );

@@ -70,3 +70,28 @@ export const DeletePetSchema = z.object({
 });
 
 export type DeletePetInput = z.infer<typeof DeletePetSchema>;
+
+// ── PET-5: Ownership Transfer & Rescue Linking ───────────────────────────────
+
+export const OwnershipReasonSchema = z.enum([
+  'registered',
+  'rescue_intake',
+  'adoption',
+  'admin_transfer',
+]);
+export type OwnershipReason = z.infer<typeof OwnershipReasonSchema>;
+
+export const TransferPetSchema = z.object({
+  pet_id: z.string().uuid(),
+  to_user_id: z.string().uuid(),
+  reason: OwnershipReasonSchema,
+  note: z.string().max(500).optional(),
+});
+export type TransferPetInput = z.infer<typeof TransferPetSchema>;
+
+export const LinkRescuePetSchema = z.object({
+  pet_id: z.string().uuid(),
+  rescue_case_id: z.string().uuid(),
+});
+export type LinkRescuePetInput = z.infer<typeof LinkRescuePetSchema>;
+
