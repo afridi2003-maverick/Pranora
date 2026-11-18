@@ -1,0 +1,63 @@
+{
+  "title": "Verification Management",
+  "subtitle": "Pending Requests",
+  "tabs": {
+    "roles": "Role Requests",
+    "providers": "Provider Documents"
+  },
+  "filters": {
+    "all": "All",
+    "rescuer": "Rescuer",
+    "shelter": "Shelter",
+    "vet": "Veterinarian",
+    "provider": "Provider",
+    "adoption_lister": "Adoption Lister"
+  },
+  "card": {
+    "requested": "Requested on",
+    "role": "Role",
+    "phone": "Phone",
+    "doc_type": "Document Type",
+    "provider": "Institution"
+  },
+  "doc_types": {
+    "bvc_certificate": "BVC Certificate",
+    "trade_license": "Trade License",
+    "nid": "National ID",
+    "other": "Other"
+  },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "view_doc": "View Document",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "modal": {
+    "approve_title": "Approve verification?",
+    "reject_title": "Reject verification?",
+    "approve_desc": "Approving will grant the user full {{role}} privileges on Pranora.",
+    "reject_desc": "Reason for rejection (optional):",
+    "note_placeholder": "Enter rejection reason..."
+  },
+  "status": {
+    "pending": "Pending",
+    "verified": "Verified",
+    "rejected": "Rejected",
+    "draft": "Draft",
+    "suspended": "Suspended"
+  },
+  "empty": {
+    "title": "No pending verifications",
+    "desc": "All verification requests have been reviewed."
+  },
+  "loading": "Loading verification requests...",
+  "success": {
+    "approved": "Successfully approved",
+    "rejected": "Request rejected"
+  },
+  "error": {
+    "load_failed": "Could not load requests. Please try again.",
+    "action_failed": "Action failed. Please try again."
+  }
+}
