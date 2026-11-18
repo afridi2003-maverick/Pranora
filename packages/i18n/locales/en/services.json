@@ -4,6 +4,21 @@
     "title": "All Services",
     "subtitle": "Everything your pet needs"
   },
+  "categories": {
+    "vet": "Veterinary",
+    "vaccination": "Vaccination",
+    "emergency": "Emergency",
+    "rescue": "Rescue & Shelter",
+    "adoption": "Adoption",
+    "grooming": "Grooming",
+    "boarding": "Boarding",
+    "home_visit": "Home Visit",
+    "online_consult": "Online Consult",
+    "pet_shop": "Pet Shop",
+    "training": "Training",
+    "sitting": "Pet Sitting & Walking",
+    "taxi": "Pet Taxi"
+  },
   "types": {
     "vet_appointment": "Vet Appointment",
     "vaccination": "Vaccination",
@@ -23,6 +38,13 @@
     "mvp": "Available now",
     "coming": "Coming soon"
   },
+  "actions": {
+    "viewAll": "View All",
+    "bookNow": "Book Now",
+    "learnMore": "Learn More"
+  },
+  "empty": "No services available",
+  "comingSoon": "Coming soon",
   "tips": {
     "title": "Tips & Articles",
     "readMore": "Read More",
