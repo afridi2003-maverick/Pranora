@@ -20,7 +20,7 @@ export default function ClinicDetailPage() {
   const router = useRouter();
   const { isBangla } = useLocale();
 
-  const clinicId = Array.isArray(params?.id) ? params.id[0] : (params?.id as string);
+  const clinicId = (Array.isArray(params?.id) ? params.id[0] : (params?.id as string)) || '';
 
   const [clinic, setClinic] = useState<ClinicFullDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,6 +34,10 @@ export default function ClinicDetailPage() {
   useEffect(() => {
     let isMounted = true;
     async function loadData() {
+      if (!clinicId) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const data = await getClinicFullDetail(clinicId);

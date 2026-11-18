@@ -1,6 +1,8 @@
 // packages/api/src/admin/index.ts
-// Owner: Afridi | Tasks: ADM-1, ADM-4, ADM-3
-// Admin verification, audit logs, and urgent rescue queue
+// Owner: Afridi | Tasks: ADM-1, ADM-4, ADM-3, ADM-2
+// Admin verification, audit logs, urgent rescue queue, and content moderation
+
+export * from './moderation';
 
 import type { TypedSupabaseClient } from '../client';
 import type {
