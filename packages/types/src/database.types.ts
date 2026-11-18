@@ -733,9 +733,221 @@ export interface Database {
         };
         Relationships: [];
       };
+      animal_reports: {
+        Row: {
+          id: string;
+          reporter_id: string;
+          kind: AnimalReportKind;
+          pet_id: string | null;
+          species: SpeciesType;
+          urgency: UrgencyLevel;
+          last_seen_at: string | null;
+          contact_phone: string | null;
+          description: string | null;
+          photos: string[];
+          location: unknown;
+          area_text: string | null;
+          upazila_id: number | null;
+          district_id: number | null;
+          status: RescueStatus;
+          duplicate_of: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          reporter_id: string;
+          kind: AnimalReportKind;
+          pet_id?: string | null;
+          species?: SpeciesType;
+          urgency?: UrgencyLevel;
+          last_seen_at?: string | null;
+          contact_phone?: string | null;
+          description?: string | null;
+          photos?: string[];
+          location: unknown;
+          area_text?: string | null;
+          upazila_id?: number | null;
+          district_id?: number | null;
+          status?: RescueStatus;
+          duplicate_of?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          reporter_id?: string;
+          kind?: AnimalReportKind;
+          pet_id?: string | null;
+          species?: SpeciesType;
+          urgency?: UrgencyLevel;
+          last_seen_at?: string | null;
+          contact_phone?: string | null;
+          description?: string | null;
+          photos?: string[];
+          location?: unknown;
+          area_text?: string | null;
+          upazila_id?: number | null;
+          district_id?: number | null;
+          status?: RescueStatus;
+          duplicate_of?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rescue_cases: {
+        Row: {
+          id: string;
+          report_id: string;
+          status: RescueStatus;
+          shelter_id: string | null;
+          assigned_rescuer_id: string | null;
+          pet_id: string | null;
+          outcome: RescueOutcome | null;
+          outcome_note: string | null;
+          closed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          report_id: string;
+          status?: RescueStatus;
+          shelter_id?: string | null;
+          assigned_rescuer_id?: string | null;
+          pet_id?: string | null;
+          outcome?: RescueOutcome | null;
+          outcome_note?: string | null;
+          closed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          report_id?: string;
+          status?: RescueStatus;
+          shelter_id?: string | null;
+          assigned_rescuer_id?: string | null;
+          pet_id?: string | null;
+          outcome?: RescueOutcome | null;
+          outcome_note?: string | null;
+          closed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rescue_assignments: {
+        Row: {
+          id: string;
+          case_id: string;
+          rescuer_id: string;
+          assigned_by: string;
+          status: AssignmentStatus;
+          decline_reason: string | null;
+          responded_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          case_id: string;
+          rescuer_id: string;
+          assigned_by: string;
+          status?: AssignmentStatus;
+          decline_reason?: string | null;
+          responded_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          case_id?: string;
+          rescuer_id?: string;
+          assigned_by?: string;
+          status?: AssignmentStatus;
+          decline_reason?: string | null;
+          responded_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      rescue_case_updates: {
+        Row: {
+          id: string;
+          case_id: string;
+          author_id: string;
+          status: RescueStatus | null;
+          note: string | null;
+          photos: string[];
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          case_id: string;
+          author_id: string;
+          status?: RescueStatus | null;
+          note?: string | null;
+          photos?: string[];
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          case_id?: string;
+          author_id?: string;
+          status?: RescueStatus | null;
+          note?: string | null;
+          photos?: string[];
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
+      review_animal_report: {
+        Args: {
+          p_report_id: string;
+          p_accept: boolean;
+          p_shelter_id?: string | null;
+        };
+        Returns: string | null;
+      };
+      assign_rescuer: {
+        Args: {
+          p_case_id: string;
+          p_rescuer_id: string;
+        };
+        Returns: string;
+      };
+      respond_to_assignment: {
+        Args: {
+          p_assignment_id: string;
+          p_accept: boolean;
+          p_decline_reason?: string | null;
+        };
+        Returns: boolean;
+      };
+      close_rescue_case: {
+        Args: {
+          p_case_id: string;
+          p_outcome: RescueOutcome;
+          p_note?: string | null;
+          p_pet_id?: string | null;
+        };
+        Returns: boolean;
+      };
+      my_report_status: {
+        Args: {
+          p_report_id: string;
+        };
+        Returns: Json;
+      };
       has_role: {
         Args: {
           target_user_id: string;
