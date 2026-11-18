@@ -227,6 +227,27 @@ export async function getMyAssignedCases(
   return (data ?? []) as unknown as RescueCaseRow[];
 }
 
+/** Fetch assignments offered to or responded by the current rescuer */
+export async function getMyRescueAssignments(
+  client: TypedSupabaseClient,
+  rescuerId: string,
+  status?: AssignmentStatus
+): Promise<RescueAssignmentRow[]> {
+  let query = client
+    .from('rescue_assignments')
+    .select('*')
+    .eq('rescuer_id', rescuerId)
+    .order('created_at', { ascending: false });
+
+  if (status) {
+    query = query.eq('status', status);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as unknown as RescueAssignmentRow[];
+}
+
 /** Fetch case updates / timeline */
 export async function getRescueCaseUpdates(
   client: TypedSupabaseClient,
