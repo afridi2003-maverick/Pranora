@@ -58,5 +58,28 @@
   "qr": {
     "label": "QR ID Card",
     "download": "Download"
+  },
+  "validation": {
+    "name_required": "Pet name is required",
+    "name_too_long": "Name must be 60 characters or fewer",
+    "breed_too_long": "Breed name must be 80 characters or fewer",
+    "invalid_date": "Date must be in YYYY-MM-DD format",
+    "weight_positive": "Weight must be a positive number",
+    "weight_too_large": "Weight seems too large",
+    "invalid_url": "Invalid photo URL"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "addPhoto": "Add Photo",
+    "changePhoto": "Change Photo"
+  },
+  "toast": {
+    "added": "Pet profile created!",
+    "updated": "Pet profile updated!",
+    "deleted": "Pet profile removed."
   }
 }

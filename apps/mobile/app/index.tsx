@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { isBangla, toggleLocale } = useLocale();
 
   return (
@@ -26,6 +28,29 @@ export default function HomeScreen() {
           🌐 {isBangla ? 'Switch to English' : 'বাংলায় দেখুন'}
         </Text>
       </TouchableOpacity>
+
+      {/* Navigation Buttons */}
+      <View className="w-full gap-3 mb-6">
+        <TouchableOpacity
+          onPress={() => router.push('/pets')}
+          className="w-full py-3.5 rounded-xl bg-primary items-center"
+          activeOpacity={0.8}
+        >
+          <Text className="text-white text-base font-bold">
+            🐾 {isBangla ? 'আমার পোষা প্রাণী' : 'My Pets'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push('/notifications')}
+          className="w-full py-3.5 rounded-xl bg-white border border-gray-300 items-center"
+          activeOpacity={0.8}
+        >
+          <Text className="text-gray-800 text-base font-semibold">
+            🔔 {isBangla ? 'বিজ্ঞপ্তি' : 'Notifications'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity
         className="w-full py-4 rounded-xl bg-emergency items-center mb-4"

@@ -22,8 +22,14 @@ function HomeContent() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
-            href="/services"
+            href="/pets"
             className="px-6 py-3 rounded-full bg-green-600 text-white font-medium hover:bg-green-700 transition shadow-1 min-h-[44px] flex items-center"
+          >
+            🐾 {isBangla ? 'আমার পোষা প্রাণী' : 'My Pets'}
+          </a>
+          <a
+            href="/services"
+            className="px-6 py-3 rounded-full bg-white border border-green-600 text-green-700 font-medium hover:bg-green-50 transition shadow-1 min-h-[44px] flex items-center"
           >
             {isBangla ? 'সেবাসমূহ দেখুন' : 'Explore Services'}
           </a>

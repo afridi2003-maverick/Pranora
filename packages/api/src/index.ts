@@ -6,4 +6,5 @@ export * from './admin';
 export * from './booking';
 export * from './map';
 export * from './clinics';
+export * from './pets';
 

@@ -75,7 +75,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### Pets & Health
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| PET-1 | Add / edit / delete pets | Zihad | M | S3 | DB-3, UI-1, I18N-1, (AUTH-1) | ⬜ |
+| PET-1 | Add / edit / delete pets | Zihad | M | S3 | DB-3, UI-1, I18N-1, (AUTH-1) | ✅ |
 | PET-5 | One profile for life: rescued animal profile, ownership transfer keeps records | Zihad | M | S4 | PET-1, (DB-8), (AUTH-5) | ⬜ |
 | HLT-1 | Vaccine record + schedule auto-generation | Zihad | L | S4 | PET-1, DB-7 | ⬜ |
 | HLT-3 | Medical history (vet-written, owner read-only) + owner uploads | Zihad | M | S5 | PET-1, (AUTH-5) | ⬜ |
