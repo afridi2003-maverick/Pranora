@@ -113,11 +113,21 @@ export default function RescueReportScreen() {
           </View>
 
           <TouchableOpacity
-            onPress={() => setSubmittedReportId(null)}
+            onPress={() => router.push(`/rescue/status?id=${submittedReportId}`)}
             className="w-full py-3 rounded-xl bg-primary items-center mb-3"
             activeOpacity={0.8}
           >
             <Text className="text-white font-bold">
+              🔍 {isBangla ? 'অগ্রগতি ট্র্যাক করুন' : 'Track Status'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setSubmittedReportId(null)}
+            className="w-full py-3 rounded-xl bg-green-50 border border-green-300 items-center mb-3"
+            activeOpacity={0.8}
+          >
+            <Text className="text-green-800 font-bold">
               {isBangla ? 'নতুন রিপোর্ট করুন' : 'Submit Another Report'}
             </Text>
           </TouchableOpacity>
