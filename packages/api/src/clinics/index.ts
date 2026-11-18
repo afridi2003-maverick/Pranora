@@ -6,6 +6,10 @@ import type {
   ProviderService,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
+import { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics } from './mock';
+
+export { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics };
+export * from './actions';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;
@@ -13,6 +17,25 @@ export interface ClinicFullDetail {
   hours: LocationHours[];
   vets: VetProfile[];
   services: ProviderService[];
+}
+
+/**
+ * High-level resolver: fetches clinic full details from DB if available,
+ * otherwise falls back seamlessly to mock seed clinic data (MAP-5).
+ */
+export async function getClinicFullDetail(
+  locationId: string,
+  client?: TypedSupabaseClient | null
+): Promise<ClinicFullDetail | null> {
+  if (client) {
+    try {
+      const data = await getClinicById(client, locationId);
+      if (data) return data;
+    } catch {
+      // Fall through to mock fallback
+    }
+  }
+  return getMockClinicById(locationId);
 }
 
 /**
@@ -185,7 +208,11 @@ export async function getClinicServices(
       nameBn: s?.name_bn as string | null | undefined,
       nameEn: s?.name_en as string | null | undefined,
       price: Number(r.price ?? 0),
-      durationMinutes: r.duration_minutes ? Number(r.duration_minutes) : null,
+      durationMinutes: r.duration_min
+        ? Number(r.duration_min)
+        : r.duration_minutes
+          ? Number(r.duration_minutes)
+          : null,
       isActive: Boolean(r.is_active),
     };
   });

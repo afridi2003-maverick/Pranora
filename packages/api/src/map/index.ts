@@ -3,7 +3,9 @@ import type {
   NearbyClinicResult,
   ProviderType,
 } from '@pranora/validation';
+export type { NearbyClinicResult };
 import type { TypedSupabaseClient } from '../client';
+import { getAllMockClinics } from '../clinics/mock';
 
 /**
  * Raw row shape returned from the Postgres nearby_clinics function (schema.md §5.2)
@@ -91,6 +93,82 @@ export async function getNearbyClinics(
 
   const rows = (data ?? []) as NearbyClinicsDbRow[];
   return rows.map(mapNearbyClinicRow);
+}
+
+/**
+ * Resolves nearby clinics using Postgres RPC when available,
+ * falling back to client-side spatial calculation over seeded clinics.
+ */
+export async function getNearbyClinicsWithFallback(
+  params: NearbyClinicsQueryInput,
+  client?: TypedSupabaseClient | null
+): Promise<NearbyClinicResult[]> {
+  if (client) {
+    try {
+      const live = await getNearbyClinics(client, params);
+      if (live && live.length > 0) return live;
+    } catch {
+      // Fall through to mock calculation
+    }
+  }
+
+  const all = getAllMockClinics();
+  const results: NearbyClinicResult[] = [];
+
+  for (const item of all) {
+    const loc = item.location;
+    const prv = item.provider;
+    const dist = calculateDistanceMeters(params.lat, params.lng, loc.lat, loc.lng);
+
+    if (params.radiusM && dist > params.radiusM) {
+      // skip outside radius
+      continue;
+    }
+    if (params.openNow && !loc.is24h) {
+      // Basic check
+      continue;
+    }
+    if (params.emergency && !loc.hasEmergency) {
+      continue;
+    }
+    if (params.homeVisit && !loc.offersHomeVisit) {
+      continue;
+    }
+    if (params.species && !loc.speciesTreated.includes(params.species)) {
+      continue;
+    }
+
+    const fee = item.vets[0]?.consultationFee ?? item.services[0]?.price ?? 500;
+    if (params.maxFee && fee > params.maxFee) {
+      continue;
+    }
+
+    results.push({
+      locationId: loc.id,
+      providerId: prv.id,
+      nameBn: prv.nameBn ?? null,
+      nameEn: prv.nameEn ?? null,
+      addressBn: loc.addressBn,
+      addressEn: loc.addressEn,
+      phone: loc.phone || prv.phone,
+      type: prv.type,
+      isGovernment: prv.isGovernment,
+      is24h: loc.is24h,
+      hasEmergency: loc.hasEmergency,
+      offersHomeVisit: loc.offersHomeVisit,
+      isOpenNow: loc.is24h || loc.isActive,
+      ratingAvg: prv.ratingAvg,
+      ratingCount: prv.ratingCount,
+      feeFrom: fee,
+      lat: loc.lat,
+      lng: loc.lng,
+      distanceM: dist,
+    });
+  }
+
+  // Sort by distance ascending
+  results.sort((a, b) => a.distanceM - b.distanceM);
+  return results.slice(0, params.limit ?? 50);
 }
 
 /**

@@ -8,6 +8,7 @@ import type { RescueCaseFullDetails } from './caseDetailMockData';
 import { CaseUpdateTimeline } from './CaseUpdateTimeline';
 import { AddCaseUpdateForm } from './AddCaseUpdateForm';
 import { CloseCaseOutcomeModal } from './CloseCaseOutcomeModal';
+import { UrgentReportAlertBanner } from './UrgentReportAlertBanner';
 
 interface RescueCaseDetailsProps {
   initialDetails: RescueCaseFullDetails;
@@ -128,6 +129,9 @@ export function RescueCaseDetails({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Urgent Report Alert & 15-min Escalation Window (RSC-6) */}
+      <UrgentReportAlertBanner report={report} />
+
       {/* 1. Header Card */}
       <Card className="p-6 bg-white dark:bg-neutral-900 border-stroke-subtle shadow-sm space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-stroke-subtle">

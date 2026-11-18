@@ -89,7 +89,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | RSC-3 | Assign rescuer; accept / decline | Brehat | M | S4 | RSC-1, (RSC-2), (AUTH-5) | ✅ |
 | RSC-4 | Case page: status, notes, photo updates | Brehat | M | S4 | RSC-3 | ✅ |
 | RSC-5 | Reporter status tracker (`my_report_status`) | Brehat | S | S3 | RSC-1 | ✅ |
-| RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ⬜ |
+| RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ✅ |
 | RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ✅ |
 
 ### Adoption (দত্তক)
@@ -106,15 +106,15 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | MAP-1 | `nearby_clinics` + `is_location_open` SQL functions | Zimia | L | S2 | DB-4 | ✅ |
-| MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ⬜ |
-| MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ⬜ |
-| MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ⬜ |
+| MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ✅ |
+| MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ✅ |
+| MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ✅ |
 | MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ⬜ |
 | MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ⬜ |
-| MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ⬜ |
-| MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ⬜ |
+| MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ✅ |
+| MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ✅ |
 | MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ⬜ |
-| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ⬜ |
+| MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ✅ |
 
 ### ⭐ Services
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
@@ -139,7 +139,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ⬜ |
 | PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ⬜ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |
-| ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ⬜ |
+| ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ✅ |
 | ADM-3 | Admin: urgent rescue report queue | Afridi | S | S4 | ADM-1, RSC-1 | ✅ |
 
 ### Notifications

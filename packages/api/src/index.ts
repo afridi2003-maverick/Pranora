@@ -6,6 +6,7 @@ export * from './admin';
 export * from './booking';
 export * from './map';
 export * from './clinics';
+export { buildTelUrl } from './clinics';
 export * from './pets';
 export * from './rescue';
 export * from './adoption';

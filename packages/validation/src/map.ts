@@ -95,7 +95,8 @@ export const nearbyClinicsQuerySchema = z.object({
   types: z.array(providerTypeSchema).default(VET_PROVIDER_TYPES),
   limit: z.number().int().min(1).max(100).default(50),
 });
-export type NearbyClinicsQueryInput = z.infer<typeof nearbyClinicsQuerySchema>;
+export type NearbyClinicsQueryInput = z.input<typeof nearbyClinicsQuerySchema>;
+export type NearbyClinicsQueryOutput = z.output<typeof nearbyClinicsQuerySchema>;
 
 /**
  * Integration Contract 5.2 / MAP-1: Result row returned by nearby_clinics RPC
