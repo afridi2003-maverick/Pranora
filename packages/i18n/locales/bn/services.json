@@ -4,6 +4,21 @@
     "title": "সব সেবা",
     "subtitle": "আপনার পোষা প্রাণীর জন্য যা প্রয়োজন"
   },
+  "categories": {
+    "vet": "ডাক্তার দেখান",
+    "vaccination": "টিকা",
+    "emergency": "জরুরি সেবা",
+    "rescue": "উদ্ধার ও আশ্রয়",
+    "adoption": "দত্তক",
+    "grooming": "গ্রুমিং",
+    "boarding": "বোর্ডিং",
+    "home_visit": "বাড়িতে ডাক্তার",
+    "online_consult": "অনলাইন পরামর্শ",
+    "pet_shop": "পেট শপ",
+    "training": "প্রশিক্ষণ",
+    "sitting": "পেট সিটিং ও হাঁটানো",
+    "taxi": "পেট ট্যাক্সি"
+  },
   "types": {
     "vet_appointment": "পশু ডাক্তার দেখানো",
     "vaccination": "টিকা",
@@ -23,6 +38,13 @@
     "mvp": "এখনই পাওয়া যায়",
     "coming": "শীঘ্রই আসছে"
   },
+  "actions": {
+    "viewAll": "সব দেখুন",
+    "bookNow": "এখনই বুক করুন",
+    "learnMore": "আরও জানুন"
+  },
+  "empty": "কোনো সেবা পাওয়া যায়নি",
+  "comingSoon": "শীঘ্রই আসছে",
   "tips": {
     "title": "পরামর্শ ও নিবন্ধ",
     "readMore": "আরও পড়ুন",
