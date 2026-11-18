@@ -158,10 +158,10 @@ def build_full_report(pdf_path):
     
     # Summary KPI Cards (4 cards)
     cards = [
-        ("TOTAL TASKS DONE", "36 / 64", "56.3% Completed", 0.09, 0.64, 0.29),
-        ("EFFORT POINTS", "75 / 132", "56.8% Points Done", 0.14, 0.38, 0.92),
+        ("TOTAL TASKS DONE", "41 / 64", "64.1% Completed", 0.09, 0.64, 0.29),
+        ("EFFORT POINTS", "85 / 132", "64.4% Points Done", 0.14, 0.38, 0.92),
         ("PHASE 0 (SETUP)", "13 / 13", "100% Completed", 0.09, 0.64, 0.29),
-        ("TOP PERFORMERS", "Zihad & Afridi", "84.6% Done (11 tasks each)", 0.85, 0.45, 0.05),
+        ("TOP CONTRIBUTOR", "Zihad", "92.3% Done (12 tasks)", 0.85, 0.45, 0.05),
     ]
     card_w = 124
     for i, (label, val, sub, cr, cg, cb) in enumerate(cards):
@@ -188,10 +188,10 @@ def build_full_report(pdf_path):
         p1.text(hx, 658, h, font="F2", size=7.5, r=0.2, g=0.25, b=0.3)
         
     members_data = [
-        ("M. Z. H. Zihad", "Product & Health Lead", "zihad", "11 / 13", "84.6%", "25 / 28", "89.3%", True),
+        ("M. Z. H. Zihad", "Product & Health Lead", "zihad", "12 / 13", "92.3%", "27 / 28", "96.4%", True),
         ("M. H. Afridi", "Platform Lead", "afridi", "11 / 13", "84.6%", "22 / 27", "81.5%", False),
-        ("Brehat Dey", "Rescue & Adoption Lead", "brihoth", "8 / 13", "61.5%", "15 / 25", "60.0%", True),
-        ("Zimia Samia", "Vet Discovery Lead", "zimia", "5 / 13", "38.5%", "11 / 26", "42.3%", False),
+        ("Brehat Dey", "Rescue & Adoption Lead", "brihoth", "9 / 13", "69.2%", "17 / 25", "68.0%", True),
+        ("Zimia Samia", "Vet Discovery Lead", "zimia", "8 / 13", "61.5%", "17 / 26", "65.4%", False),
         ("Tain Tabassum", "Vet Booking Lead", "tain", "1 / 12", "8.3%", "2 / 26", "7.7%", True),
     ]
     
