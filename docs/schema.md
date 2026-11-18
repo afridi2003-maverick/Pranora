@@ -1059,6 +1059,67 @@ Creates a booking atomically with double-booking prevention and short code gener
 - **Access:** Security definer; callable by authenticated users.
 - **Logic:** Computes the first due date from `coalesce(pets.date_of_birth, current_date) + (first_dose_age_weeks * 7)` and loops over the template dose count, populating `vaccinations` with scheduled dates.
 
+### 5.6 Rescue RPC Signatures & Contracts (Brehat — Contract 9)
+
+#### 1. `review_animal_report(p_report_id uuid, p_accept boolean, p_shelter_id uuid default null)`
+Reviewer (admin or verified shelter staff) accepts or rejects a submitted report.
+- **Parameters:**
+  - `p_report_id uuid not null`: Report identifier.
+  - `p_accept boolean not null`: True to accept and open a rescue case; false to reject.
+  - `p_shelter_id uuid`: Optional reviewing shelter ID.
+- **Returns:** `uuid` (the new `rescue_cases.id` if accepted, or null if rejected).
+- **Invariants:**
+  - Only users with role `admin` or verified role `shelter` may execute.
+  - On accept, transitions `animal_reports.status` to `'under_review'` and creates `rescue_cases` row.
+  - Appends an audit note in `rescue_case_updates`.
+
+#### 2. `assign_rescuer(p_case_id uuid, p_rescuer_id uuid)`
+Offers a rescue case to one verified rescuer.
+- **Parameters:**
+  - `p_case_id uuid not null`: Rescue case identifier.
+  - `p_rescuer_id uuid not null`: Target verified rescuer profile ID.
+- **Returns:** `uuid` (`rescue_assignments.id`).
+- **Invariants:**
+  - Case must not be closed, rejected, or duplicate.
+  - Target user must have a verified `rescuer` role.
+  - Any prior `offered` assignment for this case is withdrawn.
+  - Updates case status to `'assigned'`.
+
+#### 3. `respond_to_assignment(p_assignment_id uuid, p_accept boolean, p_decline_reason text default null)`
+Rescuer responds to an offered assignment.
+- **Parameters:**
+  - `p_assignment_id uuid not null`: Assignment identifier.
+  - `p_accept boolean not null`: True to accept assignment; false to decline.
+  - `p_decline_reason text`: Reason if declining.
+- **Returns:** `boolean`.
+- **Invariants:**
+  - Only the assigned rescuer (or admin) can respond.
+  - On accept, marks assignment `'accepted'`, case status `'rescue_in_progress'`, and sets `assigned_rescuer_id`.
+  - On decline, marks assignment `'declined'` and reverts case status to `'under_review'`.
+
+#### 4. `close_rescue_case(p_case_id uuid, p_outcome rescue_outcome, p_note text default null, p_pet_id uuid default null)`
+Concludes an active rescue case with a required outcome.
+- **Parameters:**
+  - `p_case_id uuid not null`: Rescue case identifier.
+  - `p_outcome rescue_outcome not null`: Outcome enum (`treated`, `sent_to_shelter`, `adopted`, `returned_to_owner`, `released`, `died`, `not_found`, `other`).
+  - `p_note text`: Closing notes.
+  - `p_pet_id uuid`: Optional pet profile created for the animal (PET-5).
+- **Returns:** `boolean`.
+- **Invariants:**
+  - Allowed only for assigned rescuer, case shelter, or admin.
+  - Sets case and report status to `'closed'` and records `closed_at`.
+
+#### 5. `my_report_status(p_report_id uuid)`
+Reporter-safe query for tracking their report status without revealing rescuer personal info.
+- **Parameters:** `p_report_id uuid not null`.
+- **Returns:** `jsonb` with simplified bilingual labels:
+  - `submitted` -> 'জমা' / 'Submitted'
+  - `under_review` -> 'দেখা হচ্ছে' / 'Under Review'
+  - `assigned` -> 'উদ্ধারকারী নির্ধারিত' / 'Rescuer Assigned'
+  - `rescue_in_progress` -> 'উদ্ধার চলছে' / 'Rescue In Progress'
+  - `closed` -> 'শেষ' / 'Closed'
+
+
 
 ---
 

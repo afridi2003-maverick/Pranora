@@ -61,7 +61,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | DB-5 | Migrations: bookings, availability (slots + serials) | Tain | M | S2 | DB-1, (DB-3), (DB-4) | ✅ |
 | DB-6 | RLS framework: `has_role`/`is_admin` helpers, pgTAP harness, core-table policies (each owner adds policies + tests for their own tables) | Afridi | L | S2 | DB-1 | ✅ |
 | DB-7 | Seed service catalog + vaccine templates | Zihad | M | S3 | DB-3, (DB-4) | ✅ |
-| DB-8 | Migrations: rescue (animal_reports, cases, assignments, updates, `lost_found_board`) | Brehat | M | S2 | DB-1, (DB-3), (DB-4) | ⬜ |
+| DB-8 | Migrations: rescue (animal_reports, cases, assignments, updates, `lost_found_board`) | Brehat | M | S2 | DB-1, (DB-3), (DB-4) | ✅ |
 | DB-9 | Migrations: adoption (listings, applications, handovers, favorites, follow-ups) | Brehat | M | S2 | DB-8 | ⬜ |
 
 ### Auth & Onboarding
