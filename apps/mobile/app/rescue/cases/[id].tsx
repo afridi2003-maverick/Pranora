@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
 import {
@@ -7,7 +7,7 @@ import {
   MOCK_CASE_DETAILS,
   type RescueCaseFullDetails,
 } from '../../../features/rescue';
-import type { RescueStatus } from '@pranora/types';
+import type { RescueStatus, RescueOutcome } from '@pranora/types';
 
 export default function RescueCaseScreen() {
   const router = useRouter();
@@ -65,6 +65,17 @@ export default function RescueCaseScreen() {
     return {};
   };
 
+  const handleCloseCase = async (payload: {
+    case_id: string;
+    outcome: RescueOutcome;
+    note?: string | null;
+    pet_id?: string | null;
+  }): Promise<{ error?: string }> => {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    console.log('Mobile close case:', payload);
+    return {};
+  };
+
   return (
     <View className="flex-1 bg-white">
       {/* Header Bar */}
@@ -82,14 +93,7 @@ export default function RescueCaseScreen() {
       <RescueCaseDetails
         initialDetails={caseData}
         onAddUpdate={handleAddUpdate}
-        onCloseCaseClick={() => {
-          Alert.alert(
-            isBangla ? 'কেস সমাপ্তি' : 'Close Case',
-            isBangla
-              ? 'কেস সমাপ্ত করতে ফলাফল ও চিকিৎসার রেকর্ড পূরণ করতে হবে (RSC-7)।'
-              : 'Closing case requires recording outcome notes (RSC-7).'
-          );
-        }}
+        onCloseCase={handleCloseCase}
       />
     </View>
   );

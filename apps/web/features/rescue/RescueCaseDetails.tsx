@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Card, Button } from '@pranora/ui';
-import type { RescueStatus } from '@pranora/types';
+import type { RescueStatus, RescueOutcome } from '@pranora/types';
 import type { RescueCaseFullDetails } from './caseDetailMockData';
 import { CaseUpdateTimeline } from './CaseUpdateTimeline';
 import { AddCaseUpdateForm } from './AddCaseUpdateForm';
+import { CloseCaseOutcomeModal } from './CloseCaseOutcomeModal';
 
 interface RescueCaseDetailsProps {
   initialDetails: RescueCaseFullDetails;
@@ -16,17 +17,25 @@ interface RescueCaseDetailsProps {
     status?: RescueStatus | null;
     photos?: string[];
   }) => Promise<{ error?: string }>;
+  onCloseCase?: (payload: {
+    case_id: string;
+    outcome: RescueOutcome;
+    note?: string | null;
+    pet_id?: string | null;
+  }) => Promise<{ error?: string }>;
   onCloseCaseClick?: () => void;
 }
 
 export function RescueCaseDetails({
   initialDetails,
   onAddUpdate,
+  onCloseCase,
   onCloseCaseClick,
 }: RescueCaseDetailsProps) {
   const { isBangla } = useLocale();
   const [details, setDetails] = useState<RescueCaseFullDetails>(initialDetails);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
 
   const { rescueCase, report, updates } = details;
 
@@ -43,7 +52,6 @@ export function RescueCaseDetails({
         if (res.error) return res;
       }
 
-      // Optimistic local state update
       const newUpdate = {
         id: `upd-${Date.now().toString(36)}`,
         case_id: payload.case_id,
@@ -71,6 +79,51 @@ export function RescueCaseDetails({
     }
   };
 
+  const handleExecuteClose = async (payload: {
+    case_id: string;
+    outcome: RescueOutcome;
+    note?: string | null;
+    pet_id?: string | null;
+  }): Promise<{ error?: string; success?: boolean }> => {
+    setIsSubmitting(true);
+    try {
+      if (onCloseCase) {
+        const res = await onCloseCase(payload);
+        if (res.error) return res;
+      }
+
+      const closedTimestamp = new Date().toISOString();
+      const closeAuditUpdate = {
+        id: `upd-close-${Date.now().toString(36)}`,
+        case_id: payload.case_id,
+        author_id: 'rescuer-current',
+        author_name: isBangla ? 'উদ্ধারকারী দল' : 'Rescue Team',
+        author_role: 'rescuer',
+        status: 'closed' as RescueStatus,
+        note: `[Case Closed] Outcome: ${payload.outcome}. ${payload.note || ''}`,
+        photos: [],
+        created_at: closedTimestamp,
+      };
+
+      setDetails((prev) => ({
+        ...prev,
+        rescueCase: {
+          ...prev.rescueCase,
+          status: 'closed',
+          outcome: payload.outcome,
+          outcome_note: payload.note || null,
+          closed_at: closedTimestamp,
+          pet_id: payload.pet_id || prev.rescueCase.pet_id,
+        },
+        updates: [...prev.updates, closeAuditUpdate],
+      }));
+
+      return { success: true };
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const isClosed = rescueCase.status === 'closed';
 
   return (
@@ -93,7 +146,13 @@ export function RescueCaseDetails({
                 <h1 className="text-xl sm:text-2xl font-bold text-foreground capitalize">
                   {report.species} · {report.kind}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 dark:bg-green-950/40 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800 capitalize">
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${
+                    isClosed
+                      ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                      : 'bg-green-50 dark:bg-green-950/40 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800'
+                  }`}
+                >
                   {rescueCase.status.replace('_', ' ')}
                 </span>
               </div>
@@ -116,13 +175,50 @@ export function RescueCaseDetails({
               {report.urgency}
             </span>
 
-            {!isClosed && onCloseCaseClick && (
-              <Button variant="danger" size="sm" onClick={onCloseCaseClick}>
+            {!isClosed && (
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  if (onCloseCaseClick) onCloseCaseClick();
+                  else setIsCloseModalOpen(true);
+                }}
+              >
                 🔒 {isBangla ? 'কেস সম্পন্ন করুন' : 'Close Case'}
               </Button>
             )}
           </div>
         </div>
+
+        {/* Closed Outcome Showcase Banner */}
+        {isClosed && rescueCase.outcome && (
+          <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/40 border border-green-300 dark:border-green-800 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🏆</span>
+                <div>
+                  <h4 className="text-sm font-bold text-green-900 dark:text-green-200">
+                    {isBangla ? 'কেস সম্পন্ন ও ফলাফল রেকর্ডকৃত' : 'Case Closed with Recorded Outcome'}
+                  </h4>
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-100 uppercase">
+                    {rescueCase.outcome}
+                  </span>
+                </div>
+              </div>
+              {rescueCase.closed_at && (
+                <span className="text-xs text-green-700 dark:text-green-400">
+                  🕒 {new Date(rescueCase.closed_at).toLocaleString(isBangla ? 'bn-BD' : 'en-US')}
+                </span>
+              )}
+            </div>
+
+            {rescueCase.outcome_note && (
+              <p className="text-xs text-green-800 dark:text-green-300 italic pt-1">
+                "{rescueCase.outcome_note}"
+              </p>
+            )}
+          </div>
+        )}
 
         {/* 2. Overview Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -208,6 +304,17 @@ export function RescueCaseDetails({
 
       {/* 4. Timeline */}
       <CaseUpdateTimeline updates={updates} />
+
+      {/* 5. Close Case Outcome Modal */}
+      <CloseCaseOutcomeModal
+        isOpen={isCloseModalOpen}
+        onClose={() => setIsCloseModalOpen(false)}
+        caseId={rescueCase.id}
+        animalSpecies={report.species}
+        isLostReport={report.kind === 'lost' || report.kind === 'found'}
+        onSubmit={handleExecuteClose}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }

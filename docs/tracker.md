@@ -90,7 +90,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | RSC-4 | Case page: status, notes, photo updates | Brehat | M | S4 | RSC-3 | ✅ |
 | RSC-5 | Reporter status tracker (`my_report_status`) | Brehat | S | S3 | RSC-1 | ✅ |
 | RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ⬜ |
-| RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ⬜ |
+| RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ✅ |
 
 ### Adoption (দত্তক)
 | ID | Task | Owner | Size | Sprint | Depends on | Status |

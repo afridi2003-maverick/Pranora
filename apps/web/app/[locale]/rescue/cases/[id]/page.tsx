@@ -10,7 +10,7 @@ import {
   MOCK_CASE_DETAILS,
   type RescueCaseFullDetails,
 } from '../../../../../features/rescue';
-import type { RescueStatus } from '@pranora/types';
+import type { RescueStatus, RescueOutcome } from '@pranora/types';
 
 export default function RescueCasePage() {
   const { isBangla } = useLocale();
@@ -69,6 +69,17 @@ export default function RescueCasePage() {
     return {};
   };
 
+  const handleCloseCase = async (payload: {
+    case_id: string;
+    outcome: RescueOutcome;
+    note?: string | null;
+    pet_id?: string | null;
+  }): Promise<{ error?: string }> => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    console.log('Case closed with outcome:', payload);
+    return {};
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground pb-12">
       <LanguageHeader />
@@ -89,13 +100,7 @@ export default function RescueCasePage() {
         <RescueCaseDetails
           initialDetails={caseData}
           onAddUpdate={handleAddUpdate}
-          onCloseCaseClick={() => {
-            alert(
-              isBangla
-                ? 'কেস সমাপ্তি ও ফলাফল রেকর্ড করতে RSC-7 প্রক্রিয়া চালু হবে।'
-                : 'Closing case requires outcome recording (RSC-7).'
-            );
-          }}
+          onCloseCase={handleCloseCase}
         />
       </main>
     </div>
