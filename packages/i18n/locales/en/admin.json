@@ -59,5 +59,18 @@
   "error": {
     "load_failed": "Could not load requests. Please try again.",
     "action_failed": "Action failed. Please try again."
+  },
+  "audit": {
+    "title": "Audit Logs & History",
+    "subtitle": "Immutable record of who changed what, where, and when",
+    "table": "Table",
+    "action": "Action",
+    "actor": "Actor / Admin",
+    "time": "Timestamp",
+    "details": "Change Details",
+    "old_value": "Previous Value",
+    "new_value": "New Value",
+    "filter_all": "All Tables",
+    "empty": "No audit records found"
   }
 }
