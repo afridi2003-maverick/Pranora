@@ -13,6 +13,7 @@ export type NotificationTemplateKey =
   | 'adoption_update'
   | 'urgent_rescue'
   | 'otp'
+  | 'role_verified'
   | 'system';
 
 export interface SendNotificationPayload {
