@@ -238,6 +238,42 @@ export interface Database {
         };
         Relationships: [];
       };
+      audit_logs: {
+        Row: {
+          id: number;
+          actor_id: string | null;
+          action: string;
+          table_name: string;
+          record_id: string | null;
+          old_data: Json | null;
+          new_data: Json | null;
+          ip_address: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          actor_id?: string | null;
+          action: string;
+          table_name: string;
+          record_id?: string | null;
+          old_data?: Json | null;
+          new_data?: Json | null;
+          ip_address?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          actor_id?: string | null;
+          action?: string;
+          table_name?: string;
+          record_id?: string | null;
+          old_data?: Json | null;
+          new_data?: Json | null;
+          ip_address?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       divisions: {
         Row: {
           id: number;

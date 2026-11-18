@@ -1,14 +1,38 @@
 // packages/api/src/admin/index.ts
-// Owner: Afridi | Task: ADM-1
-// Admin verification of vets, shelters, rescuers, adoption listers
+// Owner: Afridi | Tasks: ADM-1, ADM-4
+// Admin verification of vets, shelters, rescuers, adoption listers & Audit Log
 
 import type { TypedSupabaseClient } from '../client';
-import type { UserRole, VerificationStatus } from '@pranora/types';
+import type { Json, UserRole, VerificationStatus } from '@pranora/types';
 import { notify } from '../notifications';
 
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
+
+export interface AuditLogEntry {
+  id: number;
+  actor_id: string | null;
+  action: string;
+  table_name: string;
+  record_id: string | null;
+  old_data: Json | null;
+  new_data: Json | null;
+  ip_address: string | null;
+  created_at: string;
+  // joined from profiles
+  actor_name?: string | null;
+  actor_phone?: string | null;
+}
+
+export interface ListAuditLogsOptions {
+  tableName?: string;
+  action?: string;
+  recordId?: string;
+  actorId?: string;
+  limit?: number;
+  offset?: number;
+}
 
 export type VerifiableRole = Extract<
   UserRole,
@@ -315,4 +339,80 @@ export async function verifyProviderDocument(
     .eq('id', documentId);
 
   if (error) throw error;
+}
+
+// ─────────────────────────────────────────────
+// ADM-4: Audit Log Queries
+// ─────────────────────────────────────────────
+
+/**
+ * List audit logs with pagination and filters (admin only).
+ */
+export async function listAuditLogs(
+  client: TypedSupabaseClient,
+  options: ListAuditLogsOptions = {}
+): Promise<AuditLogEntry[]> {
+  const { tableName, action, recordId, actorId, limit = 50, offset = 0 } = options;
+
+  let query = client
+    .from('audit_logs')
+    .select(
+      `id, actor_id, action, table_name, record_id, old_data, new_data, ip_address, created_at,
+       profiles:actor_id (
+         full_name, phone
+       )`
+    )
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (tableName) {
+    query = query.eq('table_name', tableName);
+  }
+  if (action) {
+    query = query.eq('action', action);
+  }
+  if (recordId) {
+    query = query.eq('record_id', recordId);
+  }
+  if (actorId) {
+    query = query.eq('actor_id', actorId);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    actor_id: row.actor_id,
+    action: row.action,
+    table_name: row.table_name,
+    record_id: row.record_id,
+    old_data: row.old_data,
+    new_data: row.new_data,
+    ip_address: row.ip_address,
+    created_at: row.created_at,
+    actor_name: row.profiles?.full_name ?? null,
+    actor_phone: row.profiles?.phone ?? null,
+  }));
+}
+
+/**
+ * Get total audit log count (admin only).
+ */
+export async function getAuditLogCount(
+  client: TypedSupabaseClient,
+  options: Pick<ListAuditLogsOptions, 'tableName' | 'action'> = {}
+): Promise<number> {
+  let query = client.from('audit_logs').select('*', { count: 'exact', head: true });
+
+  if (options.tableName) {
+    query = query.eq('table_name', options.tableName);
+  }
+  if (options.action) {
+    query = query.eq('action', options.action);
+  }
+
+  const { count, error } = await query;
+  if (error) throw error;
+  return count ?? 0;
 }
