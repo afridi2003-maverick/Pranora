@@ -39,3 +39,38 @@ export const AutoGenerateSpeciesScheduleSchema = z.object({
   species: SpeciesSchema,
 });
 export type AutoGenerateSpeciesScheduleInput = z.infer<typeof AutoGenerateSpeciesScheduleSchema>;
+
+// ── HLT-3: Medical Records & Pet Documents ───────────────────────────────────
+
+export const PrescriptionItemSchema = z.object({
+  medicine: z.string().min(1, 'health:validation.medicine_required'),
+  dosage: z.string().optional().nullable(),
+  frequency: z.string().optional().nullable(),
+  duration_days: z.number().int().positive().optional().nullable(),
+  instructions: z.string().optional().nullable(),
+});
+export type PrescriptionItemInput = z.infer<typeof PrescriptionItemSchema>;
+
+export const AddMedicalRecordSchema = z.object({
+  pet_id: z.string().uuid(),
+  vet_id: z.string().uuid(),
+  booking_id: z.string().uuid().optional().nullable(),
+  rescue_case_id: z.string().uuid().optional().nullable(),
+  visit_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'health:validation.invalid_date'),
+  findings: z.string().max(2000).optional().nullable(),
+  diagnosis: z.string().max(500).optional().nullable(),
+  treatment: z.string().max(2000).optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+  attachments: z.array(z.string()).default([]),
+  prescriptions: z.array(PrescriptionItemSchema).optional().default([]),
+});
+export type AddMedicalRecordInput = z.infer<typeof AddMedicalRecordSchema>;
+
+export const AddPetDocumentSchema = z.object({
+  pet_id: z.string().uuid(),
+  title: z.string().min(1, 'health:validation.title_required').max(120),
+  file_path: z.string().min(1, 'health:validation.file_required'),
+  document_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'health:validation.invalid_date').optional().nullable(),
+});
+export type AddPetDocumentInput = z.infer<typeof AddPetDocumentSchema>;
+

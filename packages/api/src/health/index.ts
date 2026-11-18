@@ -45,6 +45,69 @@ export interface AddVaccinationPayload {
   certificate_path?: string | null;
 }
 
+// ── HLT-3: Medical Records & Pet Documents Types ────────────────────────────
+
+export interface PrescriptionRow {
+  id: string;
+  medical_record_id: string;
+  medicine: string;
+  dosage: string | null;
+  frequency: string | null;
+  duration_days: number | null;
+  instructions: string | null;
+}
+
+export interface MedicalRecordRow {
+  id: string;
+  pet_id: string;
+  booking_id: string | null;
+  rescue_case_id: string | null;
+  vet_id: string;
+  visit_date: string;
+  findings: string | null;
+  diagnosis: string | null;
+  treatment: string | null;
+  notes: string | null;
+  attachments: string[];
+  created_by: string;
+  created_at: string;
+  vet?: { id: string; name_en: string; name_bn: string | null } | null;
+  prescriptions?: PrescriptionRow[];
+}
+
+export interface PetDocumentRow {
+  id: string;
+  pet_id: string;
+  uploaded_by: string;
+  title: string | null;
+  file_path: string;
+  document_date: string | null;
+  created_at: string;
+  uploader?: { id: string; full_name: string | null } | null;
+}
+
+export interface AddMedicalRecordPayload {
+  pet_id: string;
+  vet_id: string;
+  booking_id?: string | null;
+  rescue_case_id?: string | null;
+  visit_date: string;
+  findings?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
+  notes?: string | null;
+  attachments?: string[];
+  prescriptions?: Omit<PrescriptionRow, 'id' | 'medical_record_id'>[];
+}
+
+export interface AddPetDocumentPayload {
+  pet_id: string;
+  title: string;
+  file_path: string;
+  document_date?: string | null;
+}
+
+
 // ── API Functions ────────────────────────────────────────────────────────────
 
 /**
@@ -181,3 +244,112 @@ export async function deleteVaccination(
   if (error) return { success: false, error: error.message };
   return { success: true };
 }
+
+// ── HLT-3: Medical History API Functions ─────────────────────────────────────
+
+/**
+ * List all vet-written medical records for a pet.
+ * Read-only for owners (enforced by RLS).
+ */
+export async function listMedicalRecords(
+  client: TypedSupabaseClient,
+  petId: string
+): Promise<{ data: MedicalRecordRow[]; error?: string }> {
+  const { data, error } = await client
+    .from('medical_records' as never)
+    .select(`
+      *,
+      vet:vets(id, name_en, name_bn),
+      prescriptions(*)
+    `)
+    .eq('pet_id', petId)
+    .order('visit_date', { ascending: false });
+
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as unknown as MedicalRecordRow[] };
+}
+
+/**
+ * Add a medical record (vet-only via RLS).
+ */
+export async function addMedicalRecord(
+  client: TypedSupabaseClient,
+  { prescriptions, ...recordPayload }: AddMedicalRecordPayload
+): Promise<{ data: MedicalRecordRow | null; error?: string }> {
+  const { data: record, error: recordErr } = await client
+    .from('medical_records' as never)
+    .insert(recordPayload as never)
+    .select(`*, vet:vets(id, name_en, name_bn)`)
+    .single();
+
+  if (recordErr || !record) {
+    return { data: null, error: recordErr?.message || 'Failed to insert medical record' };
+  }
+
+  const typedRecord = record as unknown as MedicalRecordRow;
+
+  // Insert prescriptions if any
+  if (prescriptions && prescriptions.length > 0) {
+    const presPayload = prescriptions.map((p) => ({
+      ...p,
+      medical_record_id: typedRecord.id,
+    }));
+    await client.from('prescriptions' as never).insert(presPayload as never);
+  }
+
+  return { data: typedRecord };
+}
+
+/**
+ * List owner-uploaded documents for a pet.
+ */
+export async function listPetDocuments(
+  client: TypedSupabaseClient,
+  petId: string
+): Promise<{ data: PetDocumentRow[]; error?: string }> {
+  const { data, error } = await client
+    .from('pet_documents' as never)
+    .select(`
+      *,
+      uploader:profiles(id, full_name)
+    `)
+    .eq('pet_id', petId)
+    .order('created_at', { ascending: false });
+
+  if (error) return { data: [], error: error.message };
+  return { data: (data ?? []) as unknown as PetDocumentRow[] };
+}
+
+/**
+ * Upload and record an owner document (old report, lab test result).
+ */
+export async function addPetDocument(
+  client: TypedSupabaseClient,
+  payload: AddPetDocumentPayload
+): Promise<{ data: PetDocumentRow | null; error?: string }> {
+  const { data, error } = await client
+    .from('pet_documents' as never)
+    .insert(payload as never)
+    .select(`*, uploader:profiles(id, full_name)`)
+    .single();
+
+  if (error) return { data: null, error: error.message };
+  return { data: data as unknown as PetDocumentRow };
+}
+
+/**
+ * Delete an owner-uploaded document.
+ */
+export async function deletePetDocument(
+  client: TypedSupabaseClient,
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  const { error } = await client
+    .from('pet_documents' as never)
+    .delete()
+    .eq('id', id);
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
+}
+
