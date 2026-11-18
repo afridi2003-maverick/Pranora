@@ -52,6 +52,7 @@ export default function RescueCasePage() {
       duplicate_of: null,
       reviewed_by: null,
       reviewed_at: null,
+      escalated_at: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },

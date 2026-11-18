@@ -9,3 +9,4 @@ export * from './CaseUpdateTimeline';
 export * from './RescueCaseDetails';
 export * from './CloseCaseOutcomeModal';
 export * from './caseDetailMockData';
+export * from './UrgentReportAlertBanner';
