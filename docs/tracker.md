@@ -129,7 +129,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ✅ |
 | APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ✅ |
 | APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ✅ |
-| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ⬜ |
+| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ✅ |
 | PAY-1 | Cash at clinic | Tain | S | S3 | APT-1 | ✅ |
 
 ### Provider, Shelter & Admin

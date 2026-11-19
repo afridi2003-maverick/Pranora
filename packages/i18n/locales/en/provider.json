@@ -95,5 +95,39 @@
       "actions": "Actions",
       "empty": "No scheduled appointments for today."
     }
+  },
+  "scheduleManager": {
+    "title": "Vet Schedule & Availability",
+    "subtitle": "Configure weekly operating hours, consultation mode (slots vs live serials), and holiday exceptions",
+    "weeklyTab": "Weekly Schedule",
+    "holidaysTab": "Holidays & Day-off Exceptions",
+    "days": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "mode": "Consultation Mode",
+    "modeSlot": "Time Slots",
+    "modeSerial": "Serial Queue",
+    "slotMinutes": "Slot Duration (mins)",
+    "capacity": "Capacity per Slot",
+    "maxSerials": "Max Serials per Session",
+    "open": "Open",
+    "closed": "Closed",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "saveSchedule": "Save Schedule",
+    "saving": "Saving Schedule...",
+    "savedSuccess": "Schedule configuration saved successfully!",
+    "addHoliday": "Add Holiday Exception",
+    "holidayDate": "Date",
+    "holidayNote": "Reason / Description",
+    "holidayNotePlaceholder": "e.g. Eid-ul-Fitr, Shab-e-Barat, Clinic Renovation",
+    "delete": "Delete",
+    "noExceptions": "No upcoming holidays or closed dates configured."
   }
 }

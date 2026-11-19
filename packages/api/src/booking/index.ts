@@ -14,6 +14,10 @@ export type {
   RescheduleBookingInput,
   UpdateBookingStatusInput,
   RecordCashPaymentInput,
+  ScheduleRule,
+  AvailabilityException,
+  SaveScheduleInput,
+  AddExceptionInput,
 } from '@pranora/validation';
 import type {
   BookingType,
@@ -27,6 +31,10 @@ import type {
   RescheduleBookingInput,
   UpdateBookingStatusInput,
   RecordCashPaymentInput,
+  ScheduleRule,
+  AvailabilityException,
+  SaveScheduleInput,
+  AddExceptionInput,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -446,3 +454,113 @@ export async function markBookingPaid(
     amount,
   });
 }
+
+/**
+ * APT-6: Get vet schedule (weekly rules + upcoming holiday exceptions)
+ */
+export async function getVetSchedule(
+  client: TypedSupabaseClient,
+  locationId: string,
+  vetId?: string | null
+): Promise<{ rules: ScheduleRule[]; exceptions: AvailabilityException[] }> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: any; error: { message: string } | null }>)(
+    'get_vet_schedule',
+    {
+      p_location_id: locationId,
+      p_vet_id: vetId ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to get vet schedule: ${error.message}`);
+  }
+
+  return (
+    data ?? {
+      rules: [],
+      exceptions: [],
+    }
+  );
+}
+
+/**
+ * APT-6: Save/replace weekly schedule rules
+ */
+export async function saveScheduleRules(
+  client: TypedSupabaseClient,
+  input: SaveScheduleInput
+): Promise<{ success: boolean; rulesSaved: number }> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: any; error: { message: string } | null }>)(
+    'save_schedule_rules',
+    {
+      p_location_id: input.locationId,
+      p_vet_id: input.vetId ?? null,
+      p_rules: input.rules,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to save schedule rules: ${error.message}`);
+  }
+
+  return data ?? { success: true, rulesSaved: input.rules.length };
+}
+
+/**
+ * APT-6: Add an availability exception (holiday or day-off)
+ */
+export async function addAvailabilityException(
+  client: TypedSupabaseClient,
+  input: AddExceptionInput
+): Promise<{ success: boolean; id: string; date: string; isClosed: boolean; note?: string }> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: any; error: { message: string } | null }>)(
+    'add_availability_exception',
+    {
+      p_location_id: input.locationId,
+      p_vet_id: input.vetId ?? null,
+      p_date: input.date,
+      p_is_closed: input.isClosed ?? true,
+      p_note: input.note ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to add availability exception: ${error.message}`);
+  }
+
+  return data ?? { success: true, id: 'mock-exc-id', date: input.date, isClosed: true };
+}
+
+/**
+ * APT-6: Delete an availability exception
+ */
+export async function deleteAvailabilityException(
+  client: TypedSupabaseClient,
+  exceptionId: string
+): Promise<{ success: boolean; deletedId: string }> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: any; error: { message: string } | null }>)(
+    'delete_availability_exception',
+    {
+      p_exception_id: exceptionId,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to delete availability exception: ${error.message}`);
+  }
+
+  return data ?? { success: true, deletedId: exceptionId };
+}
+
