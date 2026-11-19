@@ -17,6 +17,8 @@ interface AdoptionDetailModalProps {
   visible: boolean;
   onClose: () => void;
   onApply?: (listing: AdoptionListingRow) => void;
+  onSave?: (listingId: string) => void;
+  isSaved?: boolean;
 }
 
 export function AdoptionDetailModal({
@@ -24,6 +26,8 @@ export function AdoptionDetailModal({
   visible,
   onClose,
   onApply,
+  onSave,
+  isSaved = false,
 }: AdoptionDetailModalProps) {
   const { isBangla } = useLocale();
 
@@ -153,17 +157,32 @@ export function AdoptionDetailModal({
           </View>
 
           {/* Action Button */}
-          {onApply && (
-            <TouchableOpacity
-              onPress={() => onApply(listing)}
-              className="w-full py-3.5 rounded-xl bg-primary items-center mb-2"
-              activeOpacity={0.8}
-            >
-              <Text className="text-white font-bold text-sm">
-                🐾 {isBangla ? 'দত্তকের আবেদন করুন' : 'Apply for Adoption'}
-              </Text>
-            </TouchableOpacity>
-          )}
+          <View className="flex-row gap-2 mb-2">
+            {onApply && (
+              <TouchableOpacity
+                onPress={() => onApply(listing)}
+                className="flex-1 py-3.5 rounded-xl bg-primary items-center"
+                activeOpacity={0.8}
+              >
+                <Text className="text-white font-bold text-sm">
+                  🐾 {isBangla ? 'দত্তকের আবেদন করুন' : 'Apply for Adoption'}
+                </Text>
+              </TouchableOpacity>
+            )}
+            {onSave && (
+              <TouchableOpacity
+                onPress={() => onSave(listing.id)}
+                className={`px-4 py-3.5 rounded-xl items-center justify-center border ${
+                  isSaved ? 'bg-rose-50 border-rose-300' : 'bg-gray-100 border-gray-300'
+                }`}
+                activeOpacity={0.8}
+              >
+                <Text className={`font-bold text-sm ${isSaved ? 'text-rose-600' : 'text-gray-700'}`}>
+                  {isSaved ? '♥ ' + (isBangla ? 'সংরক্ষিত' : 'Saved') : '♡ ' + (isBangla ? 'সংরক্ষণ' : 'Save')}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <Text className="text-[11px] text-gray-400 text-center mb-6">
             {isBangla
               ? 'আবেদনের জন্য লগইন প্রয়োজন। সিদ্ধান্ত সর্বদা মানুষ দ্বারা যাচাই করা হয়।'

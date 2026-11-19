@@ -585,3 +585,34 @@ export async function toggleAdoptionFavorite(
   if (error) throw error;
   return Boolean(data);
 }
+
+/** Fetch list of listing IDs favorited by the current user */
+export async function getMyFavoriteListingIds(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<string[]> {
+  const { data, error } = await client
+    .from('adoption_favorites')
+    .select('listing_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return (data ?? []).map((row: { listing_id: string }) => row.listing_id);
+}
+
+/** Fetch full adoption listings saved/favorited by the user */
+export async function getMySavedListings(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<AdoptionListingRow[]> {
+  const { data, error } = await client
+    .from('adoption_favorites')
+    .select('listing_id, adoption_listings(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? [])
+    .map((row: any) => row.adoption_listings)
+    .filter(Boolean) as AdoptionListingRow[];
+}

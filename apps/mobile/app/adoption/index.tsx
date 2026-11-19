@@ -31,6 +31,15 @@ export default function AdoptionScreen() {
 
         <View className="flex-row items-center gap-2">
           <TouchableOpacity
+            onPress={() => router.push('/adoption/saved')}
+            className="bg-rose-100 px-2.5 py-1.5 rounded-lg border border-rose-300"
+          >
+            <Text className="text-rose-900 text-xs font-bold">
+              ♥ {isBangla ? 'সেভ' : 'Saved'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={() => router.push('/adoption/applications')}
             className="bg-emerald-100 px-2.5 py-1.5 rounded-lg border border-emerald-300"
           >

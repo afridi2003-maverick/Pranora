@@ -409,5 +409,11 @@ export function getFollowupsForHandover(handoverId: string): FollowupWithHandove
   );
 }
 
+export const MOCK_SAVED_LISTING_IDS: string[] = ['adp-001', 'adp-003'];
+
+export function isListingFavorited(listingId: string): boolean {
+  return MOCK_SAVED_LISTING_IDS.includes(listingId);
+}
+
 
 

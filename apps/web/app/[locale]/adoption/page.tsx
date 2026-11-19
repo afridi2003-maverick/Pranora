@@ -52,6 +52,14 @@ export default function AdoptionPublicPage() {
             >
               📋 {isBangla ? 'আমার আবেদন ট্র্যাকার (ADP-4)' : 'My Applications (ADP-4)'}
             </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push('/adoption/saved')}
+            >
+              ♥ {isBangla ? 'সংরক্ষিত তালিকা (ADP-7)' : 'Saved Pets (ADP-7)'}
+            </Button>
           </div>
         </div>
 
