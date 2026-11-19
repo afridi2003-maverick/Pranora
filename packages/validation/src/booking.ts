@@ -175,3 +175,71 @@ export const bookingRouteParamsSchema = z.object({
 });
 export type BookingRouteParams = z.infer<typeof bookingRouteParamsSchema>;
 
+/**
+ * APT-3: Common cancellation reasons
+ */
+export const CANCELLATION_REASONS = [
+  'Schedule conflict',
+  'Pet health improved / not needed',
+  'Found alternative care',
+  'Financial reasons',
+  'Emergency arose',
+  'Other',
+] as const;
+
+/**
+ * APT-3: Helper to evaluate whether an appointment can still be cancelled or rescheduled
+ * based on provider_locations.cancel_cutoff_hours (default 2h).
+ */
+export function checkCancellationCutoff(
+  startsAt: string | null | undefined,
+  cutoffHours = 2
+): {
+  canModify: boolean;
+  isPastAppointment: boolean;
+  hoursRemaining: number;
+  minutesRemaining: number;
+  formattedRemaining: string;
+} {
+  if (!startsAt) {
+    return {
+      canModify: true,
+      isPastAppointment: false,
+      hoursRemaining: 999,
+      minutesRemaining: 99999,
+      formattedRemaining: '—',
+    };
+  }
+
+  const apptTime = new Date(startsAt).getTime();
+  const now = Date.now();
+  const cutoffMs = cutoffHours * 60 * 60 * 1000;
+  const deadline = apptTime - cutoffMs;
+
+  const isPastAppointment = now >= apptTime;
+  const canModify = now < deadline;
+
+  const msToAppt = Math.max(0, apptTime - now);
+  const minutesRemaining = Math.floor(msToAppt / 60000);
+  const hoursRemaining = Math.floor(minutesRemaining / 60);
+
+  let formattedRemaining: string;
+  if (canModify) {
+    const msToDeadline = deadline - now;
+    const minsToDeadline = Math.floor(msToDeadline / 60000);
+    const hrsToDeadline = Math.floor(minsToDeadline / 60);
+    formattedRemaining = hrsToDeadline > 0 ? `${hrsToDeadline}h ${minsToDeadline % 60}m` : `${minsToDeadline}m`;
+  } else {
+    formattedRemaining = 'Cut-off passed';
+  }
+
+  return {
+    canModify,
+    isPastAppointment,
+    hoursRemaining,
+    minutesRemaining,
+    formattedRemaining,
+  };
+}
+
+
