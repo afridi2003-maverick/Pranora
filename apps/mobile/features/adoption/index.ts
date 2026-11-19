@@ -6,4 +6,5 @@ export * from './AdoptionApplicationForm';
 export * from './AdoptionApplicationStatusTracker';
 export * from './AdoptionHandoverCard';
 export * from './AdoptionFollowupCard';
+export * from './AdoptionReviewScreen';
 export * from './mockData';

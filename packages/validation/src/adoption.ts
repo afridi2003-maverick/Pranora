@@ -117,3 +117,30 @@ export const AdoptionFilterSchema = z.object({
   offset: z.number().int().min(0).default(0),
 });
 export type AdoptionFilterInput = z.infer<typeof AdoptionFilterSchema>;
+
+/**
+ * ADP-5: Adoption Application Review Item Schema
+ */
+export const adoptionReviewItemSchema = z.object({
+  id: z.string().uuid(),
+  listingId: z.string().uuid(),
+  applicantId: z.string().uuid(),
+  applicantName: z.string(),
+  applicantPhone: z.string().nullable().optional(),
+  applicantEmail: z.string().nullable().optional(),
+  petName: z.string(),
+  petSpecies: z.string(),
+  petPhotoUrl: z.string().nullable().optional(),
+  listingTitle: z.string(),
+  homeType: HomeTypeSchema,
+  hasOtherPets: z.boolean(),
+  experience: z.string().nullable().optional(),
+  reason: z.string(),
+  status: AdoptionApplicationStatusSchema,
+  reviewedBy: z.string().nullable().optional(),
+  reviewedAt: z.string().nullable().optional(),
+  decisionNote: z.string().nullable().optional(),
+  createdAt: z.string(),
+});
+export type AdoptionReviewItem = z.infer<typeof adoptionReviewItemSchema>;
+

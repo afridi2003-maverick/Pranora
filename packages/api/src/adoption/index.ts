@@ -6,6 +6,9 @@ import type {
   AdoptionApplicationStatus,
   HomeType,
 } from '@pranora/types';
+import type { AdoptionReviewItem } from '@pranora/validation';
+
+export type { AdoptionReviewItem };
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -616,3 +619,67 @@ export async function getMySavedListings(
     .map((row: any) => row.adoption_listings)
     .filter(Boolean) as AdoptionListingRow[];
 }
+
+/**
+ * ADP-5: Fetch adoption applications available for review by a shelter or poster
+ */
+export async function getReviewableAdoptionApplications(
+  client: TypedSupabaseClient,
+  shelterId?: string
+): Promise<AdoptionReviewItem[]> {
+  let query = client
+    .from('adoption_applications')
+    .select(`
+      id,
+      listing_id,
+      applicant_id,
+      home_type,
+      has_other_pets,
+      experience,
+      reason,
+      status,
+      reviewed_by,
+      reviewed_at,
+      decision_note,
+      created_at,
+      applicant:profiles!adoption_applications_applicant_id_fkey(full_name, phone, email),
+      listing:adoption_listings!adoption_applications_listing_id_fkey(
+        title_en,
+        title_bn,
+        shelter_id,
+        photos,
+        pet:pets(name, species)
+      )
+    `);
+
+  if (shelterId) {
+    query = query.eq('listing.shelter_id', shelterId);
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    listingId: row.listing_id,
+    applicantId: row.applicant_id,
+    applicantName: row.applicant?.full_name || 'Applicant',
+    applicantPhone: row.applicant?.phone || null,
+    applicantEmail: row.applicant?.email || null,
+    petName: row.listing?.pet?.name || 'Pet',
+    petSpecies: row.listing?.pet?.species || 'Animal',
+    petPhotoUrl: row.listing?.photos?.[0] || null,
+    listingTitle: row.listing?.title_en || row.listing?.title_bn || 'Adoption Listing',
+    homeType: row.home_type,
+    hasOtherPets: Boolean(row.has_other_pets),
+    experience: row.experience || null,
+    reason: row.reason,
+    status: row.status,
+    reviewedBy: row.reviewed_by || null,
+    reviewedAt: row.reviewed_at || null,
+    decisionNote: row.decision_note || null,
+    createdAt: row.created_at,
+  }));
+}
+
