@@ -2,9 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import type { PetRow, AIMessageRow, AIConversationRow } from '@pranora/api';
+import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
 import { generateAssistantReply } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
@@ -23,6 +24,8 @@ export function AIChat({
   initialMessages = [],
 }: AIChatProps) {
   const { t, locale, isBangla } = useLocale();
+  const params = useParams();
+  const localeParam = (params?.locale as string) ?? 'bn';
 
   const [selectedPet, setSelectedPet] = useState<PetRow | null>(initialSelectedPet ?? pets[0] ?? null);
   const [sharePetContext, setSharePetContext] = useState<boolean>(true);
@@ -37,6 +40,7 @@ export function AIChat({
         is_voice: false,
         emergency_flag: false,
         handoff_flag: false,
+        emergency_clinics: null,
         proposed_booking: null,
         created_at: new Date().toISOString(),
       },
@@ -72,6 +76,7 @@ export function AIChat({
       is_voice: false,
       emergency_flag: false,
       handoff_flag: false,
+      emergency_clinics: null,
       proposed_booking: null,
       created_at: new Date().toISOString(),
     };
@@ -105,6 +110,7 @@ export function AIChat({
         is_voice: false,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
+        emergency_clinics: reply.emergency_clinics ?? null,
         proposed_booking: null,
         created_at: new Date().toISOString(),
       };
@@ -120,6 +126,51 @@ export function AIChat({
     { label: t('ai:promptGrooming'), query: isBangla ? 'কত দিন পর পর লোম ব্রাশ ও গোসল করানো উচিত?' : 'How often should I groom and bathe my pet?' },
     { label: t('ai:promptEmergencyTest'), query: isBangla ? 'আমার পোষা প্রাণীর রক্তপাত হচ্ছে ও বিষাক্ত কিছু খেয়েছে' : 'My pet is bleeding and ate something toxic' },
   ];
+
+  const renderEmergencyClinicCards = (clinics: EmergencyClinicPreview[]) => (
+    <div className="mt-3 pt-3 border-t border-red-200 dark:border-red-800/60">
+      <h4 className="text-red-800 dark:text-red-300 font-bold text-xs mb-2 flex items-center gap-1">
+        <span>🏥</span> {t('ai:emergencyNearbyTitle')}
+      </h4>
+      <div className="space-y-2">
+        {clinics.map((clinic) => (
+          <div
+            key={clinic.locationId}
+            className="bg-white dark:bg-zinc-800 border border-red-200 dark:border-red-800/50 rounded-xl p-3 shadow-sm"
+          >
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
+              {isBangla ? clinic.nameBn : clinic.nameEn}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 truncate">
+              {isBangla ? clinic.addressBn : clinic.addressEn}
+            </p>
+            <p className="text-xs text-red-600 dark:text-red-400 font-semibold mt-0.5">
+              📍 {clinic.distanceKm} {clinic.is24h ? (isBangla ? '• ২৪/৭ খোলা' : '• Open 24/7') : ''}
+            </p>
+
+            <div className="flex gap-2 mt-2">
+              {clinic.phone && (
+                <a
+                  href={`tel:${clinic.phone}`}
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg transition"
+                >
+                  📞 {t('ai:emergencyCallNow')}
+                </a>
+              )}
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white dark:bg-zinc-700 border border-red-400 text-red-700 dark:text-red-300 text-xs font-bold rounded-lg hover:bg-red-50 dark:hover:bg-zinc-600 transition"
+              >
+                🗺️ {t('ai:emergencyDirections')}
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col h-[82vh] bg-app-card border border-stroke-subtle rounded-3xl shadow-sm overflow-hidden">
@@ -147,6 +198,7 @@ export function AIChat({
                 is_voice: false,
                 emergency_flag: false,
                 handoff_flag: false,
+                emergency_clinics: null,
                 proposed_booking: null,
                 created_at: new Date().toISOString(),
               },
@@ -218,20 +270,40 @@ export function AIChat({
                   {item.content}
                 </div>
 
+                {/* AI-2: Emergency First-Aid Tips */}
+                {item.emergency_flag && (
+                  <div className="mt-3 pt-2 border-t border-red-200 dark:border-red-800/60 bg-red-100/60 dark:bg-red-950/20 rounded-lg p-3">
+                    <p className="text-red-800 dark:text-red-300 font-bold text-xs mb-1 flex items-center gap-1">
+                      <span>📋</span> {t('ai:emergencyFirstAidTitle')}
+                    </p>
+                    <p className="text-red-900 dark:text-red-200 text-xs leading-4 mb-1">
+                      • {t('ai:emergencyFirstAid1')}
+                    </p>
+                    <p className="text-red-900 dark:text-red-200 text-xs leading-4">
+                      • {t('ai:emergencyFirstAid2')}
+                    </p>
+                  </div>
+                )}
+
+                {/* AI-2: Nearby Emergency Clinic Cards */}
+                {item.emergency_flag && item.emergency_clinics && item.emergency_clinics.length > 0 && (
+                  renderEmergencyClinicCards(item.emergency_clinics)
+                )}
+
                 {/* Emergency Action Buttons */}
                 {item.emergency_flag && (
                   <div className="mt-4 pt-3 border-t border-red-200 dark:border-red-800/60 flex flex-wrap gap-2">
                     <Link
-                      href={`/${locale}/emergency`}
+                      href={`/${localeParam}/emergency`}
                       className="inline-flex items-center justify-center px-4 py-2 bg-emergency hover:bg-red-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition"
                     >
                       🚨 {t('ai:viewEmergencyMap')}
                     </Link>
                     <Link
-                      href={`/${locale}/clinics`}
+                      href={`/${localeParam}/map?emergency=true`}
                       className="inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-zinc-800 border border-red-400 text-red-700 dark:text-red-300 font-bold text-xs sm:text-sm rounded-xl hover:bg-red-50 transition"
                     >
-                      📞 {t('ai:callVet')}
+                      🗺️ {isBangla ? 'জরুরি ক্লিনিক ম্যাপ' : 'Emergency Map'}
                     </Link>
                   </div>
                 )}
@@ -240,7 +312,7 @@ export function AIChat({
                 {item.handoff_flag && !item.emergency_flag && (
                   <div className="mt-3 pt-2 border-t border-gray-100 dark:border-zinc-700">
                     <Link
-                      href={`/${locale}/clinics`}
+                      href={`/${localeParam}/clinics`}
                       className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                     >
                       <span>🩺 {t('ai:handoff')}</span>

@@ -10,10 +10,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Switch,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
-import type { PetRow, AIMessageRow, AIConversationRow } from '@pranora/api';
+import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
 import { generateAssistantReply } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
@@ -47,6 +48,7 @@ export function AIChatScreen({
         is_voice: false,
         emergency_flag: false,
         handoff_flag: false,
+        emergency_clinics: null,
         proposed_booking: null,
         created_at: new Date().toISOString(),
       },
@@ -74,6 +76,7 @@ export function AIChatScreen({
       is_voice: false,
       emergency_flag: false,
       handoff_flag: false,
+      emergency_clinics: null,
       proposed_booking: null,
       created_at: new Date().toISOString(),
     };
@@ -111,6 +114,7 @@ export function AIChatScreen({
         is_voice: false,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
+        emergency_clinics: reply.emergency_clinics ?? null,
         proposed_booking: null,
         created_at: new Date().toISOString(),
       };
@@ -130,6 +134,53 @@ export function AIChatScreen({
     { label: t('ai:promptGrooming'), query: isBangla ? 'কত দিন পর পর লোম ব্রাশ ও গোসল করানো উচিত?' : 'How often should I groom and bathe my pet?' },
     { label: t('ai:promptEmergencyTest'), query: isBangla ? 'আমার বিড়ালের শ্বাসকষ্ট হচ্ছে ও বিষাক্ত কিছু খেয়েছে' : 'My cat has breathing difficulty and ate something toxic' },
   ];
+
+  const renderEmergencyClinicCards = (clinics: EmergencyClinicPreview[]) => (
+    <View className="mt-3 pt-2 border-t border-red-200">
+      <Text className="text-red-800 font-bold text-xs mb-2">
+        🏥 {t('ai:emergencyNearbyTitle')}
+      </Text>
+      {clinics.map((clinic) => (
+        <View
+          key={clinic.locationId}
+          className="bg-white border border-red-200 rounded-xl p-3 mb-2"
+        >
+          <Text className="text-sm font-bold text-gray-900" numberOfLines={1}>
+            {isBangla ? clinic.nameBn : clinic.nameEn}
+          </Text>
+          <Text className="text-xs text-gray-600 mt-0.5" numberOfLines={1}>
+            {isBangla ? clinic.addressBn : clinic.addressEn}
+          </Text>
+          <Text className="text-xs text-red-600 font-semibold mt-0.5">
+            📍 {clinic.distanceKm} {clinic.is24h ? (isBangla ? '• ২৪/৭ খোলা' : '• Open 24/7') : ''}
+          </Text>
+
+          <View className="flex-row gap-2 mt-2">
+            {clinic.phone && (
+              <TouchableOpacity
+                onPress={() => Linking.openURL(`tel:${clinic.phone}`)}
+                className="flex-1 bg-red-600 py-2 rounded-lg items-center"
+                activeOpacity={0.8}
+              >
+                <Text className="text-white text-xs font-bold">
+                  📞 {t('ai:emergencyCallNow')}
+                </Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${clinic.lat},${clinic.lng}`)}
+              className="flex-1 bg-white border border-red-400 py-2 rounded-lg items-center"
+              activeOpacity={0.8}
+            >
+              <Text className="text-red-700 text-xs font-bold">
+                🗺️ {t('ai:emergencyDirections')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -158,6 +209,7 @@ export function AIChatScreen({
                   is_voice: false,
                   emergency_flag: false,
                   handoff_flag: false,
+                  emergency_clinics: null,
                   proposed_booking: null,
                   created_at: new Date().toISOString(),
                 },
@@ -245,6 +297,26 @@ export function AIChatScreen({
                     {item.content}
                   </Text>
 
+                  {/* AI-2: Emergency First-Aid Tips */}
+                  {item.emergency_flag && (
+                    <View className="mt-3 pt-2 border-t border-red-200 bg-red-100/60 rounded-lg p-2.5">
+                      <Text className="text-red-800 font-bold text-xs mb-1">
+                        📋 {t('ai:emergencyFirstAidTitle')}
+                      </Text>
+                      <Text className="text-red-900 text-xs leading-4 mb-0.5">
+                        • {t('ai:emergencyFirstAid1')}
+                      </Text>
+                      <Text className="text-red-900 text-xs leading-4">
+                        • {t('ai:emergencyFirstAid2')}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* AI-2: Nearby Emergency Clinic Cards */}
+                  {item.emergency_flag && item.emergency_clinics && item.emergency_clinics.length > 0 && (
+                    renderEmergencyClinicCards(item.emergency_clinics)
+                  )}
+
                   {/* Emergency Action Buttons */}
                   {item.emergency_flag && (
                     <View className="mt-3 pt-2 border-t border-red-200 gap-2">
@@ -259,12 +331,12 @@ export function AIChatScreen({
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        onPress={() => router.push('/clinics' as never)}
+                        onPress={() => router.push({ pathname: '/map', params: { emergency: 'true' } })}
                         className="w-full bg-white border border-red-400 py-2 px-3 rounded-lg flex-row items-center justify-center"
                         activeOpacity={0.8}
                       >
                         <Text className="text-red-700 text-xs font-bold">
-                          📞 {t('ai:callVet')}
+                          🗺️ {isBangla ? 'জরুরি ক্লিনিক ম্যাপ' : 'Emergency Map'}
                         </Text>
                       </TouchableOpacity>
                     </View>

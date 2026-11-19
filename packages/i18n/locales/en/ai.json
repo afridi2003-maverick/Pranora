@@ -25,5 +25,12 @@
   "emergencyBannerTitle": "EMERGENCY DETECTED",
   "viewEmergencyMap": "Open Emergency Clinic Map",
   "callVet": "Call a Vet",
-  "emptyStateDesc": "Ask anything about general diet, grooming, vaccinations, and daily pet care."
+  "emptyStateDesc": "Ask anything about general diet, grooming, vaccinations, and daily pet care.",
+  "emergencyNearbyTitle": "Nearest 24/7 Emergency Clinics",
+  "emergencyCallNow": "Call Now",
+  "emergencyDirections": "Directions",
+  "emergencyFirstAidTitle": "Immediate Action Guidelines:",
+  "emergencyFirstAid1": "Keep your pet calm and gently immobilize in a blanket or carrier.",
+  "emergencyFirstAid2": "Ensure the airway is completely unobstructed. Never give human medicines or force fluids.",
+  "emergencyHotline": "Central Emergency Hotline: +880 1711-000000"
 }
