@@ -181,7 +181,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ADM-4 | Audit log | Afridi | M | S6 | ADM-1 | ✅ |
 | ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ⬜ |
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ⬜ |
-| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ⬜ |
+| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ✅ |
 | RSC-8 | Duplicate report detection + merge | Brehat | M | S7 | RSC-1 | ⬜ |
 | RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ⬜ |
 | RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | Brehat | M | S8 | RSC-1, NOTIF-1 | ⬜ |

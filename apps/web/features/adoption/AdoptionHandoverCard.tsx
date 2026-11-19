@@ -128,9 +128,20 @@ export function AdoptionHandoverCard({
 
           <div className="pt-2 border-t border-emerald-200 dark:border-emerald-800/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <span>📅 {isBangla ? 'কল্যাণ যাচাই সূচি (Follow-ups): ৩০, ৯০ ও ১৮০ দিন' : 'Follow-up checks: 30, 90 & 180 days'}</span>
-            <span className="font-bold text-[11px] px-2.5 py-0.5 bg-white/70 dark:bg-black/30 rounded-full">
-              ✅ {isBangla ? 'একক হস্তান্তর সম্পন্ন' : 'One-Handover Policy'}
-            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  window.location.href = `/adoption/followup/${handover.id}`;
+                }}
+              >
+                {isBangla ? '📋 ফলো-আপ চেক-ইন' : '📋 View Follow-ups'}
+              </Button>
+              <span className="font-bold text-[11px] px-2.5 py-0.5 bg-white/70 dark:bg-black/30 rounded-full">
+                ✅ {isBangla ? 'একক হস্তান্তর সম্পন্ন' : 'One-Handover Policy'}
+              </span>
+            </div>
           </div>
         </Card>
       )}

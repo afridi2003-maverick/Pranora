@@ -94,6 +94,16 @@ export type AdoptionFollowupAnswerInput = z.infer<
   typeof AdoptionFollowupAnswerSchema
 >;
 
+export const SubmitAdoptionFollowupSchema = z.object({
+  followup_id: z.string().uuid(),
+  wellbeing: z.enum(['good', 'okay', 'needs_help']),
+  note: z.string().max(1000).nullable().optional(),
+  photos: z.array(z.string().url()).max(6).default([]),
+});
+export type SubmitAdoptionFollowupInput = z.infer<
+  typeof SubmitAdoptionFollowupSchema
+>;
+
 export const AdoptionAgeGroupSchema = z.enum(['all', 'baby', 'young', 'adult', 'senior']);
 export type AdoptionAgeGroup = z.infer<typeof AdoptionAgeGroupSchema>;
 

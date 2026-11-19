@@ -23,6 +23,13 @@ export default function AdoptionHandoverScreen() {
     return { success: true };
   };
 
+  const handleGoToFollowup = (handoverId: string) => {
+    router.push({
+      pathname: '/adoption/followup/[id]',
+      params: { id: handoverId },
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
       {/* Header Bar */}
@@ -54,6 +61,7 @@ export default function AdoptionHandoverScreen() {
         initialDetails={handoverDetails}
         currentUserId="user-current"
         onConfirmHandover={handleConfirmHandover}
+        onGoToFollowup={handleGoToFollowup}
         onBack={() => router.back()}
       />
     </View>

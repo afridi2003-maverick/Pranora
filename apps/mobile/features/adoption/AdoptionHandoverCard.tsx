@@ -16,6 +16,7 @@ interface AdoptionHandoverCardProps {
   initialDetails: HandoverFullDetails;
   currentUserId?: string;
   onConfirmHandover?: (handoverId: string) => Promise<{ success: boolean; bothConfirmed?: boolean; error?: string }>;
+  onGoToFollowup?: (handoverId: string) => void;
   onBack?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function AdoptionHandoverCard({
   initialDetails,
   currentUserId = 'user-current',
   onConfirmHandover,
+  onGoToFollowup,
   onBack,
 }: AdoptionHandoverCardProps) {
   const { isBangla } = useLocale();
@@ -129,6 +131,16 @@ export function AdoptionHandoverCard({
             <Text style={styles.followupText}>
               📅 {isBangla ? 'খোঁজখবর (Follow-ups): ৩০, ৯০ ও ১৮০ দিন' : 'Follow-up checks: 30, 90 & 180 days'}
             </Text>
+            {onGoToFollowup && (
+              <TouchableOpacity
+                onPress={() => onGoToFollowup(handover.id)}
+                style={styles.followupBtn}
+              >
+                <Text style={styles.followupBtnText}>
+                  📋 {isBangla ? 'ফলো-আপ চেক-ইন' : 'View Follow-ups'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       )}
@@ -320,12 +332,28 @@ const styles = StyleSheet.create({
   followupRow: {
     borderTopWidth: 1,
     borderTopColor: '#a7f3d0',
-    paddingTop: 6,
+    paddingTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
   },
   followupText: {
     fontSize: 11,
     color: '#047857',
     fontWeight: '600',
+    flex: 1,
+  },
+  followupBtn: {
+    backgroundColor: '#059669',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+  },
+  followupBtnText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
   },
   statusCard: {
     backgroundColor: '#ffffff',

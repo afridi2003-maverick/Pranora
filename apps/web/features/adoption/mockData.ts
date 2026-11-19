@@ -2,6 +2,7 @@ import type {
   AdoptionListingRow,
   AdoptionApplicationWithListing,
   AdoptionHandoverRow,
+  AdoptionFollowupRow,
 } from '@pranora/api';
 
 export const MOCK_ADOPTION_LISTINGS: AdoptionListingRow[] = [
@@ -340,6 +341,71 @@ export function findHandoverByIdOrListing(idOrListingId: string): HandoverFullDe
       h.handover.id === idOrListingId ||
       h.handover.listing_id === idOrListingId ||
       h.handover.application_id === idOrListingId
+  );
+}
+
+export interface FollowupWithHandover {
+  followup: AdoptionFollowupRow;
+  handover: AdoptionHandoverRow;
+  listing: AdoptionListingRow;
+  petName: string;
+}
+
+export const MOCK_ADOPTION_FOLLOWUPS: Record<string, FollowupWithHandover> = {
+  'flw-001': {
+    followup: {
+      id: 'flw-001',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString().split('T')[0]!,
+      sent_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-002': {
+    followup: {
+      id: 'flw-002',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-003': {
+    followup: {
+      id: 'flw-003',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 150).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+};
+
+export function findFollowupById(followupId: string): FollowupWithHandover | undefined {
+  return MOCK_ADOPTION_FOLLOWUPS[followupId];
+}
+
+export function getFollowupsForHandover(handoverId: string): FollowupWithHandover[] {
+  return Object.values(MOCK_ADOPTION_FOLLOWUPS).filter(
+    (f) => f.followup.handover_id === handoverId
   );
 }
 

@@ -497,6 +497,21 @@ export async function getHandoverFollowups(
   return (data ?? []) as unknown as AdoptionFollowupRow[];
 }
 
+/** Fetch a specific follow-up by ID */
+export async function getFollowupById(
+  client: TypedSupabaseClient,
+  followupId: string
+): Promise<AdoptionFollowupRow | null> {
+  const { data, error } = await client
+    .from('adoption_followups')
+    .select('*')
+    .eq('id', followupId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as AdoptionFollowupRow | null;
+}
+
 // ── RPC Invocations ─────────────────────────────────────────────────────────
 
 /** Human reviewer approves or rejects an application */
@@ -527,6 +542,35 @@ export async function confirmHandover(
 
   if (error) throw error;
   return Boolean(data);
+}
+
+/** Adopter submits post-adoption follow-up welfare report */
+export async function submitAdoptionFollowup(
+  client: TypedSupabaseClient,
+  followupId: string,
+  wellbeing: 'good' | 'okay' | 'needs_help',
+  note?: string | null,
+  photos: string[] = []
+): Promise<boolean> {
+  const { data, error } = await client.rpc('submit_adoption_followup', {
+    p_followup_id: followupId,
+    p_wellbeing: wellbeing,
+    p_note: note ?? null,
+    p_photos: photos,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+/** Processes due follow-up milestones and notifies adopters */
+export async function processDueAdoptionFollowups(
+  client: TypedSupabaseClient
+): Promise<number> {
+  const { data, error } = await client.rpc('process_due_adoption_followups');
+
+  if (error) throw error;
+  return Number(data ?? 0);
 }
 
 /** Toggle favorite/save on an adoption listing */
