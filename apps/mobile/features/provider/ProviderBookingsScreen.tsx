@@ -16,6 +16,7 @@ import {
   startConsultation,
   completeBooking,
   markNoShow,
+  recordCashPayment,
   type BookingDetails,
   type BookingStatus,
 } from '@pranora/api';
@@ -285,6 +286,47 @@ export function ProviderBookingsScreen({
     );
   };
 
+  const handleCollectCash = (booking: BookingDetails) => {
+    Alert.alert(
+      isBangla ? 'নগদ গ্রহণ' : 'Collect Cash',
+      isBangla
+        ? `রোগীর কাছ থেকে ৳${booking.price ?? 500} নগদ গ্রহণ করা হয়েছে?`
+        : `Confirm receiving ৳${booking.price ?? 500} in cash at reception?`,
+      [
+        { text: isBangla ? 'না' : 'Cancel', style: 'cancel' },
+        {
+          text: isBangla ? 'হ্যাঁ, গ্রহণ করেছি' : 'Yes, Received',
+          onPress: async () => {
+            setActionLoadingId(booking.id);
+            try {
+              await recordCashPayment(null as any, {
+                bookingId: booking.id,
+                amount: booking.price ?? 500,
+              });
+              setBookings((prev) =>
+                prev.map((b) =>
+                  b.id === booking.id
+                    ? { ...b, paymentStatus: 'paid', paymentMethod: 'cash' }
+                    : b
+                )
+              );
+              Alert.alert(
+                isBangla ? 'নগদ রশিদ' : 'Receipt',
+                isBangla
+                  ? `বুকিং ${booking.code} এর জন্য ৳${booking.price ?? 500} নগদ পেমেন্ট নিশ্চিত করা হয়েছে।`
+                  : `Payment of ৳${booking.price ?? 500} in cash confirmed for booking ${booking.code}.`
+              );
+            } catch (err: unknown) {
+              Alert.alert('Error', err instanceof Error ? err.message : 'Payment recording failed');
+            } finally {
+              setActionLoadingId(null);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const statusLabel = (status: BookingStatus): string => {
     const map: Record<string, string> = {
       pending: t('booking.status.pending'),
@@ -434,10 +476,30 @@ export function ProviderBookingsScreen({
                     <Text className="font-medium text-foreground">{t('booking.summary.pet')}: </Text>
                     {booking.petId ? 'Pet #' + booking.petId.substring(0, 5) : (isBangla ? 'সাধারণ' : 'General')}
                   </Text>
-                  <Text className="text-xs text-content-secondary mb-0.5">
-                    <Text className="font-medium text-foreground">{t('booking.summary.price')}: </Text>
-                    ৳{booking.price ?? 500} ({booking.paymentMethod})
-                  </Text>
+                  <View className="flex-row justify-between items-center mb-0.5">
+                    <Text className="text-xs text-content-secondary">
+                      <Text className="font-medium text-foreground">{t('booking.summary.price')}: </Text>
+                      ৳{booking.price ?? 500} ({booking.paymentMethod})
+                      <Text
+                        className={`font-bold uppercase ${
+                          booking.paymentStatus === 'paid' ? 'text-green-600' : 'text-amber-600'
+                        }`}
+                      >
+                        {' '}· {booking.paymentStatus === 'paid' ? t('booking.payment.paid') : t('booking.payment.pending')}
+                      </Text>
+                    </Text>
+                    {booking.paymentStatus !== 'paid' && !['cancelled_by_owner', 'cancelled_by_provider'].includes(booking.status) && (
+                      <TouchableOpacity
+                        className="px-2 py-1 rounded bg-amber-100 border border-amber-300"
+                        disabled={isLoading}
+                        onPress={() => handleCollectCash(booking)}
+                      >
+                        <Text className="text-[10px] font-bold text-amber-800">
+                          💵 {t('booking.payment.collectCash')}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                   {booking.problemNote ? (
                     <Text className="text-xs text-content-secondary italic mt-1" numberOfLines={2}>
                       "{booking.problemNote}"

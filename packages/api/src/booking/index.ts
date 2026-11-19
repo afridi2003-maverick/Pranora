@@ -9,6 +9,7 @@ export type {
   CancelBookingInput,
   RescheduleBookingInput,
   UpdateBookingStatusInput,
+  RecordCashPaymentInput,
 } from '@pranora/validation';
 import type {
   BookingType,
@@ -21,6 +22,7 @@ import type {
   CancelBookingInput,
   RescheduleBookingInput,
   UpdateBookingStatusInput,
+  RecordCashPaymentInput,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -400,4 +402,43 @@ export async function listProviderBookings(
   }
 
   return (data ?? []) as unknown as BookingDetails[];
+}
+
+/**
+ * PAY-1: Record cash payment at clinic reception via record_cash_payment RPC
+ */
+export async function recordCashPayment(
+  client: TypedSupabaseClient,
+  input: RecordCashPaymentInput
+): Promise<BookingActionResponse> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+    'record_cash_payment',
+    {
+      p_booking_id: input.bookingId,
+      p_amount: input.amount ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to record cash payment: ${error.message}`);
+  }
+
+  return (data as BookingActionResponse) ?? { success: true };
+}
+
+/**
+ * PAY-1: Mark a booking as paid in cash at clinic reception
+ */
+export async function markBookingPaid(
+  client: TypedSupabaseClient,
+  bookingId: string,
+  amount?: number
+): Promise<BookingActionResponse> {
+  return recordCashPayment(client, {
+    bookingId,
+    amount,
+  });
 }

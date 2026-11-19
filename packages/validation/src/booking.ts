@@ -154,6 +154,15 @@ export const updateBookingStatusSchema = z.object({
 export type UpdateBookingStatusInput = z.infer<typeof updateBookingStatusSchema>;
 
 /**
+ * PAY-1: Input schema for recording cash payment at clinic (record_cash_payment RPC)
+ */
+export const recordCashPaymentSchema = z.object({
+  bookingId: z.string().uuid('Invalid booking ID'),
+  amount: z.number().positive('Amount must be positive').optional(),
+});
+export type RecordCashPaymentInput = z.infer<typeof recordCashPaymentSchema>;
+
+/**
  * Integration Contract 6: Route params for entering booking flow (/book)
  * Route contract: /book?locationId=&vetId=&serviceId=
  */

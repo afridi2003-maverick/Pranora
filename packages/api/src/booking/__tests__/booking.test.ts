@@ -10,6 +10,8 @@ import {
   startConsultation,
   completeBooking,
   markNoShow,
+  recordCashPayment,
+  markBookingPaid,
 } from '../index';
 import type { TypedSupabaseClient } from '../../client';
 
@@ -243,6 +245,40 @@ describe('APT-1a: Booking RPC Client and Validation Contract', () => {
         p_booking_id: 'bk-123',
         p_status: 'no_show',
         p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('PAY-1: Cash Payment at Clinic', () => {
+    it('calls record_cash_payment RPC with correct arguments', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true, bookingId: 'bk-123', paymentStatus: 'paid', amount: 500 },
+        error: null,
+      });
+
+      const result = await recordCashPayment(mockClient, {
+        bookingId: 'bk-123',
+        amount: 500,
+      });
+
+      expect(mockRpc).toHaveBeenCalledWith('record_cash_payment', {
+        p_booking_id: 'bk-123',
+        p_amount: 500,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('markBookingPaid convenience helper marks booking as paid', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true, bookingId: 'bk-456', paymentStatus: 'paid' },
+        error: null,
+      });
+
+      const result = await markBookingPaid(mockClient, 'bk-456', 450);
+      expect(mockRpc).toHaveBeenCalledWith('record_cash_payment', {
+        p_booking_id: 'bk-456',
+        p_amount: 450,
       });
       expect(result.success).toBe(true);
     });

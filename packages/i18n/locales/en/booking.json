@@ -69,7 +69,13 @@
     "rocket": "Rocket",
     "card": "Card",
     "amount": "Total Fee",
-    "fee": "Fee"
+    "fee": "Fee",
+    "collectCash": "Collect Cash",
+    "markPaid": "Mark as Paid",
+    "paid": "Paid",
+    "pending": "Pending",
+    "receipt": "Cash Receipt",
+    "receiptNotice": "Cash collected at reception desk"
   },
   "summary": {
     "clinic": "Clinic",

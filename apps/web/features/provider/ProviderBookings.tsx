@@ -10,6 +10,7 @@ import {
   startConsultation,
   completeBooking,
   markNoShow,
+  recordCashPayment,
   type BookingDetails,
   type BookingStatus,
 } from '@pranora/api';
@@ -155,6 +156,9 @@ export function ProviderBookings({
   const [declineTargetId, setDeclineTargetId] = useState<string | null>(null);
   const [declineReason, setDeclineReason] = useState<string>('');
 
+  // Cash Receipt Modal State (PAY-1)
+  const [receiptBooking, setReceiptBooking] = useState<BookingDetails | null>(null);
+
   useEffect(() => {
     let isMounted = true;
     async function fetchBookings() {
@@ -270,6 +274,27 @@ export function ProviderBookings({
       );
     } catch (err: unknown) {
       setActionError(err instanceof Error ? err.message : 'Action failed');
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleCollectCash = async (booking: BookingDetails) => {
+    setActionLoadingId(booking.id);
+    setActionError(null);
+    try {
+      await recordCashPayment(null as any, {
+        bookingId: booking.id,
+        amount: booking.price ?? 500,
+      });
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === booking.id ? { ...b, paymentStatus: 'paid', paymentMethod: 'cash' } : b
+        )
+      );
+      setReceiptBooking({ ...booking, paymentStatus: 'paid', paymentMethod: 'cash' });
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : 'Cash collection failed');
     } finally {
       setActionLoadingId(null);
     }
@@ -408,12 +433,27 @@ export function ProviderBookings({
                     <span className="font-medium text-foreground">{t('booking.summary.price')}: </span>
                     ৳{booking.price ?? 500}
                   </div>
-                  <div className="col-span-2">
-                    <span className="font-medium text-foreground">{t('booking.payment.method')}: </span>
-                    {booking.paymentMethod === 'cash' ? t('booking.payment.cash') : booking.paymentMethod}
-                    <span className="ml-2 font-mono text-[11px] uppercase text-content-tertiary">
-                      ({booking.paymentStatus})
-                    </span>
+                  <div className="col-span-2 flex items-center justify-between pt-1 border-t border-stroke-subtle">
+                    <div>
+                      <span className="font-medium text-foreground">{t('booking.payment.method')}: </span>
+                      {booking.paymentMethod === 'cash' ? t('booking.payment.cash') : booking.paymentMethod}
+                      <span className={`ml-2 font-mono text-[11px] font-bold uppercase ${
+                        booking.paymentStatus === 'paid' ? 'text-green-600 dark:text-lime-400' : 'text-amber-600'
+                      }`}>
+                        ({booking.paymentStatus === 'paid' ? t('booking.payment.paid') : t('booking.payment.pending')})
+                      </span>
+                    </div>
+                    {booking.paymentStatus !== 'paid' && !['cancelled_by_owner', 'cancelled_by_provider'].includes(booking.status) && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() => handleCollectCash(booking)}
+                        className="text-xs"
+                      >
+                        💵 {t('booking.payment.collectCash')}
+                      </Button>
+                    )}
                   </div>
                 </div>
 
@@ -537,6 +577,56 @@ export function ProviderBookings({
                 {actionLoadingId === declineTargetId
                   ? '...'
                   : t('booking.provider.declineModal.confirm')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PAY-1: Cash Receipt Modal */}
+      {receiptBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-app-card border border-stroke-medium rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🧾</span>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">
+                  {t('booking.payment.receipt')}
+                </h3>
+                <p className="text-xs text-content-secondary">
+                  {t('booking.payment.receiptNotice')}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-surface-secondary/60 p-4 rounded-xl space-y-2 text-xs">
+              <div className="flex justify-between py-1 border-b border-stroke-subtle">
+                <span className="text-content-secondary">Booking Ref:</span>
+                <span className="font-mono font-bold text-foreground">{receiptBooking.code}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-stroke-subtle">
+                <span className="text-content-secondary">{t('booking.summary.price')}:</span>
+                <span className="font-bold text-green-600 dark:text-lime-400 text-sm">
+                  ৳{receiptBooking.price ?? 500}
+                </span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-stroke-subtle">
+                <span className="text-content-secondary">{t('booking.payment.method')}:</span>
+                <span className="font-semibold text-foreground">{t('booking.payment.cash')}</span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-content-secondary">Status:</span>
+                <Chip variant="status" statusType="confirmed" label={t('booking.payment.paid')} />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setReceiptBooking(null)}
+              >
+                OK
               </Button>
             </div>
           </div>
