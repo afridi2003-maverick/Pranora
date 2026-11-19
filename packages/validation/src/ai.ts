@@ -6,12 +6,17 @@ export const AIMessageRoleSchema = z.enum(['user', 'assistant', 'tool']);
 export type AIMessageRole = z.infer<typeof AIMessageRoleSchema>;
 
 export const ProposedBookingSchema = z.object({
-  clinic_id: z.string().uuid().optional().nullable(),
+  clinic_id: z.string().optional().nullable(),
   clinic_name: z.string().optional().nullable(),
-  service_id: z.string().uuid().optional().nullable(),
+  service_id: z.string().optional().nullable(),
   service_name: z.string().optional().nullable(),
   suggested_date: z.string().optional().nullable(),
+  suggested_time: z.string().optional().nullable(),
+  price: z.number().optional().nullable(),
   notes: z.string().optional().nullable(),
+  status: z.enum(['pending_confirmation', 'confirmed', 'declined']).optional().nullable(),
+  booking_id: z.string().optional().nullable(),
+  booking_code: z.string().optional().nullable(),
 });
 export type ProposedBooking = z.infer<typeof ProposedBookingSchema>;
 

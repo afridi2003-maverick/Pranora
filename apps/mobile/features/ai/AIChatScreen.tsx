@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
-import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
-import { generateAssistantReply } from '@pranora/api';
+import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData } from '@pranora/api';
+import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
 export interface AIChatScreenProps {
@@ -89,21 +89,26 @@ export function AIChatScreen({
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
-    // Simulate AI response with guardrail evaluation
+    // Simulate AI response with guardrail evaluation, consent-based pet context & booking logic
     setTimeout(() => {
       const petContext =
-        sharePetContext && selectedPet
-          ? {
-              name: selectedPet.name,
-              species: selectedPet.species,
-              breed: selectedPet.breed?.name_bn || selectedPet.breed?.name_en || null,
-            }
-          : null;
+        sharePetContext && selectedPet ? buildPetContextInfo(selectedPet) : null;
+
+      const lastPendingBooking =
+        messages
+          .slice()
+          .reverse()
+          .find(
+            (m) =>
+              m.proposed_booking &&
+              m.proposed_booking.status === 'pending_confirmation'
+          )?.proposed_booking ?? null;
 
       const reply = generateAssistantReply(
         text,
         locale === 'en' ? 'en' : 'bn',
-        petContext
+        petContext,
+        lastPendingBooking
       );
 
       const assistantMessage: AIMessageRow = {
@@ -115,7 +120,7 @@ export function AIChatScreen({
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
         emergency_clinics: reply.emergency_clinics ?? null,
-        proposed_booking: null,
+        proposed_booking: reply.proposed_booking ?? null,
         created_at: new Date().toISOString(),
       };
 
@@ -129,6 +134,7 @@ export function AIChatScreen({
   };
 
   const quickPrompts = [
+    { label: t('ai:bookingHelp'), query: isBangla ? 'একজন পশু চিকিৎসকের অ্যাপয়েন্টমেন্ট বুক করতে সাহায্য করুন' : 'Help me book an appointment with a vet' },
     { label: t('ai:promptFood'), query: isBangla ? 'আমার পোষা প্রাণীর জন্য কোন খাবার নিরাপদ ও পুষ্টিকর?' : 'What food is safe and healthy for my pet?' },
     { label: t('ai:promptVaccine'), query: isBangla ? 'পোষা প্রাণীর প্রাথমিক ভ্যাকসিন রুটিন কেমন হয়?' : 'What is the standard vaccination schedule for pets?' },
     { label: t('ai:promptGrooming'), query: isBangla ? 'কত দিন পর পর লোম ব্রাশ ও গোসল করানো উচিত?' : 'How often should I groom and bathe my pet?' },
@@ -182,6 +188,92 @@ export function AIChatScreen({
     </View>
   );
 
+  const renderProposedBookingCard = (booking: ProposedBookingData) => {
+    if (booking.status === 'confirmed') {
+      return (
+        <View className="mt-3 pt-3 border-t border-green-200 bg-green-50 rounded-xl p-3 border border-green-300">
+          <Text className="text-green-800 font-bold text-xs mb-1">
+            ✅ {isBangla ? 'বুকিং নিশ্চিত হয়েছে' : 'Booking Confirmed'}
+          </Text>
+          <Text className="text-gray-900 font-bold text-sm">
+            {booking.clinic_name}
+          </Text>
+          <Text className="text-xs text-gray-600 mt-0.5">
+            {booking.service_name} • {booking.suggested_date} ({booking.suggested_time})
+          </Text>
+          <View className="bg-white border border-green-300 rounded-lg p-2.5 mt-2 flex-row justify-between items-center">
+            <Text className="text-xs text-gray-700 font-medium">{isBangla ? 'বুকিং কোড:' : 'Booking Code:'}</Text>
+            <Text className="text-sm font-black text-green-700">{booking.booking_code}</Text>
+          </View>
+        </View>
+      );
+    }
+
+    if (booking.status === 'declined') {
+      return (
+        <View className="mt-3 pt-2 border-t border-gray-200">
+          <Text className="text-xs text-gray-500 italic">
+            ❌ {t('ai:bookingDeclined')}
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <View className="mt-3 pt-3 border-t border-primary/30 bg-green-50/70 rounded-xl p-3 border border-green-200">
+        <Text className="text-primary font-bold text-xs mb-2">
+          📅 {t('ai:bookingProposedTitle')}
+        </Text>
+        <View className="bg-white rounded-lg p-2.5 border border-gray-200 mb-3">
+          <Text className="text-xs text-gray-600 mb-1">
+            <Text className="font-semibold text-gray-800">{t('ai:bookingClinic')}: </Text>
+            {booking.clinic_name}
+          </Text>
+          <Text className="text-xs text-gray-600 mb-1">
+            <Text className="font-semibold text-gray-800">{t('ai:bookingService')}: </Text>
+            {booking.service_name}
+          </Text>
+          <Text className="text-xs text-gray-600 mb-1">
+            <Text className="font-semibold text-gray-800">{t('ai:bookingDate')}: </Text>
+            {booking.suggested_date} ({booking.suggested_time})
+          </Text>
+          {booking.price != null && (
+            <Text className="text-xs text-gray-600">
+              <Text className="font-semibold text-gray-800">{t('ai:bookingFee')}: </Text>
+              ৳ {booking.price}
+            </Text>
+          )}
+        </View>
+
+        <Text className="text-xs font-semibold text-gray-700 mb-2">
+          {t('ai:bookingConfirm')}
+        </Text>
+
+        <View className="flex-row gap-2">
+          <TouchableOpacity
+            onPress={() => handleSendMessage(isBangla ? 'হ্যাঁ, বুক করুন' : 'Yes, Confirm')}
+            className="flex-1 bg-primary py-2.5 rounded-lg items-center"
+            activeOpacity={0.8}
+          >
+            <Text className="text-white text-xs font-bold">
+              {t('ai:bookingConfirmBtn')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handleSendMessage(isBangla ? 'না, বাতিল' : 'No, Cancel')}
+            className="bg-white border border-gray-300 py-2.5 px-3 rounded-lg items-center"
+            activeOpacity={0.8}
+          >
+            <Text className="text-gray-700 text-xs font-semibold">
+              {t('ai:bookingDeclineBtn')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <KeyboardAvoidingView
@@ -223,8 +315,8 @@ export function AIChatScreen({
           </TouchableOpacity>
         </View>
 
-        {/* Pet Context Selector & Toggle */}
-        <View className="bg-green-50/70 border-b border-green-200 px-4 py-2">
+        {/* AI-3: Pet Context Selector & Explicit Consent Toggle */}
+        <View className="bg-green-50/80 border-b border-green-200 px-4 py-2.5">
           {pets.length > 0 && (
             <PetPicker
               pets={pets}
@@ -233,10 +325,25 @@ export function AIChatScreen({
               label={isBangla ? 'যে পোষা প্রাণী সম্পর্কে জানতে চান:' : 'Select pet context:'}
             />
           )}
-          <View className="flex-row items-center justify-between mt-1">
-            <Text className="text-xs text-gray-700 flex-1 mr-2">
-              🔒 {t('ai:petContextBanner')}
-            </Text>
+
+          <View className="flex-row items-center justify-between mt-2 pt-2 border-t border-green-200/60">
+            <View className="flex-1 mr-3">
+              <View className="flex-row items-center gap-1.5">
+                <Text className="text-xs font-bold text-gray-800">
+                  {sharePetContext ? '🔒 ' + t('ai:petContextActive') : '🛡️ ' + t('ai:petContextDisabled')}
+                </Text>
+              </View>
+              <Text className="text-[11px] text-gray-600 mt-0.5">
+                {sharePetContext
+                  ? selectedPet
+                    ? `${selectedPet.name} • ${selectedPet.species}${selectedPet.allergies ? ` (${isBangla ? 'অ্যালার্জি' : 'Allergies'}: ${selectedPet.allergies})` : ''}`
+                    : t('ai:selectPetPrompt')
+                  : isBangla
+                  ? 'পোষা প্রাণীর কোনো ব্যক্তিগত তথ্য এআই এর সাথে শেয়ার করা হচ্ছে না।'
+                  : 'No personal pet profile data is shared with the AI.'}
+              </Text>
+            </View>
+
             <Switch
               value={sharePetContext}
               onValueChange={setSharePetContext}
@@ -316,6 +423,9 @@ export function AIChatScreen({
                   {item.emergency_flag && item.emergency_clinics && item.emergency_clinics.length > 0 && (
                     renderEmergencyClinicCards(item.emergency_clinics)
                   )}
+
+                  {/* AI-4: Proposed Booking Card */}
+                  {item.proposed_booking && renderProposedBookingCard(item.proposed_booking)}
 
                   {/* Emergency Action Buttons */}
                   {item.emergency_flag && (
