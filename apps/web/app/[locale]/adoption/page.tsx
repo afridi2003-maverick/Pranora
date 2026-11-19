@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { LanguageHeader } from '../../../components/LanguageHeader';
 import { AdoptionList } from '../../../features/adoption';
+import { Button } from '@pranora/ui';
 import type { AdoptionListingRow } from '@pranora/api';
 
 export default function AdoptionPublicPage() {
@@ -12,8 +13,8 @@ export default function AdoptionPublicPage() {
   const router = useRouter();
 
   const handleApply = (listing: AdoptionListingRow) => {
-    // When user clicks Apply, redirect to login or application page with returnUrl
-    router.push(`/login?redirect=/adoption&listingId=${listing.id}`);
+    // Navigate directly to the one-page application form (ADP-3)
+    router.push(`/adoption/apply/${listing.id}`);
   };
 
   return (
@@ -34,6 +35,24 @@ export default function AdoptionPublicPage() {
               ? 'শেল্টার ও উদ্ধারকারীদের যত্নশীল আশ্রয়ে থাকা প্রাণীদের প্রোফাইল ব্রাউজ করুন। কোনো লগইন ছাড়াই সকল তথ্য দেখুন।'
               : 'Browse profiles of rescued pets lovingly sheltered across Bangladesh. Freely explore without logging in.'}
           </p>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => router.push('/adoption/create')}
+            >
+              ➕ {isBangla ? 'পোষা প্রাণী তালিকাভুক্ত করুন (ADP-2)' : 'List Pet for Adoption (ADP-2)'}
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push('/adoption/applications')}
+            >
+              📋 {isBangla ? 'আমার আবেদন ট্র্যাকার (ADP-4)' : 'My Applications (ADP-4)'}
+            </Button>
+          </div>
         </div>
 
         {/* Human Review Guarantee Banner */}
