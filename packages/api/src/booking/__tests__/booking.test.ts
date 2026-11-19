@@ -4,6 +4,12 @@ import {
   createBooking,
   cancelBooking,
   rescheduleBooking,
+  updateBookingStatus,
+  confirmBooking,
+  rejectBooking,
+  startConsultation,
+  completeBooking,
+  markNoShow,
 } from '../index';
 import type { TypedSupabaseClient } from '../../client';
 
@@ -144,5 +150,101 @@ describe('APT-1a: Booking RPC Client and Validation Contract', () => {
         paymentMethod: 'cash',
       })
     ).rejects.toThrow('Failed to create booking: Selected slot is no longer available');
+  });
+
+  describe('APT-2: Booking Lifecycle & Provider Status Management', () => {
+    it('calls update_booking_status RPC when updating status', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true, bookingId: 'bk-123', status: 'confirmed' },
+        error: null,
+      });
+
+      const result = await updateBookingStatus(mockClient, {
+        bookingId: 'bk-123',
+        status: 'confirmed',
+      });
+
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'confirmed',
+        p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('confirmBooking convenience helper calls update_booking_status with confirmed', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true },
+        error: null,
+      });
+
+      const result = await confirmBooking(mockClient, 'bk-123');
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'confirmed',
+        p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejectBooking convenience helper passes reason and cancelled_by_provider status', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true },
+        error: null,
+      });
+
+      const result = await rejectBooking(mockClient, 'bk-123', 'Clinic is closed today');
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'cancelled_by_provider',
+        p_reason: 'Clinic is closed today',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('startConsultation helper transitions booking to in_progress', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true },
+        error: null,
+      });
+
+      const result = await startConsultation(mockClient, 'bk-123');
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'in_progress',
+        p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('completeBooking helper transitions booking to completed', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true },
+        error: null,
+      });
+
+      const result = await completeBooking(mockClient, 'bk-123');
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'completed',
+        p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('markNoShow helper transitions booking to no_show', async () => {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true },
+        error: null,
+      });
+
+      const result = await markNoShow(mockClient, 'bk-123');
+      expect(mockRpc).toHaveBeenCalledWith('update_booking_status', {
+        p_booking_id: 'bk-123',
+        p_status: 'no_show',
+        p_reason: null,
+      });
+      expect(result.success).toBe(true);
+    });
   });
 });
