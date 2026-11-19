@@ -14,6 +14,7 @@ interface AdoptionApplicationStatusTrackerProps {
   initialApplications?: AdoptionApplicationWithListing[];
   onWithdrawApplication?: (applicationId: string) => Promise<{ success: boolean; error?: string }>;
   onViewListing?: (listingId: string) => void;
+  onGoToHandover?: (listingId: string) => void;
 }
 
 const STATUS_STEPS: {
@@ -30,6 +31,7 @@ export function AdoptionApplicationStatusTracker({
   initialApplications = MOCK_MY_APPLICATIONS,
   onWithdrawApplication,
   onViewListing,
+  onGoToHandover,
 }: AdoptionApplicationStatusTrackerProps) {
   const { isBangla } = useLocale();
   const [applications, setApplications] = useState<AdoptionApplicationWithListing[]>(initialApplications);
@@ -257,6 +259,22 @@ export function AdoptionApplicationStatusTracker({
                     {application.decision_note}
                   </p>
                 )}
+
+                <div className="pt-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                      if (onGoToHandover) {
+                        onGoToHandover(application.listing_id);
+                      } else {
+                        window.location.href = `/adoption/handover/${application.listing_id}`;
+                      }
+                    }}
+                  >
+                    {isBangla ? '🤝 হস্তান্তর প্রক্রিয়া ও নিশ্চিতকরণ' : '🤝 View Handover Details'}
+                  </Button>
+                </div>
               </div>
             )}
 

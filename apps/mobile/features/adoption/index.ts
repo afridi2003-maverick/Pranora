@@ -4,4 +4,5 @@ export * from './AdoptionListScreen';
 export * from './CreateAdoptionListingForm';
 export * from './AdoptionApplicationForm';
 export * from './AdoptionApplicationStatusTracker';
+export * from './AdoptionHandoverCard';
 export * from './mockData';

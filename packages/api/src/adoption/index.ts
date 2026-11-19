@@ -467,6 +467,21 @@ export async function getHandoverByListingId(
   return data as unknown as AdoptionHandoverRow | null;
 }
 
+/** Fetch handover record by its ID */
+export async function getHandoverById(
+  client: TypedSupabaseClient,
+  handoverId: string
+): Promise<AdoptionHandoverRow | null> {
+  const { data, error } = await client
+    .from('adoption_handovers')
+    .select('*')
+    .eq('id', handoverId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as AdoptionHandoverRow | null;
+}
+
 /** Fetch follow-ups for a handover */
 export async function getHandoverFollowups(
   client: TypedSupabaseClient,
