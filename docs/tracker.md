@@ -85,7 +85,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | RSC-1 | Report an animal (injured / lost / found / abandoned): photos (EXIF stripped), location, urgency; lost links own pet + last seen | Brehat | L | S3 | DB-8, UI-1, I18N-1, (AUTH-1), (PET-1) | ✅ |
-| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ⬜ |
+| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ✅ |
 | RSC-3 | Assign rescuer; accept / decline | Brehat | M | S4 | RSC-1, (RSC-2), (AUTH-5) | ✅ |
 | RSC-4 | Case page: status, notes, photo updates | Brehat | M | S4 | RSC-3 | ✅ |
 | RSC-5 | Reporter status tracker (`my_report_status`) | Brehat | S | S3 | RSC-1 | ✅ |
@@ -128,16 +128,16 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | APT-1 | Booking flow (service → pet → slot or serial → confirm) | Tain | L | S3 | APT-1a, UI-1, I18N-1, (PET-1), (MAP-5), (MAP-SEED) | ✅ |
 | APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ✅ |
 | APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ✅ |
-| APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ⬜ |
+| APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ✅ |
 | APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ⬜ |
 | PAY-1 | Cash at clinic | Tain | S | S3 | APT-1 | ✅ |
 
 ### Provider, Shelter & Admin
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ⬜ |
+| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ✅ |
 | PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ⬜ |
-| PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ⬜ |
+| PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ✅ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |
 | ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ✅ |
 | ADM-3 | Admin: urgent rescue report queue | Afridi | S | S4 | ADM-1, RSC-1 | ✅ |

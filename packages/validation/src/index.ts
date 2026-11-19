@@ -12,4 +12,6 @@ export * from './health';
 export * from './ai';
 export * from './moderation';
 export * from './reminders';
+export * from './shelter';
+export * from './provider';
 

@@ -52,13 +52,25 @@
     "expired": "Expired"
   },
   "cancel": {
-    "label": "Cancel Booking",
-    "confirm": "Are you sure? This booking will be cancelled.",
-    "cutoffWarning": "The clinic's cancellation deadline has passed"
+    "label": "Cancel Appointment",
+    "confirm": "Are you sure you want to cancel this booking?",
+    "cutoffWarning": "The clinic's cancellation deadline has passed",
+    "cutoffPassed": "Cancellation deadline has passed (within cut-off window). Please contact the clinic directly.",
+    "cutoffNotice": "Free cancellation available until {{cutoff}}",
+    "reasonLabel": "Reason for Cancellation",
+    "reasonPlaceholder": "Please choose or describe why you are cancelling...",
+    "submitting": "Cancelling..."
   },
   "reschedule": {
     "label": "Reschedule",
-    "confirm": "Confirm New Time"
+    "title": "Reschedule Appointment",
+    "selectNewSlot": "Select New Date & Time Slot",
+    "confirm": "Confirm Reschedule",
+    "reasonLabel": "Reason for Rescheduling (Optional)",
+    "reasonPlaceholder": "e.g., Change in schedule, pet not available...",
+    "success": "Appointment rescheduled successfully!",
+    "submitting": "Rescheduling...",
+    "cutoffPassed": "Rescheduling is locked within {{cutoff}} hours of the appointment."
   },
   "payment": {
     "method": "Payment Method",

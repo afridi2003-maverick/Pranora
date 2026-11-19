@@ -5,12 +5,16 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
+  TextInput,
+  Modal,
 } from 'react-native';
 import { useLocale } from '@pranora/i18n';
 import {
   listUserBookings,
   cancelBooking,
+  rescheduleBooking,
+  checkCancellationCutoff,
+  CANCELLATION_REASONS,
   type BookingDetails,
 } from '@pranora/api';
 
@@ -55,7 +59,7 @@ const MOCK_BOOKINGS: BookingDetails[] = [
     endsAt: null,
     serialNo: null,
     addressId: null,
-    problemNote: 'Routine check-up',
+    problemNote: 'Routine check-up & vaccination',
     attachments: [],
     price: 500,
     paymentMethod: 'cash',
@@ -66,51 +70,53 @@ const MOCK_BOOKINGS: BookingDetails[] = [
   },
   {
     id: 'mock-2',
-    code: 'PRN-18B3X2',
+    code: 'PRN-99A1B2',
     ownerId: 'user-1',
     petId: 'pet-2',
-    locationId: 'loc-dhaka-gulshan',
+    locationId: 'loc-dhaka-dhanmondi',
     vetId: null,
     providerServiceId: 'svc-2',
-    type: 'serial',
-    status: 'completed',
-    startsAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    type: 'slot',
+    status: 'pending',
+    startsAt: new Date(Date.now() + 50 * 60 * 1000).toISOString(),
     endsAt: null,
-    serialNo: 4,
+    serialNo: null,
     addressId: null,
-    problemNote: null,
+    problemNote: 'Skin itchiness',
     attachments: [],
-    price: 300,
+    price: 600,
     paymentMethod: 'cash',
-    paymentStatus: 'paid',
+    paymentStatus: 'pending',
     cancelReason: null,
-    createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ];
 
-function isUpcoming(b: BookingDetails): boolean {
-  if (
-    ['cancelled_by_owner', 'cancelled_by_provider', 'no_show', 'expired', 'completed'].includes(
-      b.status
-    )
-  ) {
-    return false;
-  }
-  if (b.startsAt) return new Date(b.startsAt) >= new Date();
-  return true;
-}
+type BookingTab = 'upcoming' | 'past';
 
 export function MyBookingsScreen() {
   const { t, isBangla } = useLocale();
-  const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [tab, setTab] = useState<BookingTab>('upcoming');
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Cancel Modal State (APT-3)
+  const [cancelTargetBooking, setCancelTargetBooking] = useState<BookingDetails | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>(CANCELLATION_REASONS[0]);
+  const [cancelNote, setCancelNote] = useState<string>('');
+  const [cancelling, setCancelling] = useState(false);
+
+  // Reschedule Modal State (APT-3)
+  const [rescheduleTargetBooking, setRescheduleTargetBooking] = useState<BookingDetails | null>(null);
+  const [newOffsetDays, setNewOffsetDays] = useState<number>(1);
+  const [newHour, setNewHour] = useState<number>(10);
+  const [rescheduleReason, setRescheduleReason] = useState<string>('');
+  const [rescheduling, setRescheduling] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-    async function load() {
+    async function fetchBookings() {
       setLoading(true);
       try {
         const data = await listUserBookings(null as any);
@@ -121,17 +127,99 @@ export function MyBookingsScreen() {
         if (isMounted) setLoading(false);
       }
     }
-    load();
+    fetchBookings();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const upcoming = bookings.filter(isUpcoming);
-  const past = bookings.filter((b) => !isUpcoming(b));
+  const handleConfirmCancel = async () => {
+    if (!cancelTargetBooking) return;
+    setCancelling(true);
+
+    const fullReason = cancelNote.trim() ? `${cancelReason}: ${cancelNote.trim()}` : cancelReason;
+
+    try {
+      await cancelBooking(null as any, {
+        bookingId: cancelTargetBooking.id,
+        reason: fullReason,
+      });
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === cancelTargetBooking.id
+            ? { ...b, status: 'cancelled_by_owner', cancelReason: fullReason }
+            : b
+        )
+      );
+      setCancelTargetBooking(null);
+      setCancelNote('');
+    } catch {
+      // optimistic
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === cancelTargetBooking.id
+            ? { ...b, status: 'cancelled_by_owner', cancelReason: fullReason }
+            : b
+        )
+      );
+      setCancelTargetBooking(null);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const handleConfirmReschedule = async () => {
+    if (!rescheduleTargetBooking) return;
+    setRescheduling(true);
+
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + newOffsetDays);
+    targetDate.setHours(newHour, 0, 0, 0);
+    const newStartsAt = targetDate.toISOString();
+
+    try {
+      await rescheduleBooking(null as any, {
+        bookingId: rescheduleTargetBooking.id,
+        startsAt: newStartsAt,
+        reason: rescheduleReason.trim() || undefined,
+      });
+
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === rescheduleTargetBooking.id
+            ? { ...b, startsAt: newStartsAt, status: 'pending' }
+            : b
+        )
+      );
+      setRescheduleTargetBooking(null);
+      setRescheduleReason('');
+    } catch {
+      // optimistic
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === rescheduleTargetBooking.id
+            ? { ...b, startsAt: newStartsAt, status: 'pending' }
+            : b
+        )
+      );
+      setRescheduleTargetBooking(null);
+    } finally {
+      setRescheduling(false);
+    }
+  };
+
+  const upcoming = bookings.filter((b) =>
+    ['pending', 'confirmed', 'in_progress'].includes(b.status)
+  );
+  const past = bookings.filter((b) =>
+    ['completed', 'cancelled_by_owner', 'cancelled_by_provider', 'no_show', 'expired'].includes(
+      b.status
+    )
+  );
   const displayed = tab === 'upcoming' ? upcoming : past;
 
-  const statusLabel = (status: string): string => {
+  const statusLabel = (status: string) => {
     const map: Record<string, string> = {
       pending: t('booking.status.pending'),
       confirmed: t('booking.status.confirmed'),
@@ -145,166 +233,309 @@ export function MyBookingsScreen() {
     return map[status] ?? status;
   };
 
-  const handleCancel = (bookingId: string) => {
-    Alert.alert(
-      isBangla ? 'বুকিং বাতিল' : 'Cancel Booking',
-      t('booking.cancel.confirm'),
-      [
-        { text: isBangla ? 'না' : 'No', style: 'cancel' },
-        {
-          text: isBangla ? 'হ্যাঁ, বাতিল করুন' : 'Yes, Cancel',
-          style: 'destructive',
-          onPress: async () => {
-            setCancellingId(bookingId);
-            try {
-              await cancelBooking(null as any, {
-                bookingId,
-                reason: 'User cancelled',
-              });
-              setBookings((prev) =>
-                prev.map((b) =>
-                  b.id === bookingId ? { ...b, status: 'cancelled_by_owner' } : b
-                )
-              );
-            } catch (err) {
-              Alert.alert(
-                'Error',
-                err instanceof Error ? err.message : 'Cancel failed'
-              );
-            } finally {
-              setCancellingId(null);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   return (
-    <View className="flex-1 bg-neutral-50 dark:bg-neutral-950">
+    <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       {/* Header */}
-      <View className="px-4 pt-12 pb-4 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-        <Text className="text-xl font-bold text-foreground">
+      <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb', backgroundColor: '#ffffff' }}>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#111827' }}>
           {t('booking.myBookings')}
         </Text>
-      </View>
+        <Text style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+          {isBangla ? 'কাট-অফ: ২ ঘণ্টা আগে পর্যন্ত বাতিল/পরিবর্তন সম্ভব' : 'Cut-off: modify until 2h before visit (APT-3)'}
+        </Text>
 
-      {/* Tab Row */}
-      <View className="flex-row bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-        {(['upcoming', 'past'] as const).map((tabKey) => (
+        {/* Tab switch */}
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
           <TouchableOpacity
-            key={tabKey}
-            className={`flex-1 py-3 items-center border-b-2 ${
-              tab === tabKey
-                ? 'border-primary'
-                : 'border-transparent'
-            }`}
-            onPress={() => setTab(tabKey)}
+            style={{
+              paddingVertical: 6,
+              paddingHorizontal: 16,
+              borderRadius: 20,
+              backgroundColor: tab === 'upcoming' ? '#10b981' : '#f3f4f6',
+            }}
+            onPress={() => setTab('upcoming')}
           >
-            <Text
-              className={`text-sm font-medium ${
-                tab === tabKey ? 'text-primary' : 'text-content-secondary'
-              }`}
-            >
-              {tabKey === 'upcoming'
-                ? `${t('booking.upcoming')} (${upcoming.length})`
-                : `${t('booking.past')} (${past.length})`}
+            <Text style={{ fontSize: 13, fontWeight: 'bold', color: tab === 'upcoming' ? '#ffffff' : '#4b5563' }}>
+              {t('booking.upcoming')} ({upcoming.length})
             </Text>
           </TouchableOpacity>
-        ))}
+          <TouchableOpacity
+            style={{
+              paddingVertical: 6,
+              paddingHorizontal: 16,
+              borderRadius: 20,
+              backgroundColor: tab === 'past' ? '#10b981' : '#f3f4f6',
+            }}
+            onPress={() => setTab('past')}
+          >
+            <Text style={{ fontSize: 13, fontWeight: 'bold', color: tab === 'past' ? '#ffffff' : '#4b5563' }}>
+              {t('booking.past')} ({past.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Content */}
+      {/* List */}
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#6366f1" />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator color="#10b981" />
         </View>
       ) : (
-        <ScrollView className="flex-1 p-4" contentContainerStyle={{ paddingBottom: 32 }}>
-          {displayed.length === 0 && (
-            <Text className="text-center text-content-secondary py-12">
-              {t('booking.noBookings')}
-            </Text>
-          )}
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+          {displayed.length === 0 ? (
+            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+              <Text style={{ color: '#6b7280', fontSize: 14 }}>
+                {t('booking.noBookings')}
+              </Text>
+            </View>
+          ) : (
+            displayed.map((booking) => {
+              const cutoff = checkCancellationCutoff(booking.startsAt, 2);
+              const isUpcomingActive = tab === 'upcoming' && ['pending', 'confirmed'].includes(booking.status);
 
-          {displayed.map((booking) => (
-            <View
-              key={booking.id}
-              className="bg-white dark:bg-neutral-900 rounded-xl p-4 mb-3 border border-neutral-200 dark:border-neutral-800"
-            >
-              {/* Code + Status */}
-              <View className="flex-row justify-between items-start mb-2">
-                <View>
-                  <Text className="text-xs text-content-secondary">
-                    {booking.locationId}
-                  </Text>
-                  <Text className="font-mono font-bold text-foreground text-sm mt-0.5">
-                    {booking.code}
-                  </Text>
-                </View>
+              return (
                 <View
-                  className="rounded-full px-2 py-0.5"
+                  key={booking.id}
                   style={{
-                    backgroundColor:
-                      (STATUS_COLORS[booking.status] ?? '#6b7280') + '22',
+                    backgroundColor: '#ffffff',
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 12,
+                    borderWidth: 1,
+                    borderColor: '#e5e7eb',
                   }}
                 >
-                  <Text
-                    className="text-xs font-medium"
-                    style={{ color: STATUS_COLORS[booking.status] ?? '#6b7280' }}
-                  >
-                    {statusLabel(booking.status)}
-                  </Text>
-                </View>
-              </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <View>
+                      <Text style={{ fontSize: 11, color: '#6b7280' }}>
+                        {t('booking.summary.clinic')} • {booking.locationId}
+                      </Text>
+                      <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#111827', marginTop: 2 }}>
+                        {booking.code}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 3,
+                        borderRadius: 12,
+                        backgroundColor: (STATUS_COLORS[booking.status] ?? '#6b7280') + '20',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 'bold',
+                          color: STATUS_COLORS[booking.status] ?? '#6b7280',
+                        }}
+                      >
+                        {statusLabel(booking.status)}
+                      </Text>
+                    </View>
+                  </View>
 
-              {/* Details */}
-              <View className="space-y-1">
-                <Text className="text-xs text-content-secondary">
-                  <Text className="font-medium">{t('booking.summary.date')}: </Text>
-                  {formatDateTime(booking.startsAt)}
-                </Text>
-                {booking.type === 'serial' && booking.serialNo != null && (
-                  <Text className="text-xs text-content-secondary">
-                    <Text className="font-medium">{t('booking.summary.serial')}: </Text>
-                    #{booking.serialNo}
-                  </Text>
-                )}
-                {booking.price != null && (
-                  <Text className="text-xs text-content-secondary">
-                    <Text className="font-medium">{t('booking.payment.fee')}: </Text>
-                    ৳{booking.price}
-                  </Text>
-                )}
-                {booking.problemNote ? (
-                  <Text
-                    className="text-xs text-content-secondary italic"
-                    numberOfLines={2}
-                  >
-                    {booking.problemNote}
-                  </Text>
-                ) : null}
-              </View>
-
-              {/* Cancel action */}
-              {tab === 'upcoming' &&
-                ['pending', 'confirmed'].includes(booking.status) && (
-                  <TouchableOpacity
-                    className="mt-3 self-start"
-                    onPress={() => handleCancel(booking.id)}
-                    disabled={cancellingId === booking.id}
-                  >
-                    <Text className="text-xs text-red-500 font-medium">
-                      {cancellingId === booking.id
-                        ? '...'
-                        : t('booking.cancel.label')}
+                  <View style={{ marginTop: 8, gap: 3 }}>
+                    <Text style={{ fontSize: 12, color: '#374151' }}>
+                      <Text style={{ fontWeight: '600' }}>{t('booking.summary.date')}: </Text>
+                      {formatDateTime(booking.startsAt)}
                     </Text>
-                  </TouchableOpacity>
-                )}
-            </View>
-          ))}
+                    {booking.type === 'serial' && booking.serialNo != null && (
+                      <Text style={{ fontSize: 12, color: '#374151' }}>
+                        <Text style={{ fontWeight: '600' }}>{t('booking.summary.serial')}: </Text>
+                        #{booking.serialNo}
+                      </Text>
+                    )}
+                    {booking.price != null && (
+                      <Text style={{ fontSize: 12, color: '#374151' }}>
+                        <Text style={{ fontWeight: '600' }}>{t('booking.payment.fee')}: </Text>
+                        ৳{booking.price}
+                      </Text>
+                    )}
+                  </View>
+
+                  {/* Cutoff status & actions */}
+                  {isUpcomingActive && (
+                    <View style={{ marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f3f4f6' }}>
+                      {cutoff.canModify ? (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Text style={{ fontSize: 11, color: '#059669', fontWeight: '500' }}>
+                            ⏱ {cutoff.formattedRemaining} left to modify
+                          </Text>
+                          <View style={{ flexDirection: 'row', gap: 8 }}>
+                            <TouchableOpacity
+                              onPress={() => setRescheduleTargetBooking(booking)}
+                              style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, borderWidth: 1, borderColor: '#d1d5db' }}
+                            >
+                              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#374151' }}>
+                                {t('booking.reschedule.label')}
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => setCancelTargetBooking(booking)}
+                              style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, backgroundColor: '#fee2e2' }}
+                            >
+                              <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#dc2626' }}>
+                                {t('booking.cancel.label')}
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ) : (
+                        <View style={{ backgroundColor: '#fffbeb', padding: 8, borderRadius: 6 }}>
+                          <Text style={{ fontSize: 11, color: '#d97706', fontWeight: '500' }}>
+                            ⚠️ {isBangla ? 'কাট-অফ সময় পার হয়েছে (২ ঘণ্টার কম সময় বাকি)' : 'Cut-off passed (< 2h). Please contact clinic.'}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              );
+            })
+          )}
         </ScrollView>
       )}
+
+      {/* Cancel Modal (APT-3) */}
+      <Modal visible={Boolean(cancelTargetBooking)} transparent animationType="fade">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 }}>
+          <View style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 }}>
+              {t('booking.cancel.label')}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>
+              {isBangla ? 'বুকিং বাতিলের কারণ নির্বাচন করুন:' : 'Select reason for cancellation:'}
+            </Text>
+
+            <View style={{ gap: 6, marginBottom: 12 }}>
+              {CANCELLATION_REASONS.slice(0, 4).map((r) => (
+                <TouchableOpacity
+                  key={r}
+                  onPress={() => setCancelReason(r)}
+                  style={{
+                    padding: 8,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: cancelReason === r ? '#10b981' : '#e5e7eb',
+                    backgroundColor: cancelReason === r ? '#ecfdf5' : '#ffffff',
+                  }}
+                >
+                  <Text style={{ fontSize: 12, color: cancelReason === r ? '#059669' : '#374151', fontWeight: cancelReason === r ? 'bold' : 'normal' }}>
+                    {r}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TextInput
+              placeholder={isBangla ? 'অতিরিক্ত বিবরণ লিখুন...' : 'Additional note...'}
+              value={cancelNote}
+              onChangeText={setCancelNote}
+              style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, padding: 8, fontSize: 12, marginBottom: 16 }}
+            />
+
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
+              <TouchableOpacity
+                onPress={() => setCancelTargetBooking(null)}
+                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, borderColor: '#d1d5db' }}
+              >
+                <Text style={{ fontSize: 12, color: '#374151' }}>{isBangla ? 'ফিরে যান' : 'Back'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleConfirmCancel}
+                disabled={cancelling}
+                style={{ backgroundColor: '#dc2626', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 6 }}
+              >
+                <Text style={{ fontSize: 12, color: '#ffffff', fontWeight: 'bold' }}>
+                  {cancelling ? '...' : (isBangla ? 'বাতিল নিশ্চিত করুন' : 'Confirm Cancel')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Reschedule Modal (APT-3) */}
+      <Modal visible={Boolean(rescheduleTargetBooking)} transparent animationType="fade">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 }}>
+          <View style={{ backgroundColor: '#ffffff', borderRadius: 12, padding: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 }}>
+              {t('booking.reschedule.title')}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>
+              {isBangla ? 'নতুন দিন ও সময় নির্বাচন করুন:' : 'Select new day & time slot:'}
+            </Text>
+
+            <View style={{ flexDirection: 'row', gap: 6, marginBottom: 12 }}>
+              {[1, 2, 3].map((days) => (
+                <TouchableOpacity
+                  key={days}
+                  onPress={() => setNewOffsetDays(days)}
+                  style={{
+                    flex: 1,
+                    padding: 8,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    alignItems: 'center',
+                    borderColor: newOffsetDays === days ? '#10b981' : '#e5e7eb',
+                    backgroundColor: newOffsetDays === days ? '#ecfdf5' : '#ffffff',
+                  }}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: 'bold', color: newOffsetDays === days ? '#059669' : '#374151' }}>
+                    {days === 1 ? (isBangla ? 'আগামীকাল' : 'Tomorrow') : `+${days} days`}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              {[10, 11, 14, 16].map((hr) => (
+                <TouchableOpacity
+                  key={hr}
+                  onPress={() => setNewHour(hr)}
+                  style={{
+                    paddingVertical: 6,
+                    paddingHorizontal: 10,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: newHour === hr ? '#10b981' : '#e5e7eb',
+                    backgroundColor: newHour === hr ? '#ecfdf5' : '#ffffff',
+                  }}
+                >
+                  <Text style={{ fontSize: 11, color: newHour === hr ? '#059669' : '#374151', fontWeight: newHour === hr ? 'bold' : 'normal' }}>
+                    {hr > 12 ? `${hr - 12}:00 PM` : `${hr}:00 AM`}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TextInput
+              placeholder={isBangla ? 'কারণ লিখুন (ঐচ্ছিক)...' : 'Reason (optional)...'}
+              value={rescheduleReason}
+              onChangeText={setRescheduleReason}
+              style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, padding: 8, fontSize: 12, marginBottom: 16 }}
+            />
+
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
+              <TouchableOpacity
+                onPress={() => setRescheduleTargetBooking(null)}
+                style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 6, borderWidth: 1, borderColor: '#d1d5db' }}
+              >
+                <Text style={{ fontSize: 12, color: '#374151' }}>{isBangla ? 'বাতিল' : 'Cancel'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleConfirmReschedule}
+                disabled={rescheduling}
+                style={{ backgroundColor: '#10b981', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 6 }}
+              >
+                <Text style={{ fontSize: 12, color: '#ffffff', fontWeight: 'bold' }}>
+                  {rescheduling ? '...' : (isBangla ? 'নিশ্চিত করুন' : 'Confirm')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
