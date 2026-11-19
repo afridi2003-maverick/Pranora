@@ -62,6 +62,38 @@
   },
   "dashboard": {
     "title": "Provider Dashboard",
-    "subtitle": "Overview of appointments, patients, and clinic schedule"
+    "subtitle": "Overview of patient schedule, live serial queue, and clinic operations",
+    "stats": {
+      "todayAppts": "Today's Appointments",
+      "activeSerials": "Serial Patients",
+      "nowServing": "Now Serving",
+      "revenue": "Today's Revenue",
+      "pending": "Pending Requests",
+      "completed": "Completed Visits"
+    },
+    "tabs": {
+      "schedule": "Today's Schedule",
+      "serials": "Live Serial Queue",
+      "bookings": "All Bookings",
+      "profile": "Clinic Info & Hours"
+    },
+    "serials": {
+      "title": "Live Serial Number Calling",
+      "currentNumber": "Now Serving Serial #",
+      "nextButton": "Call Next Serial",
+      "waiting": "Waiting",
+      "serving": "In Consultation",
+      "completed": "Completed",
+      "empty": "No active serial bookings for today's session."
+    },
+    "schedule": {
+      "title": "Today's Patient Schedule",
+      "slot": "Time Slot",
+      "patient": "Patient & Owner",
+      "service": "Service",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No scheduled appointments for today."
+    }
   }
 }
