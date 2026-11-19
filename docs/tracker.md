@@ -125,7 +125,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### Booking
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| APT-1 | Booking flow (service → pet → slot or serial → confirm) | Tain | L | S3 | APT-1a, UI-1, I18N-1, (PET-1), (MAP-5), (MAP-SEED) | ⬜ |
+| APT-1 | Booking flow (service → pet → slot or serial → confirm) | Tain | L | S3 | APT-1a, UI-1, I18N-1, (PET-1), (MAP-5), (MAP-SEED) | ✅ |
 | APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ✅ |
 | APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ⬜ |
 | APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ⬜ |
