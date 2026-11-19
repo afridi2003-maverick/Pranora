@@ -119,6 +119,50 @@ export const rescheduleBookingSchema = z.object({
 export type RescheduleBookingInput = z.infer<typeof rescheduleBookingSchema>;
 
 /**
+ * Valid state transitions for the booking lifecycle
+ */
+export const VALID_STATUS_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
+  pending: ['confirmed', 'cancelled_by_provider', 'cancelled_by_owner', 'expired'],
+  confirmed: ['in_progress', 'completed', 'cancelled_by_provider', 'cancelled_by_owner', 'no_show'],
+  in_progress: ['completed', 'cancelled_by_provider'],
+  completed: [],
+  cancelled_by_owner: [],
+  cancelled_by_provider: [],
+  no_show: [],
+  expired: [],
+};
+
+/**
+ * Returns true if a state transition is permitted by the lifecycle state machine
+ */
+export function isValidBookingStatusTransition(
+  from: BookingStatus,
+  to: BookingStatus
+): boolean {
+  if (from === to) return true;
+  return VALID_STATUS_TRANSITIONS[from]?.includes(to) ?? false;
+}
+
+/**
+ * Input schema for updating a booking's status (update_booking_status RPC)
+ */
+export const updateBookingStatusSchema = z.object({
+  bookingId: z.string().uuid('Invalid booking ID'),
+  status: bookingStatusSchema,
+  reason: z.string().max(500, 'Reason cannot exceed 500 characters').optional(),
+});
+export type UpdateBookingStatusInput = z.infer<typeof updateBookingStatusSchema>;
+
+/**
+ * PAY-1: Input schema for recording cash payment at clinic (record_cash_payment RPC)
+ */
+export const recordCashPaymentSchema = z.object({
+  bookingId: z.string().uuid('Invalid booking ID'),
+  amount: z.number().positive('Amount must be positive').optional(),
+});
+export type RecordCashPaymentInput = z.infer<typeof recordCashPaymentSchema>;
+
+/**
  * Integration Contract 6: Route params for entering booking flow (/book)
  * Route contract: /book?locationId=&vetId=&serviceId=
  */

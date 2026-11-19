@@ -69,7 +69,13 @@
     "rocket": "Rocket",
     "card": "Card",
     "amount": "Total Fee",
-    "fee": "Fee"
+    "fee": "Fee",
+    "collectCash": "Collect Cash",
+    "markPaid": "Mark as Paid",
+    "paid": "Paid",
+    "pending": "Pending",
+    "receipt": "Cash Receipt",
+    "receiptNotice": "Cash collected at reception desk"
   },
   "summary": {
     "clinic": "Clinic",
@@ -95,5 +101,35 @@
     "selectSerial": "Please select an available serial number",
     "bookingFailed": "Failed to complete booking. Please try again.",
     "noLocation": "No clinic selected. Please choose a clinic first."
+  },
+  "provider": {
+    "title": "Clinic Bookings & Schedule",
+    "subtitle": "Manage incoming visit requests and patient status lifecycle",
+    "tabs": {
+      "pending": "Pending Requests",
+      "confirmed": "Confirmed / Upcoming",
+      "inProgress": "In Progress",
+      "completed": "Completed & History"
+    },
+    "actions": {
+      "confirm": "Accept & Confirm",
+      "decline": "Decline Request",
+      "startVisit": "Start Visit / Check-in",
+      "complete": "Complete Visit",
+      "noShow": "Mark No-Show"
+    },
+    "declineModal": {
+      "title": "Decline Booking Request",
+      "reasonLabel": "Reason for declining",
+      "reasonPlaceholder": "e.g., Doctor is unavailable, emergency surgery...",
+      "confirm": "Confirm Decline",
+      "cancel": "Cancel"
+    },
+    "empty": {
+      "pending": "No pending booking requests",
+      "confirmed": "No confirmed bookings",
+      "inProgress": "No visits currently in progress",
+      "completed": "No past visits recorded"
+    }
   }
 }

@@ -1,3 +1,16 @@
+export type {
+  BookingType,
+  BookingStatus,
+  ScheduleMode,
+  PaymentMethod,
+  PaymentStatus,
+  GetAvailableSlotsInput,
+  CreateBookingInput,
+  CancelBookingInput,
+  RescheduleBookingInput,
+  UpdateBookingStatusInput,
+  RecordCashPaymentInput,
+} from '@pranora/validation';
 import type {
   BookingType,
   BookingStatus,
@@ -8,6 +21,8 @@ import type {
   CreateBookingInput,
   CancelBookingInput,
   RescheduleBookingInput,
+  UpdateBookingStatusInput,
+  RecordCashPaymentInput,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -247,4 +262,183 @@ export async function listUserBookings(
   }
 
   return (data ?? []) as unknown as BookingDetails[];
+}
+
+/**
+ * APT-2: Update booking status via update_booking_status RPC
+ * Validates lifecycle state machine transition.
+ */
+export async function updateBookingStatus(
+  client: TypedSupabaseClient,
+  input: UpdateBookingStatusInput
+): Promise<BookingActionResponse> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+    'update_booking_status',
+    {
+      p_booking_id: input.bookingId,
+      p_status: input.status,
+      p_reason: input.reason ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to update booking status: ${error.message}`);
+  }
+
+  return (data as BookingActionResponse) ?? { success: true };
+}
+
+/**
+ * APT-2: Provider confirms a pending booking
+ */
+export async function confirmBooking(
+  client: TypedSupabaseClient,
+  bookingId: string
+): Promise<BookingActionResponse> {
+  return updateBookingStatus(client, {
+    bookingId,
+    status: 'confirmed',
+  });
+}
+
+/**
+ * APT-2: Provider declines/rejects a pending booking with a reason
+ */
+export async function rejectBooking(
+  client: TypedSupabaseClient,
+  bookingId: string,
+  reason: string
+): Promise<BookingActionResponse> {
+  return updateBookingStatus(client, {
+    bookingId,
+    status: 'cancelled_by_provider',
+    reason,
+  });
+}
+
+/**
+ * APT-2: Provider/vet marks pet owner checked in / consultation in progress
+ */
+export async function startConsultation(
+  client: TypedSupabaseClient,
+  bookingId: string
+): Promise<BookingActionResponse> {
+  return updateBookingStatus(client, {
+    bookingId,
+    status: 'in_progress',
+  });
+}
+
+/**
+ * APT-2: Provider/vet marks appointment completed
+ */
+export async function completeBooking(
+  client: TypedSupabaseClient,
+  bookingId: string
+): Promise<BookingActionResponse> {
+  return updateBookingStatus(client, {
+    bookingId,
+    status: 'completed',
+  });
+}
+
+/**
+ * APT-2: Provider/vet marks pet owner as no-show
+ */
+export async function markNoShow(
+  client: TypedSupabaseClient,
+  bookingId: string
+): Promise<BookingActionResponse> {
+  return updateBookingStatus(client, {
+    bookingId,
+    status: 'no_show',
+  });
+}
+
+/**
+ * Lists bookings for a provider location (for clinic/vet staff)
+ */
+export async function listProviderBookings(
+  client: TypedSupabaseClient,
+  locationId: string,
+  params?: {
+    status?: BookingStatus;
+    date?: string;
+    limit?: number;
+    offset?: number;
+  }
+): Promise<BookingDetails[]> {
+  let query = client
+    .from('bookings')
+    .select('*')
+    .eq('location_id', locationId)
+    .order('starts_at', { ascending: true });
+
+  if (params?.status) {
+    query = query.eq('status', params.status);
+  }
+
+  if (params?.date) {
+    const dayStart = `${params.date}T00:00:00.000Z`;
+    const dayEnd = `${params.date}T23:59:59.999Z`;
+    query = query.gte('starts_at', dayStart).lte('starts_at', dayEnd);
+  }
+
+  if (params?.limit) {
+    query = query.limit(params.limit);
+  }
+
+  if (params?.offset) {
+    query = query.range(params.offset, params.offset + (params.limit ?? 50) - 1);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to list provider bookings: ${error.message}`);
+  }
+
+  return (data ?? []) as unknown as BookingDetails[];
+}
+
+/**
+ * PAY-1: Record cash payment at clinic reception via record_cash_payment RPC
+ */
+export async function recordCashPayment(
+  client: TypedSupabaseClient,
+  input: RecordCashPaymentInput
+): Promise<BookingActionResponse> {
+  const { data, error } = await (client.rpc as unknown as (
+    fn: string,
+    args: Record<string, unknown>
+  ) => Promise<{ data: unknown; error: { message: string } | null }>)(
+    'record_cash_payment',
+    {
+      p_booking_id: input.bookingId,
+      p_amount: input.amount ?? null,
+    }
+  );
+
+  if (error) {
+    throw new Error(`Failed to record cash payment: ${error.message}`);
+  }
+
+  return (data as BookingActionResponse) ?? { success: true };
+}
+
+/**
+ * PAY-1: Mark a booking as paid in cash at clinic reception
+ */
+export async function markBookingPaid(
+  client: TypedSupabaseClient,
+  bookingId: string,
+  amount?: number
+): Promise<BookingActionResponse> {
+  return recordCashPayment(client, {
+    bookingId,
+    amount,
+  });
 }
