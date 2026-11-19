@@ -177,6 +177,12 @@ const k = {
     noDiagnosis:       ns('ai')('noDiagnosis'),
     noMedicine:        ns('ai')('noMedicine'),
   },
+
+  shelter: {
+    title:       ns('shelter')('title'),
+    onboarding:  ns('shelter')('onboarding.title'),
+    dashboard:   ns('shelter')('dashboard.title'),
+  },
 } as const;
 
 export { k as KEYS };
