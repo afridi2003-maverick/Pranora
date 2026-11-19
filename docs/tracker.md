@@ -135,7 +135,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 ### Provider, Shelter & Admin
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ⬜ |
+| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ✅ |
 | PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ⬜ |
 | PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ✅ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |

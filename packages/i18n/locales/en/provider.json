@@ -1,0 +1,67 @@
+{
+  "onboarding": {
+    "title": "Register Your Veterinary or Pet Care Business",
+    "subtitle": "Join the Pranora provider network to receive appointments, manage patient queues, and grow your clinic.",
+    "steps": {
+      "info": "Business Info",
+      "location": "Location & Map Pin",
+      "hours": "Operating Hours",
+      "services": "Services Offered",
+      "documents": "Verification Documents"
+    },
+    "fields": {
+      "type": "Provider Type",
+      "nameEn": "Clinic / Business Name (English)",
+      "nameBn": "Clinic / Business Name (Bangla)",
+      "phone": "Official Phone Number",
+      "email": "Email Address",
+      "tradeLicense": "Trade License Number",
+      "website": "Website URL",
+      "addressEn": "Address (English)",
+      "addressBn": "ঠিকানা (বাংলা)",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "is24h": "24/7 Open",
+      "hasEmergency": "Emergency Critical Care Available",
+      "offersHomeVisit": "Offers Home Visits",
+      "cutoff": "Cancellation Cut-off Hours (before appointment)",
+      "speciesTreated": "Species Treated",
+      "documents": "Trade License / BVC Certificate URLs"
+    },
+    "types": {
+      "vet_clinic": "Veterinary Clinic",
+      "pet_hospital": "Pet Hospital",
+      "govt_vet_hospital": "Government Vet Hospital",
+      "freelance_vet": "Independent Vet Doctor",
+      "groomer": "Pet Grooming Salon",
+      "pet_shop": "Pet Shop & Supplies",
+      "boarding": "Pet Boarding / Daycare",
+      "shelter": "Animal Shelter / Rescue"
+    },
+    "placeholders": {
+      "nameEn": "e.g. Care Pet Clinic & Surgery",
+      "nameBn": "যেমন: কেয়ার পেট ক্লিনিক",
+      "phone": "+8801XXXXXXXXX",
+      "tradeLicense": "TRAD/DSCC/012345/2026",
+      "addressEn": "House 14, Road 7, Dhanmondi, Dhaka",
+      "docUrl": "https://storage.example.com/license.pdf"
+    },
+    "actions": {
+      "next": "Continue",
+      "back": "Back",
+      "submit": "Submit for Verification",
+      "submitting": "Submitting Registration...",
+      "addDoc": "Add Document URL",
+      "addService": "Add Service"
+    },
+    "success": {
+      "title": "Provider Registered Successfully!",
+      "message": "Your clinic application has been received. Our team will verify your trade license and credentials within 24-48 hours. You can preview your provider dashboard in the meantime.",
+      "goToDashboard": "Go to Provider Dashboard"
+    }
+  },
+  "dashboard": {
+    "title": "Provider Dashboard",
+    "subtitle": "Overview of appointments, patients, and clinic schedule"
+  }
+}

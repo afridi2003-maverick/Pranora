@@ -183,6 +183,11 @@ const k = {
     onboarding:  ns('shelter')('onboarding.title'),
     dashboard:   ns('shelter')('dashboard.title'),
   },
+
+  provider: {
+    onboarding:  ns('provider')('onboarding.title'),
+    dashboard:   ns('provider')('dashboard.title'),
+  },
 } as const;
 
 export { k as KEYS };
