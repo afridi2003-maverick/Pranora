@@ -1,5 +1,8 @@
 import type { TypedSupabaseClient } from '../client';
 import type { SpeciesType } from '@pranora/types';
+import type { DigitalPrescriptionInput } from '@pranora/validation';
+
+export type { DigitalPrescriptionInput };
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -354,5 +357,87 @@ export async function deletePetDocument(
 
   if (error) return { success: false, error: error.message };
   return { success: true };
+}
+
+/**
+ * APT-5: Create a digital prescription for a pet consultation (vet only).
+ * Creates a medical_record and associated prescription items.
+ */
+export async function createDigitalPrescription(
+  client: TypedSupabaseClient,
+  input: DigitalPrescriptionInput
+): Promise<{ data: MedicalRecordRow | null; error?: string }> {
+  const { data: user } = await client.auth.getUser();
+  if (!user.user) {
+    return { data: null, error: 'User not authenticated' };
+  }
+
+  // 1. Insert medical record
+  const { data: record, error: recordError } = await client
+    .from('medical_records' as never)
+    .insert({
+      pet_id: input.petId,
+      booking_id: input.bookingId || null,
+      vet_id: input.vetId,
+      visit_date: input.visitDate,
+      diagnosis: input.diagnosis,
+      findings: input.findings || null,
+      notes: input.advice
+        ? `Advice: ${input.advice}${input.followUpDate ? `\nFollow-up: ${input.followUpDate}` : ''}`
+        : input.notes || null,
+      created_by: user.user.id,
+    } as never)
+    .select(`*, vet:vets(id, bvc_reg_no, profile:profiles(full_name, phone))`)
+    .single();
+
+  if (recordError || !record) {
+    return { data: null, error: recordError?.message || 'Failed to create medical record' };
+  }
+
+  const typedRecord = record as unknown as MedicalRecordRow;
+
+  // 2. Insert prescription items
+  if (input.medicines && input.medicines.length > 0) {
+    const presPayload = input.medicines.map((m) => ({
+      medical_record_id: typedRecord.id,
+      medicine: m.medicine,
+      dosage: m.dosage || null,
+      frequency: m.frequency || null,
+      duration_days: m.duration_days || null,
+      instructions: m.instructions || null,
+    }));
+
+    const { error: presError } = await client
+      .from('prescriptions' as never)
+      .insert(presPayload as never);
+
+    if (presError) {
+      return { data: typedRecord, error: `Prescription saved with items error: ${presError.message}` };
+    }
+  }
+
+  return { data: typedRecord };
+}
+
+/**
+ * APT-5: Get digital prescription by booking ID.
+ */
+export async function getPrescriptionByBooking(
+  client: TypedSupabaseClient,
+  bookingId: string
+): Promise<{ data: MedicalRecordRow | null; error?: string }> {
+  const { data, error } = await client
+    .from('medical_records' as never)
+    .select(`
+      *,
+      vet:vets(id, bvc_reg_no, profile:profiles(full_name, phone)),
+      pet:pets(id, name, species, breed, dob),
+      prescriptions(*)
+    `)
+    .eq('booking_id', bookingId)
+    .maybeSingle();
+
+  if (error) return { data: null, error: error.message };
+  return { data: data as unknown as MedicalRecordRow | null };
 }
 

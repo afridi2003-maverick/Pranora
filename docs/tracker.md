@@ -92,7 +92,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ✅ |
 | RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ✅ |
 
-### Adoption (দত্তক)
+### Adoption (দত্তক)yes
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | ADP-1 | Public listings without login; filters species / age / district | Brehat | M | S3 | DB-9, UI-1, I18N-1 | ✅ |
@@ -167,7 +167,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ⬜ |
 | PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
-| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ⬜ |
+| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
 | CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ⬜ |
 | CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ⬜ |
