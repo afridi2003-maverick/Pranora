@@ -13,8 +13,8 @@ export default function AdoptionPublicPage() {
   const router = useRouter();
 
   const handleApply = (listing: AdoptionListingRow) => {
-    // When user clicks Apply, redirect to login or application page with returnUrl
-    router.push(`/login?redirect=/adoption&listingId=${listing.id}`);
+    // Navigate directly to the one-page application form (ADP-3)
+    router.push(`/adoption/apply/${listing.id}`);
   };
 
   return (

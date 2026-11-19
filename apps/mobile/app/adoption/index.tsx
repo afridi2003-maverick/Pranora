@@ -10,8 +10,8 @@ export default function AdoptionScreen() {
   const { isBangla } = useLocale();
 
   const handleApply = (listing: AdoptionListingRow) => {
-    // Navigate to login or adoption application
-    router.push(`/(auth)/login?redirect=/adoption&listingId=${listing.id}`);
+    // Navigate directly to the one-page application form (ADP-3)
+    router.push(`/adoption/apply/${listing.id}`);
   };
 
   return (
