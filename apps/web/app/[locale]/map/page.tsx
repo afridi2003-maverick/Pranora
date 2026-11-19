@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Chip, SearchBar, EmptyState } from '@pranora/ui';
 import {
@@ -16,6 +16,8 @@ const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function WebMapPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emergencyParam = searchParams?.get('emergency') === 'true';
   const { isBangla } = useLocale();
 
   // Location state
@@ -27,7 +29,7 @@ export default function WebMapPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterOpenNow, setFilterOpenNow] = useState<boolean>(false);
   const [filter24h, setFilter24h] = useState<boolean>(false);
-  const [filterEmergency, setFilterEmergency] = useState<boolean>(false);
+  const [filterEmergency, setFilterEmergency] = useState<boolean>(emergencyParam);
   const [filterHomeVisit, setFilterHomeVisit] = useState<boolean>(false);
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
   const [selectedSpecies, setSelectedSpecies] = useState<'all' | 'dog' | 'cat' | 'bird' | 'rabbit'>('all');

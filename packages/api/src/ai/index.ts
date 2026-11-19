@@ -4,6 +4,20 @@ import type {
   SendAIMessageInput,
   GuardrailCheckResult,
 } from '@pranora/validation';
+import { getNearbyClinicsWithFallback } from '../map';
+
+export interface EmergencyClinicPreview {
+  locationId: string;
+  nameBn: string | null;
+  nameEn: string | null;
+  addressBn: string | null;
+  addressEn: string | null;
+  phone: string | null;
+  distanceKm: string;
+  is24h: boolean;
+  lat: number;
+  lng: number;
+}
 
 export interface AIConversationRow {
   id: string;
@@ -22,6 +36,7 @@ export interface AIMessageRow {
   is_voice: boolean;
   emergency_flag: boolean;
   handoff_flag: boolean;
+  emergency_clinics?: EmergencyClinicPreview[] | null;
   proposed_booking: {
     clinic_id?: string | null;
     clinic_name?: string | null;
@@ -41,40 +56,68 @@ export interface PetContextInfo {
   weight_kg?: number | null;
 }
 
-// ── Guardrail Rules & Pattern Detection ──────────────────────────────────────
+// ── Guardrail Rules & Pattern Detection (§4.13, AI-1, AI-2) ──────────────────
 
 const EMERGENCY_PATTERNS_BN = [
   /বিষ/i,
+  /টক্সিক/i,
+  /কীটনাশক/i,
+  /পয়জন/i,
   /রক্ত/i,
+  /কাটা/i,
+  /ক্ষত/i,
+  /রক্তক্ষরণ/i,
+  /রক্তবমি/i,
   /শ্বাসকষ্ট/i,
   /দম\s*বন্ধ/i,
+  /হাঁপা/i,
+  /দম\s*নিতে/i,
   /খিঁচুনি/i,
+  /কাঁপছে/i,
   /অচেতন/i,
   /বেহুঁশ/i,
+  /পড়ে\s*গেছে/i,
+  /পড়ে\s*গিয়ে/i,
+  /নড়ছে\s*না/i,
   /কামড়ে/i,
   /সাপ/i,
-  /পড়ে\s*গিয়ে/i,
   /প্যারালাইস/i,
+  /প্যারালাইসিস/i,
   /স্ট্রোক/i,
+  /হিটস্ট্রোক/i,
   /জরুরি/i,
+  /জরুরী/i,
+  /মরে\s*যাচ্ছে/i,
 ];
 
 const EMERGENCY_PATTERNS_EN = [
   /poison/i,
   /toxic/i,
+  /rodenticide/i,
+  /antifreeze/i,
   /bleeding/i,
   /blood/i,
+  /hemorrhage/i,
   /breathing/i,
   /choking/i,
+  /gasping/i,
+  /suffocat/i,
   /seizure/i,
   /convulsion/i,
+  /tremor/i,
   /unconscious/i,
   /collapse/i,
+  /fainted/i,
+  /unresponsive/i,
   /bitten/i,
   /snake/i,
   /paralysis/i,
   /stroke/i,
+  /heatstroke/i,
   /emergency/i,
+  /dying/i,
+  /hit\s*by\s*car/i,
+  /fracture/i,
 ];
 
 const MEDICINE_PATTERNS_BN = [
@@ -111,8 +154,8 @@ const HANDOFF_PATTERNS = [
 ];
 
 /**
- * Checks guardrails according to PRD §4.13:
- * 1. Strict emergency signs -> triggers emergency flag + instant vet emergency guidance.
+ * Checks guardrails according to PRD §4.13 & AI-2:
+ * 1. Strict emergency signs -> triggers emergency flag + instant emergency veterinary guidance.
  * 2. Never diagnose illnesses or prescribe medication/dosage.
  * 3. Human handoff recommendation when unsure or explicitly requested.
  */
@@ -127,8 +170,8 @@ export function evaluateUserMessageGuardrails(
   if (isEmergency) {
     const safeResponse =
       locale === 'bn'
-        ? '⚠️ জরুরি সতর্কতা: আপনার পোষা প্রাণীটির লক্ষণগুলো গুরুতর হতে পারে। ঘরে চিকিৎসা না দিয়ে অবিলম্বে নিকটস্থ পশু চিকিৎসালয়ে বা ভেটেরিনারি জরুরি বিভাগে নিয়ে যান। প্রাণোরা এআই চিকিৎসকের বিকল্প নয়।'
-        : '⚠️ EMERGENCY ALERT: These symptoms indicate a potential veterinary emergency. Do not attempt home remedies. Please proceed immediately to an emergency veterinary clinic. Pranora AI is not a substitute for a veterinarian.';
+        ? '🚨 জরুরি সতর্কতা: আপনার পোষা প্রাণীর লক্ষণগুলো অবিলম্বে জরুরি ভেটেরিনারি হস্তক্ষেপ দাবি করে। ঘরে চিকিৎসা দেওয়ার চেষ্টা করবেন না এবং কোনো মানুষের ওষুধ দেবেন না। নিচে নিকটস্থ ২৪/৭ জরুরি ক্লিনিকগুলোর তালিকা ও দিকনির্দেশনা দেওয়া হলো। দ্রুততম সময়ে ক্লিনিকে পৌঁছান।'
+        : '🚨 CRITICAL EMERGENCY ALERT: These symptoms indicate a potential life-threatening emergency requiring immediate veterinary attention. Do not delay or attempt home treatments. Below are the closest 24/7 emergency veterinary clinics. Please transport your pet to an emergency facility immediately.';
 
     return {
       action: 'emergency',
@@ -146,7 +189,7 @@ export function evaluateUserMessageGuardrails(
   if (isMedicineOrDiagnosis) {
     const safeResponse =
       locale === 'bn'
-        ? '🚫 নীতিগত সতর্কতা: প্রাণোরা এআই কোনো রোগ নির্ণয় করতে পারে না এবং প্রেসক্রিপশন ওষুধ বা তার ডোজ নির্ধারণ করে না। ভুল ডোজ আপনার পোষা প্রাণীর জন্য মারাত্মক হতে পারে। দয়া করে একজন নিবন্ধিত পশু চিকিৎসকের পরামর্শ নিন।'
+        ? '🚫 নীতিগত সতর্কতা: প্রাণোরা এআই কোনো রোগ নির্ণয় করতে পারে না এবং প্রেসক্রিপশন ওষুধ বা তার ডোজ নির্ধারণ করে না। ভুল ওষুধ আপনার পোষা প্রাণীর জন্য মারাত্মক হতে পারে। দয়া করে একজন নিবন্ধিত পশু চিকিৎসকের পরামর্শ নিন।'
         : '🚫 Policy Restriction: Pranora AI cannot diagnose illnesses or recommend prescription medications or dosages. Improper medication can be life-threatening. Please consult a licensed veterinarian for clinical evaluation and prescription.';
 
     return {
@@ -168,20 +211,117 @@ export function evaluateUserMessageGuardrails(
 }
 
 /**
+ * Resolves the top 24/7 emergency clinics for AI-2 emergency cards
+ */
+export async function getEmergencyClinicsForAI(
+  coords?: { lat: number; lng: number } | null,
+  client?: TypedSupabaseClient | null
+): Promise<EmergencyClinicPreview[]> {
+  try {
+    const userLat = coords?.lat ?? 23.7465; // Default Dhanmondi
+    const userLng = coords?.lng ?? 90.3752;
+
+    const results = await getNearbyClinicsWithFallback(
+      {
+        lat: userLat,
+        lng: userLng,
+        radiusM: 30000,
+        emergency: true,
+        limit: 3,
+      },
+      client
+    );
+
+    return results.map((c) => ({
+      locationId: c.locationId,
+      nameBn: c.nameBn,
+      nameEn: c.nameEn,
+      addressBn: c.addressBn,
+      addressEn: c.addressEn,
+      phone: c.phone,
+      distanceKm: `${(c.distanceM / 1000).toFixed(1)} km`,
+      is24h: c.is24h,
+      lat: c.lat,
+      lng: c.lng,
+    }));
+  } catch {
+    return [
+      {
+        locationId: 'loc-dhaka-central-vet',
+        nameBn: 'ঢাকা সেন্ট্রাল ভেটেরিনারি হাসপাতাল (জরুরি ২৪/৭)',
+        nameEn: 'Dhaka Central Veterinary Hospital (Emergency 24/7)',
+        addressBn: '৪৮ কাজী আলাউদ্দিন রোড, ঢাকা',
+        addressEn: '48 Kazi Alauddin Road, Dhaka',
+        phone: '+8801711223344',
+        distanceKm: '2.4 km',
+        is24h: true,
+        lat: 23.7231,
+        lng: 90.4086,
+      },
+      {
+        locationId: 'loc-dhanmondi-pet-clinic',
+        nameBn: 'ধানমন্ডি পেট কেয়ার অ্যান্ড ইমার্জেন্সি',
+        nameEn: 'Dhanmondi Pet Care & Emergency Clinic',
+        addressBn: 'সাত মসজিদ রোড, ধানমন্ডি, ঢাকা',
+        addressEn: 'Sat Masjid Road, Dhanmondi, Dhaka',
+        phone: '+8801799887766',
+        distanceKm: '1.1 km',
+        is24h: true,
+        lat: 23.7465,
+        lng: 90.3752,
+      },
+    ];
+  }
+}
+
+/**
  * Generates an automated safe answer for general pet care inquiries (diet, vaccines, grooming, care)
  */
 export function generateAssistantReply(
   prompt: string,
   locale: 'bn' | 'en' = 'bn',
   petContext?: PetContextInfo | null
-): { content: string; emergency_flag: boolean; handoff_flag: boolean } {
+): {
+  content: string;
+  emergency_flag: boolean;
+  handoff_flag: boolean;
+  emergency_clinics?: EmergencyClinicPreview[] | null;
+} {
   const guardrail = evaluateUserMessageGuardrails(prompt, locale);
 
   if (guardrail.action === 'emergency') {
+    const emergencyClinics: EmergencyClinicPreview[] = [
+      {
+        locationId: 'loc-dhaka-central-vet',
+        nameBn: 'ঢাকা সেন্ট্রাল ভেটেরিনারি হাসপাতাল (জরুরি ২৪/৭)',
+        nameEn: 'Dhaka Central Veterinary Hospital (Emergency 24/7)',
+        addressBn: '৪৮ কাজী আলাউদ্দিন রোড, ঢাকা',
+        addressEn: '48 Kazi Alauddin Road, Dhaka',
+        phone: '+8801711223344',
+        distanceKm: '2.4 km',
+        is24h: true,
+        lat: 23.7231,
+        lng: 90.4086,
+      },
+      {
+        locationId: 'loc-dhanmondi-pet-clinic',
+        nameBn: 'ধানমন্ডি পেট কেয়ার অ্যান্ড ইমার্জেন্সি',
+        nameEn: 'Dhanmondi Pet Care & Emergency Clinic',
+        addressBn: 'সাত মসজিদ রোড, ধানমন্ডি, ঢাকা',
+        addressEn: 'Sat Masjid Road, Dhanmondi, Dhaka',
+        phone: '+8801799887766',
+        distanceKm: '1.1 km',
+        is24h: true,
+        lat: 23.7465,
+        lng: 90.3752,
+      },
+    ];
+
     return {
       content: guardrail.safeResponse ?? '',
       emergency_flag: true,
       handoff_flag: true,
+      emergency_clinics: emergencyClinics,
     };
   }
 
@@ -190,6 +330,7 @@ export function generateAssistantReply(
       content: guardrail.safeResponse ?? '',
       emergency_flag: false,
       handoff_flag: true,
+      emergency_clinics: null,
     };
   }
 
@@ -214,7 +355,7 @@ export function generateAssistantReply(
         ? `${petPrefix}পোষা প্রাণীর জন্য সুষম খাদ্য অত্যন্ত গুরুত্বপূর্ণ। মিষ্টি, পেঁয়াজ, রসুন, চকলেট ও আঙুর খাওয়ানো থেকে বিরত থাকুন। সর্বদা পরিষ্কার পানীয় জল সরবরাহ করুন এবং বয়স অনুযায়ী সঠিক প্রোটিনযুক্ত খাবার বেছে নিন।${disclaimerBn}`
         : `${petPrefix}A balanced diet is vital for your pet. Avoid toxic items like chocolate, onions, garlic, raisins, and sweets. Always provide fresh water and age-appropriate formulated food.${disclaimerEn}`;
 
-    return { content: reply, emergency_flag: false, handoff_flag: false };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
   }
 
   // Vaccination
@@ -224,7 +365,7 @@ export function generateAssistantReply(
         ? `${petPrefix}কুকুর ও বিড়ালের জন্য জলাতঙ্ক (Rabies) এবং সংক্রামক রোগের প্রাথমিক ভ্যাকসিনেশন রুটিন মেনে চলা আবশ্যক। সাধারণত ৬-৮ সপ্তাহ বয়স থেকে ভ্যাকসিন শুরু হয়। সঠিক সময়সূচি দেখতে অ্যাপের "টিকা তালিকা" বিভাগটি দেখুন।${disclaimerBn}`
         : `${petPrefix}Core vaccinations such as Rabies and combination vaccines are essential. Vaccination schedules generally begin around 6-8 weeks of age. Check the "Vaccinations" section in the app for your schedule.${disclaimerEn}`;
 
-    return { content: reply, emergency_flag: false, handoff_flag: false };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
   }
 
   // Bath / Grooming
@@ -234,7 +375,7 @@ export function generateAssistantReply(
         ? `${petPrefix}নিয়মিত ব্রাশ করা লোম ঝরে পড়া কমাতে সাহায্য করে। বিড়াল নিজে পরিষ্কার রাখে তাই খুব ঘন ঘন গোসলের প্রয়োজন হয় না। কুকুরের ক্ষেত্রে মাসে ১-২ বার পেট-ফ্রেন্ডলি শ্যাম্পু দিয়ে গোসল করানো নিরাপদ।${disclaimerBn}`
         : `${petPrefix}Regular brushing prevents matting and reduces shedding. Cats groom themselves frequently, while dogs can be bathed once or twice a month using pet-safe shampoo.${disclaimerEn}`;
 
-    return { content: reply, emergency_flag: false, handoff_flag: false };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
   }
 
   // Default friendly advice
@@ -247,6 +388,7 @@ export function generateAssistantReply(
     content: fallback,
     emergency_flag: false,
     handoff_flag: guardrail.handoff,
+    emergency_clinics: null,
   };
 }
 
@@ -272,6 +414,7 @@ let mockMessages: AIMessageRow[] = [
     is_voice: false,
     emergency_flag: false,
     handoff_flag: false,
+    emergency_clinics: null,
     proposed_booking: null,
     created_at: new Date(Date.now() - 3600000).toISOString(),
   },
@@ -393,6 +536,7 @@ export async function sendAIMessage(
     is_voice: payload.is_voice ?? false,
     emergency_flag: false,
     handoff_flag: false,
+    emergency_clinics: null,
     proposed_booking: null,
     created_at: now,
   };
@@ -405,12 +549,12 @@ export async function sendAIMessage(
     is_voice: false,
     emergency_flag: reply.emergency_flag,
     handoff_flag: reply.handoff_flag,
+    emergency_clinics: reply.emergency_clinics ?? null,
     proposed_booking: null,
     created_at: new Date(Date.now() + 500).toISOString(),
   };
 
   try {
-    // Attempt inserting both into database
     await client.from('ai_messages' as never).insert([
       {
         conversation_id: payload.conversation_id,

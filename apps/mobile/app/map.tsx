@@ -10,7 +10,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
 import {
   getNearbyClinicsWithFallback,
@@ -25,6 +25,7 @@ const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function MobileMapScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ emergency?: string }>();
   const { isBangla } = useLocale();
 
   // Location & Filter state
@@ -32,7 +33,7 @@ export default function MobileMapScreen() {
   const [search, setSearch] = useState('');
   const [filterOpenNow, setFilterOpenNow] = useState(false);
   const [filter24h, setFilter24h] = useState(false);
-  const [filterEmergency, setFilterEmergency] = useState(false);
+  const [filterEmergency, setFilterEmergency] = useState(params.emergency === 'true');
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
   const [selectedSpecies] = useState<'all' | 'dog' | 'cat'>('all');
 
