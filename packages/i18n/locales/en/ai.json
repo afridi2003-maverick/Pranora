@@ -32,5 +32,15 @@
   "emergencyFirstAidTitle": "Immediate Action Guidelines:",
   "emergencyFirstAid1": "Keep your pet calm and gently immobilize in a blanket or carrier.",
   "emergencyFirstAid2": "Ensure the airway is completely unobstructed. Never give human medicines or force fluids.",
-  "emergencyHotline": "Central Emergency Hotline: +880 1711-000000"
+  "emergencyHotline": "Central Emergency Hotline: +880 1711-000000",
+  "petContextActive": "Active Pet Context",
+  "petContextDisabled": "Pet Context Disabled (Generic guidance only)",
+  "petContextConsent": "Share profile (age, species, allergies)",
+  "consentRevoke": "Revoke Consent",
+  "consentGrant": "Grant Consent",
+  "petAllergiesWarning": "Allergy Alert: Pet profile notes sensitivity to",
+  "lifeStagePuppy": "Puppy / Kitten",
+  "lifeStageAdult": "Adult",
+  "lifeStageSenior": "Senior",
+  "selectPetPrompt": "Select a pet to personalize advice"
 }

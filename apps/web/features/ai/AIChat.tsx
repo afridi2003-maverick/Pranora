@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
 import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
-import { generateAssistantReply } from '@pranora/api';
+import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
 export interface AIChatProps {
@@ -85,16 +85,10 @@ export function AIChat({
     setInputContent('');
     setIsTyping(true);
 
-    // Generate AI response with guardrail checks
+    // Generate AI response with guardrail checks and consent-based pet context
     setTimeout(() => {
       const petContext =
-        sharePetContext && selectedPet
-          ? {
-              name: selectedPet.name,
-              species: selectedPet.species,
-              breed: selectedPet.breed?.name_bn || selectedPet.breed?.name_en || null,
-            }
-          : null;
+        sharePetContext && selectedPet ? buildPetContextInfo(selectedPet) : null;
 
       const reply = generateAssistantReply(
         text,
@@ -209,8 +203,8 @@ export function AIChat({
         </Button>
       </div>
 
-      {/* Pet Context Selector & Consent */}
-      <div className="bg-green-50/60 dark:bg-green-950/20 border-b border-green-200 dark:border-green-800/40 px-6 py-3">
+      {/* AI-3: Pet Context Selector & Explicit Consent Toggle */}
+      <div className="bg-green-50/70 dark:bg-green-950/20 border-b border-green-200 dark:border-green-800/40 px-6 py-3">
         {pets.length > 0 && (
           <PetPicker
             pets={pets}
@@ -220,15 +214,33 @@ export function AIChat({
             className="mb-2"
           />
         )}
-        <label className="flex items-center gap-2 text-xs sm:text-sm text-content-secondary cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={sharePetContext}
-            onChange={(e) => setSharePetContext(e.target.checked)}
-            className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
-          />
-          <span>🔒 {t('ai:petContextBanner')}</span>
-        </label>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-green-200/60 dark:border-green-800/40">
+          <div>
+            <div className="text-xs sm:text-sm font-bold text-content-primary flex items-center gap-1.5">
+              <span>{sharePetContext ? '🔒' : '🛡️'}</span>
+              <span>{sharePetContext ? t('ai:petContextActive') : t('ai:petContextDisabled')}</span>
+            </div>
+            <p className="text-xs text-content-secondary mt-0.5">
+              {sharePetContext
+                ? selectedPet
+                  ? `${selectedPet.name} • ${selectedPet.species}${selectedPet.allergies ? ` (${isBangla ? 'অ্যালার্জি' : 'Allergies'}: ${selectedPet.allergies})` : ''}`
+                  : t('ai:selectPetPrompt')
+                : isBangla
+                ? 'পোষা প্রাণীর কোনো ব্যক্তিগত তথ্য এআই এর সাথে শেয়ার করা হচ্ছে না।'
+                : 'No personal pet profile data is shared with the AI.'}
+            </p>
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-xs sm:text-sm text-content-primary cursor-pointer select-none self-start sm:self-center">
+            <input
+              type="checkbox"
+              checked={sharePetContext}
+              onChange={(e) => setSharePetContext(e.target.checked)}
+              className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
+            />
+            <span className="font-semibold text-xs text-primary">{t('ai:petContextConsent')}</span>
+          </label>
+        </div>
       </div>
 
       {/* Chat Messages Feed */}

@@ -15,7 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
 import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
-import { generateAssistantReply } from '@pranora/api';
+import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
 export interface AIChatScreenProps {
@@ -89,16 +89,10 @@ export function AIChatScreen({
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
-    // Simulate AI response with guardrail evaluation
+    // Simulate AI response with guardrail evaluation and consent-based pet context
     setTimeout(() => {
       const petContext =
-        sharePetContext && selectedPet
-          ? {
-              name: selectedPet.name,
-              species: selectedPet.species,
-              breed: selectedPet.breed?.name_bn || selectedPet.breed?.name_en || null,
-            }
-          : null;
+        sharePetContext && selectedPet ? buildPetContextInfo(selectedPet) : null;
 
       const reply = generateAssistantReply(
         text,
@@ -223,8 +217,8 @@ export function AIChatScreen({
           </TouchableOpacity>
         </View>
 
-        {/* Pet Context Selector & Toggle */}
-        <View className="bg-green-50/70 border-b border-green-200 px-4 py-2">
+        {/* AI-3: Pet Context Selector & Explicit Consent Toggle */}
+        <View className="bg-green-50/80 border-b border-green-200 px-4 py-2.5">
           {pets.length > 0 && (
             <PetPicker
               pets={pets}
@@ -233,10 +227,25 @@ export function AIChatScreen({
               label={isBangla ? 'যে পোষা প্রাণী সম্পর্কে জানতে চান:' : 'Select pet context:'}
             />
           )}
-          <View className="flex-row items-center justify-between mt-1">
-            <Text className="text-xs text-gray-700 flex-1 mr-2">
-              🔒 {t('ai:petContextBanner')}
-            </Text>
+
+          <View className="flex-row items-center justify-between mt-2 pt-2 border-t border-green-200/60">
+            <View className="flex-1 mr-3">
+              <View className="flex-row items-center gap-1.5">
+                <Text className="text-xs font-bold text-gray-800">
+                  {sharePetContext ? '🔒 ' + t('ai:petContextActive') : '🛡️ ' + t('ai:petContextDisabled')}
+                </Text>
+              </View>
+              <Text className="text-[11px] text-gray-600 mt-0.5">
+                {sharePetContext
+                  ? selectedPet
+                    ? `${selectedPet.name} • ${selectedPet.species}${selectedPet.allergies ? ` (${isBangla ? 'অ্যালার্জি' : 'Allergies'}: ${selectedPet.allergies})` : ''}`
+                    : t('ai:selectPetPrompt')
+                  : isBangla
+                  ? 'পোষা প্রাণীর কোনো ব্যক্তিগত তথ্য এআই এর সাথে শেয়ার করা হচ্ছে না।'
+                  : 'No personal pet profile data is shared with the AI.'}
+              </Text>
+            </View>
+
             <Switch
               value={sharePetContext}
               onValueChange={setSharePetContext}
