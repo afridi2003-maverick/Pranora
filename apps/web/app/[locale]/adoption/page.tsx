@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { LanguageHeader } from '../../../components/LanguageHeader';
 import { AdoptionList } from '../../../features/adoption';
+import { Button } from '@pranora/ui';
 import type { AdoptionListingRow } from '@pranora/api';
 
 export default function AdoptionPublicPage() {
@@ -34,6 +35,16 @@ export default function AdoptionPublicPage() {
               ? 'শেল্টার ও উদ্ধারকারীদের যত্নশীল আশ্রয়ে থাকা প্রাণীদের প্রোফাইল ব্রাউজ করুন। কোনো লগইন ছাড়াই সকল তথ্য দেখুন।'
               : 'Browse profiles of rescued pets lovingly sheltered across Bangladesh. Freely explore without logging in.'}
           </p>
+
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => router.push('/adoption/create')}
+            >
+              ➕ {isBangla ? 'পোষা প্রাণী দত্তকের জন্য তালিকাভুক্ত করুন (ADP-2)' : 'List Pet for Adoption (ADP-2)'}
+            </Button>
+          </div>
         </div>
 
         {/* Human Review Guarantee Banner */}

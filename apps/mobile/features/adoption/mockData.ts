@@ -165,3 +165,61 @@ export const DISTRICT_MAP: Record<number, { bn: string; en: string }> = {
   7: { bn: 'রংপুর', en: 'Rangpur' },
   8: { bn: 'ময়মনসিংহ', en: 'Mymensingh' },
 };
+
+export interface EligiblePetForAdoption {
+  id: string;
+  name: string;
+  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+  gender: 'male' | 'female' | 'unknown';
+  date_of_birth: string | null;
+  age_months: number;
+  breed_name?: string | null;
+  photo_url: string | null;
+  is_vaccinated: boolean;
+  is_neutered: boolean;
+  shelter_id?: string | null;
+  has_active_listing: boolean;
+}
+
+export const MOCK_ELIGIBLE_PETS: EligiblePetForAdoption[] = [
+  {
+    id: 'pet-user-101',
+    name: 'লাকি (Lucky)',
+    species: 'dog',
+    gender: 'male',
+    date_of_birth: '2024-03-15',
+    age_months: 8,
+    breed_name: 'দেশি কুকুর / Deshi',
+    photo_url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800',
+    is_vaccinated: true,
+    is_neutered: false,
+    has_active_listing: false,
+  },
+  {
+    id: 'pet-user-102',
+    name: 'মিনি (Mini)',
+    species: 'cat',
+    gender: 'female',
+    date_of_birth: '2023-11-01',
+    age_months: 12,
+    breed_name: 'দেশি বিড়াল / Domestic Short Hair',
+    photo_url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
+    is_vaccinated: true,
+    is_neutered: true,
+    has_active_listing: false,
+  },
+  {
+    id: 'pet-user-103',
+    name: 'ব্রাউনি (Brownie)',
+    species: 'rabbit',
+    gender: 'male',
+    date_of_birth: '2024-06-10',
+    age_months: 5,
+    breed_name: 'ডাচ র্যাবিট / Dutch Rabbit',
+    photo_url: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800',
+    is_vaccinated: false,
+    is_neutered: false,
+    has_active_listing: false,
+  },
+];
+

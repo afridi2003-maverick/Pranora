@@ -97,6 +97,26 @@ export interface CreateApplicationPayload {
   reason: string;
 }
 
+export interface ListerEligibilityResult {
+  isEligible: boolean;
+  role: 'shelter' | 'adoption_lister' | 'admin' | null;
+  status: 'verified' | 'pending' | 'none';
+  shelterId?: string | null;
+}
+
+export interface EligiblePetItem {
+  id: string;
+  name: string;
+  species: SpeciesType;
+  gender: PetGender;
+  date_of_birth: string | null;
+  age_months: number | null;
+  breed_name?: string | null;
+  photo_url: string | null;
+  is_neutered: boolean | null;
+  has_active_listing: boolean;
+}
+
 // ── Client Methods ──────────────────────────────────────────────────────────
 
 /** Browse public adoption listings with optional filters */
@@ -176,6 +196,121 @@ export async function getMyAdoptionListings(
 
   if (error) throw error;
   return (data ?? []) as unknown as AdoptionListingRow[];
+}
+
+/**
+ * Check whether a user is an approved adoption lister or verified shelter staff (ADP-2)
+ */
+export async function checkAdoptionListerEligibility(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<ListerEligibilityResult> {
+  const { data: roles, error } = await client
+    .from('user_roles')
+    .select('role, status')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+
+  const rolesList = roles || [];
+  const isAdmin = rolesList.some((r) => r.role === 'admin' && r.status === 'verified');
+  if (isAdmin) {
+    return { isEligible: true, role: 'admin', status: 'verified' };
+  }
+
+  const shelterRole = rolesList.find((r) => r.role === 'shelter');
+  if (shelterRole?.status === 'verified') {
+    // Lookup associated shelter provider id
+    const { data: prov } = await client
+      .from('providers')
+      .select('id')
+      .eq('owner_user_id', userId)
+      .eq('type', 'shelter')
+      .maybeSingle();
+
+    return {
+      isEligible: true,
+      role: 'shelter',
+      status: 'verified',
+      shelterId: prov?.id ?? null,
+    };
+  }
+
+  const listerRole = rolesList.find((r) => r.role === 'adoption_lister');
+  if (listerRole?.status === 'verified') {
+    return { isEligible: true, role: 'adoption_lister', status: 'verified' };
+  }
+
+  if (shelterRole?.status === 'pending' || listerRole?.status === 'pending') {
+    return {
+      isEligible: false,
+      role: (shelterRole ? 'shelter' : 'adoption_lister') as any,
+      status: 'pending',
+    };
+  }
+
+  return { isEligible: false, role: null, status: 'none' };
+}
+
+/**
+ * Fetch pets owned by the user or their shelter, along with their active listing status (ADP-2)
+ */
+export async function getEligiblePetsForAdoption(
+  client: TypedSupabaseClient,
+  userId: string,
+  shelterId?: string | null
+): Promise<EligiblePetItem[]> {
+  // Query pets owned by user or shelter
+  let query = client
+    .from('pets' as any)
+    .select('id, name, species, gender, date_of_birth, photo_url, is_neutered, deleted_at')
+    .is('deleted_at', null);
+
+  if (shelterId) {
+    query = query.or(`owner_id.eq.${userId},shelter_id.eq.${shelterId}`);
+  } else {
+    query = query.eq('owner_id', userId);
+  }
+
+  const { data: petsData, error: petsError } = await query;
+  if (petsError) throw petsError;
+
+  const pets = (petsData || []) as any[];
+  if (pets.length === 0) return [];
+
+  const petIds = pets.map((p) => p.id);
+
+  // Check active listings
+  const { data: activeListings, error: listingsError } = await client
+    .from('adoption_listings')
+    .select('pet_id')
+    .in('pet_id', petIds)
+    .in('status', ['draft', 'available', 'reserved']);
+
+  if (listingsError) throw listingsError;
+
+  const activePetIdSet = new Set((activeListings || []).map((l) => l.pet_id));
+
+  return pets.map((p) => {
+    let ageMonths: number | null = null;
+    if (p.date_of_birth) {
+      const birth = new Date(p.date_of_birth).getTime();
+      const diffMs = Date.now() - birth;
+      ageMonths = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30.4375)));
+    }
+
+    return {
+      id: p.id,
+      name: p.name,
+      species: p.species,
+      gender: p.gender,
+      date_of_birth: p.date_of_birth,
+      age_months: ageMonths,
+      photo_url: p.photo_url,
+      is_neutered: p.is_neutered,
+      has_active_listing: activePetIdSet.has(p.id),
+    };
+  });
 }
 
 /** Create a new adoption listing */
