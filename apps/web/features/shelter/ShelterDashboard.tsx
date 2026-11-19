@@ -304,6 +304,12 @@ export function ShelterDashboard() {
         <div className="flex items-center gap-2">
           <Button
             variant="secondary"
+            onClick={() => window.location.href = `/${locale}/shelter/rescue-queue`}
+          >
+            {isBn ? 'রিভিউ কিউ' : 'Review Queue'}
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => window.location.href = `/${locale}/shelter/onboarding`}
           >
             {isBn ? 'প্রোফাইল আপডেট' : 'Update Profile'}

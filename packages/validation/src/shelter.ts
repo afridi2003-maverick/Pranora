@@ -56,3 +56,28 @@ export const shelterDashboardStatsSchema = z.object({
   pendingApplicationsCount: z.number().int().nonnegative(),
 });
 export type ShelterDashboardStats = z.infer<typeof shelterDashboardStatsSchema>;
+
+/**
+ * RSC-2: Review queue filter schema
+ */
+export const rescueReviewQueueFilterSchema = z.object({
+  urgency: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  species: speciesTypeSchema.optional(),
+  districtId: z.number().int().positive().optional(),
+  status: z.enum(['submitted', 'under_review', 'all']).optional().default('submitted'),
+  limit: z.number().int().positive().max(100).default(50),
+  offset: z.number().int().nonnegative().default(0),
+});
+export type RescueReviewQueueFilter = z.infer<typeof rescueReviewQueueFilterSchema>;
+
+/**
+ * RSC-2: Review report decision schema
+ */
+export const reviewReportDecisionSchema = z.object({
+  reportId: z.string().uuid('Invalid report ID'),
+  accept: z.boolean(),
+  shelterId: z.string().uuid().optional(),
+  notes: z.string().max(500).optional(),
+});
+export type ReviewReportDecisionInput = z.infer<typeof reviewReportDecisionSchema>;
+

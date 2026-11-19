@@ -85,7 +85,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | RSC-1 | Report an animal (injured / lost / found / abandoned): photos (EXIF stripped), location, urgency; lost links own pet + last seen | Brehat | L | S3 | DB-8, UI-1, I18N-1, (AUTH-1), (PET-1) | ✅ |
-| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ⬜ |
+| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ✅ |
 | RSC-3 | Assign rescuer; accept / decline | Brehat | M | S4 | RSC-1, (RSC-2), (AUTH-5) | ✅ |
 | RSC-4 | Case page: status, notes, photo updates | Brehat | M | S4 | RSC-3 | ✅ |
 | RSC-5 | Reporter status tracker (`my_report_status`) | Brehat | S | S3 | RSC-1 | ✅ |

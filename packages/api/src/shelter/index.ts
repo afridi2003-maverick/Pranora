@@ -1,5 +1,9 @@
 import type { TypedSupabaseClient } from '../client';
-import type { ShelterOnboardingInput, ShelterDashboardStats } from '@pranora/validation';
+import type {
+  ShelterOnboardingInput,
+  ShelterDashboardStats,
+  RescueReviewQueueFilter,
+} from '@pranora/validation';
 import type { AnimalReportRow, RescueCaseRow } from '../rescue';
 import type { AdoptionListingRow, AdoptionApplicationRow } from '../adoption';
 
@@ -87,6 +91,51 @@ export async function getShelterRescueQueue(
     .order('urgency', { ascending: false })
     .order('created_at', { ascending: true });
 
+  if (error) throw error;
+  return (data ?? []) as unknown as AnimalReportRow[];
+}
+
+/**
+ * RSC-2: Fetch rescue review queue for admin or shelter staff,
+ * ordered by urgency DESC (critical first), then created_at ASC (oldest first).
+ */
+export async function getRescueReviewQueue(
+  client: TypedSupabaseClient,
+  filter?: Partial<RescueReviewQueueFilter>
+): Promise<AnimalReportRow[]> {
+  let query = client
+    .from('animal_reports' as any)
+    .select('*');
+
+  if (filter?.status && filter.status !== 'all') {
+    query = query.eq('status', filter.status);
+  } else if (!filter?.status) {
+    query = query.in('status', ['submitted', 'under_review']);
+  }
+
+  if (filter?.urgency) {
+    query = query.eq('urgency', filter.urgency);
+  }
+  if (filter?.species) {
+    query = query.eq('species', filter.species);
+  }
+  if (filter?.districtId) {
+    query = query.eq('district_id', filter.districtId);
+  }
+
+  // Priority ordering: critical > high > medium > low, then oldest first
+  query = query
+    .order('urgency', { ascending: false })
+    .order('created_at', { ascending: true });
+
+  if (filter?.limit) {
+    query = query.limit(filter.limit);
+  }
+  if (filter?.offset) {
+    query = query.range(filter.offset, filter.offset + (filter.limit ?? 50) - 1);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as unknown as AnimalReportRow[];
 }

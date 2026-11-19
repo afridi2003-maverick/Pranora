@@ -91,5 +91,35 @@
       "reason": "Reason",
       "homeType": "Home Type"
     }
+  },
+  "reviewQueue": {
+    "title": "Animal Rescue Review Queue",
+    "subtitle": "Urgent reports are prioritized at the top of the queue. Review and dispatch cases promptly.",
+    "filters": {
+      "all": "All Reports",
+      "urgency": "Filter Urgency",
+      "species": "Filter Species",
+      "allUrgency": "All Urgencies",
+      "allSpecies": "All Species"
+    },
+    "urgency": {
+      "critical": "Critical (Life Threatening)",
+      "high": "High Priority",
+      "medium": "Medium Urgency",
+      "low": "Low / Routine"
+    },
+    "stats": {
+      "criticalAlert": "Critical Reports",
+      "highPriority": "High Priority",
+      "totalPending": "Awaiting Review"
+    },
+    "actions": {
+      "admit": "Admit & Create Case",
+      "decline": "Decline",
+      "callReporter": "Call Reporter",
+      "openLocation": "View Map",
+      "assignRescuer": "Assign Rescuer"
+    },
+    "empty": "No reports matching current filter criteria."
   }
 }
