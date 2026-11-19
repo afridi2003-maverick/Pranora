@@ -1173,6 +1173,19 @@ export interface Database {
         };
         Returns: boolean;
       };
+      submit_adoption_followup: {
+        Args: {
+          p_followup_id: string;
+          p_wellbeing: 'good' | 'okay' | 'needs_help';
+          p_note?: string | null;
+          p_photos?: string[];
+        };
+        Returns: boolean;
+      };
+      process_due_adoption_followups: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
       toggle_adoption_favorite: {
         Args: {
           p_listing_id: string;

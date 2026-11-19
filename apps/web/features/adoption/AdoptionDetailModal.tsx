@@ -12,6 +12,8 @@ interface AdoptionDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onApply?: (listing: AdoptionListingRow) => void;
+  onSave?: (listingId: string) => void;
+  isSaved?: boolean;
 }
 
 export function AdoptionDetailModal({
@@ -19,6 +21,8 @@ export function AdoptionDetailModal({
   isOpen,
   onClose,
   onApply,
+  onSave,
+  isSaved = false,
 }: AdoptionDetailModalProps) {
   const { isBangla } = useLocale();
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
@@ -167,15 +171,26 @@ export function AdoptionDetailModal({
 
         {/* Action Button */}
         <div className="pt-2 border-t border-stroke-subtle flex flex-col gap-2">
-          {onApply && (
-            <Button
-              variant="primary"
-              className="w-full py-3"
-              onClick={() => onApply(listing)}
-            >
-              🐾 {isBangla ? 'দত্তকের আবেদন করুন' : 'Apply for Adoption'}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {onApply && (
+              <Button
+                variant="primary"
+                className="flex-1 py-3"
+                onClick={() => onApply(listing)}
+              >
+                🐾 {isBangla ? 'দত্তকের আবেদন করুন' : 'Apply for Adoption'}
+              </Button>
+            )}
+            {onSave && (
+              <Button
+                variant={isSaved ? 'danger' : 'secondary'}
+                className="px-4 py-3"
+                onClick={() => onSave(listing.id)}
+              >
+                {isSaved ? '♥ ' + (isBangla ? 'সংরক্ষিত' : 'Saved') : '♡ ' + (isBangla ? 'সংরক্ষণ' : 'Save')}
+              </Button>
+            )}
+          </div>
           <p className="text-[11px] text-center text-neutral-500">
             {isBangla
               ? 'আবেদন করার জন্য একাউন্টে লগইন করতে হবে। অনুমোদন সরাসরি লিস্টার দ্বারা নিয়ন্ত্রিত হয়।'

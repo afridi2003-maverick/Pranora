@@ -17,6 +17,13 @@ export default function MyAdoptionApplicationsScreen() {
     router.push('/adoption');
   };
 
+  const handleGoToHandover = (listingId: string) => {
+    router.push({
+      pathname: '/adoption/handover/[id]',
+      params: { id: listingId },
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
       {/* Header bar */}
@@ -47,6 +54,7 @@ export default function MyAdoptionApplicationsScreen() {
       <AdoptionApplicationStatusTracker
         onWithdrawApplication={handleWithdraw}
         onViewListing={handleViewListing}
+        onGoToHandover={handleGoToHandover}
       />
     </View>
   );

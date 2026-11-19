@@ -20,6 +20,7 @@ interface AdoptionApplicationStatusTrackerProps {
   initialApplications?: AdoptionApplicationWithListing[];
   onWithdrawApplication?: (applicationId: string) => Promise<{ success: boolean; error?: string }>;
   onViewListing?: (listingId: string) => void;
+  onGoToHandover?: (listingId: string) => void;
 }
 
 const STATUS_STEPS: {
@@ -36,6 +37,7 @@ export function AdoptionApplicationStatusTracker({
   initialApplications = MOCK_MY_APPLICATIONS,
   onWithdrawApplication,
   onViewListing,
+  onGoToHandover,
 }: AdoptionApplicationStatusTrackerProps) {
   const { isBangla } = useLocale();
   const [applications, setApplications] = useState<AdoptionApplicationWithListing[]>(initialApplications);
@@ -251,6 +253,16 @@ export function AdoptionApplicationStatusTracker({
                   <Text style={styles.noteText}>
                     💬 {application.decision_note}
                   </Text>
+                )}
+                {onGoToHandover && (
+                  <TouchableOpacity
+                    style={styles.handoverButton}
+                    onPress={() => onGoToHandover(application.listing_id)}
+                  >
+                    <Text style={styles.handoverButtonText}>
+                      🤝 {isBangla ? 'হস্তান্তর প্রক্রিয়া দেখুন' : 'View Handover'}
+                    </Text>
+                  </TouchableOpacity>
                 )}
               </View>
             )}
@@ -512,6 +524,19 @@ const styles = StyleSheet.create({
   approvedBoxSub: {
     fontSize: 11,
     color: '#047857',
+  },
+  handoverButton: {
+    backgroundColor: '#059669',
+    borderRadius: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  handoverButtonText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   noteText: {
     fontSize: 11,

@@ -7,6 +7,8 @@ import { DISTRICT_MAP } from './mockData';
 interface AdoptionCardProps {
   listing: AdoptionListingRow;
   onPress: (listing: AdoptionListingRow) => void;
+  onSave?: (listingId: string) => void;
+  isSaved?: boolean;
 }
 
 export function formatAge(months: number | null, isBangla: boolean): string {
@@ -22,7 +24,7 @@ export function formatAge(months: number | null, isBangla: boolean): string {
   return isBangla ? `${years} বছর ${rem} মাস` : `${years}y ${rem}m`;
 }
 
-export function AdoptionCard({ listing, onPress }: AdoptionCardProps) {
+export function AdoptionCard({ listing, onPress, onSave, isSaved = false }: AdoptionCardProps) {
   const { isBangla } = useLocale();
 
   const title = isBangla
@@ -72,6 +74,19 @@ export function AdoptionCard({ listing, onPress }: AdoptionCardProps) {
             </View>
           )}
         </View>
+
+        {onSave && (
+          <TouchableOpacity
+            onPress={() => onSave(listing.id)}
+            className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full items-center justify-center ${
+              isSaved ? 'bg-rose-500' : 'bg-white/90'
+            }`}
+          >
+            <Text style={{ fontSize: 16, color: isSaved ? '#ffffff' : '#374151' }}>
+              {isSaved ? '♥' : '♡'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Details */}

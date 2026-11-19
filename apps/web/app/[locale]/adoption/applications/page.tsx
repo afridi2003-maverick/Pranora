@@ -20,6 +20,10 @@ export default function MyAdoptionApplicationsPage() {
     router.push(`/adoption?listingId=${listingId}`);
   };
 
+  const handleGoToHandover = (listingId: string) => {
+    router.push(`/adoption/handover/${listingId}`);
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
       <LanguageHeader />
@@ -50,6 +54,7 @@ export default function MyAdoptionApplicationsPage() {
         <AdoptionApplicationStatusTracker
           onWithdrawApplication={handleWithdraw}
           onViewListing={handleViewListing}
+          onGoToHandover={handleGoToHandover}
         />
       </main>
     </div>

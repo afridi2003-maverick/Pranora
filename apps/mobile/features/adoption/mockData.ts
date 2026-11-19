@@ -1,4 +1,9 @@
-import type { AdoptionListingRow, AdoptionApplicationWithListing } from '@pranora/api';
+import type {
+  AdoptionListingRow,
+  AdoptionApplicationWithListing,
+  AdoptionHandoverRow,
+  AdoptionFollowupRow,
+} from '@pranora/api';
 
 export const MOCK_ADOPTION_LISTINGS: AdoptionListingRow[] = [
   {
@@ -279,5 +284,136 @@ export const MOCK_MY_APPLICATIONS: AdoptionApplicationWithListing[] = [
     listing: MOCK_ADOPTION_LISTINGS[2]!,
   },
 ];
+
+export interface HandoverFullDetails {
+  handover: AdoptionHandoverRow;
+  listing: AdoptionListingRow;
+  petName: string;
+  giverName: string;
+  adopterName: string;
+}
+
+export const MOCK_HANDOVERS: Record<string, HandoverFullDetails> = {
+  'hnd-001': {
+    handover: {
+      id: 'hnd-001',
+      listing_id: 'adp-002',
+      application_id: 'app-002',
+      pet_id: 'pet-adp-2',
+      from_user_id: 'user-shelter-2',
+      to_user_id: 'user-current',
+      giver_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+      adopter_confirmed_at: null,
+      completed_at: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[1]!,
+    petName: 'সিম্বা (Simba)',
+    giverName: 'উত্তরার আশ্রয়কেন্দ্র (Uttara Shelter)',
+    adopterName: 'জিহাদ রহমান (Zihad Rahman)',
+  },
+  'hnd-002': {
+    handover: {
+      id: 'hnd-002',
+      listing_id: 'adp-006',
+      application_id: 'app-006',
+      pet_id: 'pet-adp-6',
+      from_user_id: 'user-shelter-3',
+      to_user_id: 'user-current',
+      giver_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      adopter_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+      completed_at: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[3] || MOCK_ADOPTION_LISTINGS[0]!,
+    petName: 'মায়া (Maya)',
+    giverName: 'রাজশাহী প্রাণিসেবক ফাউন্ডেশন',
+    adopterName: 'জিহাদ রহমান (Zihad Rahman)',
+  },
+};
+
+export function findHandoverByIdOrListing(idOrListingId: string): HandoverFullDetails | undefined {
+  if (MOCK_HANDOVERS[idOrListingId]) {
+    return MOCK_HANDOVERS[idOrListingId];
+  }
+  return Object.values(MOCK_HANDOVERS).find(
+    (h) =>
+      h.handover.id === idOrListingId ||
+      h.handover.listing_id === idOrListingId ||
+      h.handover.application_id === idOrListingId
+  );
+}
+
+export interface FollowupWithHandover {
+  followup: AdoptionFollowupRow;
+  handover: AdoptionHandoverRow;
+  listing: AdoptionListingRow;
+  petName: string;
+}
+
+export const MOCK_ADOPTION_FOLLOWUPS: Record<string, FollowupWithHandover> = {
+  'flw-001': {
+    followup: {
+      id: 'flw-001',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString().split('T')[0]!,
+      sent_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-002': {
+    followup: {
+      id: 'flw-002',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-003': {
+    followup: {
+      id: 'flw-003',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 150).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+};
+
+export function findFollowupById(followupId: string): FollowupWithHandover | undefined {
+  return MOCK_ADOPTION_FOLLOWUPS[followupId];
+}
+
+export function getFollowupsForHandover(handoverId: string): FollowupWithHandover[] {
+  return Object.values(MOCK_ADOPTION_FOLLOWUPS).filter(
+    (f) => f.followup.handover_id === handoverId
+  );
+}
+
+export const MOCK_SAVED_LISTING_IDS: string[] = ['adp-001', 'adp-003'];
+
+export function isListingFavorited(listingId: string): boolean {
+  return MOCK_SAVED_LISTING_IDS.includes(listingId);
+}
+
 
 

@@ -100,7 +100,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ADP-3 | Adoption application form | Brehat | M | S5 | ADP-1, (AUTH-1), (ADP-2) | ✅ |
 | ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ✅ |
 | ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ⬜ |
-| ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ⬜ |
+| ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ✅ |
 
 ### ⭐ Nearest Vet Map
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
@@ -179,9 +179,9 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | AI-5 | Hand-off to clinic / support | Zihad | S | S8 | AI-1, MAP-5 | ⬜ |
 | AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ⬜ |
 | ADM-4 | Audit log | Afridi | M | S6 | ADM-1 | ✅ |
-| ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ⬜ |
+| ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ✅ |
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ⬜ |
-| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ⬜ |
+| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ✅ |
 | RSC-8 | Duplicate report detection + merge | Brehat | M | S7 | RSC-1 | ⬜ |
 | RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ⬜ |
 | RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | Brehat | M | S8 | RSC-1, NOTIF-1 | ⬜ |

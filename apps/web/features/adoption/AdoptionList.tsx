@@ -6,7 +6,7 @@ import type { AdoptionListingRow } from '@pranora/api';
 import { AdoptionCard } from './AdoptionCard';
 import { AdoptionFilters, type FilterState } from './AdoptionFilters';
 import { AdoptionDetailModal } from './AdoptionDetailModal';
-import { MOCK_ADOPTION_LISTINGS } from './mockData';
+import { MOCK_ADOPTION_LISTINGS, MOCK_SAVED_LISTING_IDS } from './mockData';
 
 interface AdoptionListProps {
   initialListings?: AdoptionListingRow[];
@@ -22,7 +22,7 @@ export function AdoptionList({
   const [filters, setFilters] = useState<FilterState>({});
   const [selectedListing, setSelectedListing] = useState<AdoptionListingRow | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set(MOCK_SAVED_LISTING_IDS));
 
   const handleToggleSave = (id: string) => {
     setSavedIds((prev) => {
@@ -84,9 +84,14 @@ export function AdoptionList({
         }
       }
 
+      // 6. Saved Only Filter (ADP-7)
+      if (filters.savedOnly && !savedIds.has(item.id)) {
+        return false;
+      }
+
       return true;
     });
-  }, [initialListings, filters]);
+  }, [initialListings, filters, savedIds]);
 
   return (
     <div>
@@ -95,6 +100,7 @@ export function AdoptionList({
         onChange={setFilters}
         onReset={() => setFilters({})}
         totalCount={filteredListings.length}
+        savedCount={savedIds.size}
       />
 
       {filteredListings.length > 0 ? (
@@ -136,6 +142,8 @@ export function AdoptionList({
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
         onApply={onApply}
+        onSave={handleToggleSave}
+        isSaved={selectedListing ? savedIds.has(selectedListing.id) : false}
       />
     </div>
   );
