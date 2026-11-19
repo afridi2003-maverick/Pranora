@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview } from '@pranora/api';
+import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData } from '@pranora/api';
 import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
@@ -85,15 +85,26 @@ export function AIChat({
     setInputContent('');
     setIsTyping(true);
 
-    // Generate AI response with guardrail checks and consent-based pet context
+    // Generate AI response with guardrail checks, consent-based pet context & booking logic
     setTimeout(() => {
       const petContext =
         sharePetContext && selectedPet ? buildPetContextInfo(selectedPet) : null;
 
+      const lastPendingBooking =
+        messages
+          .slice()
+          .reverse()
+          .find(
+            (m) =>
+              m.proposed_booking &&
+              m.proposed_booking.status === 'pending_confirmation'
+          )?.proposed_booking ?? null;
+
       const reply = generateAssistantReply(
         text,
         locale === 'en' ? 'en' : 'bn',
-        petContext
+        petContext,
+        lastPendingBooking
       );
 
       const assistantMessage: AIMessageRow = {
@@ -105,7 +116,7 @@ export function AIChat({
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
         emergency_clinics: reply.emergency_clinics ?? null,
-        proposed_booking: null,
+        proposed_booking: reply.proposed_booking ?? null,
         created_at: new Date().toISOString(),
       };
 
@@ -115,6 +126,7 @@ export function AIChat({
   };
 
   const quickPrompts = [
+    { label: t('ai:bookingHelp'), query: isBangla ? 'একজন পশু চিকিৎসকের অ্যাপয়েন্টমেন্ট বুক করতে সাহায্য করুন' : 'Help me book an appointment with a vet' },
     { label: t('ai:promptFood'), query: isBangla ? 'আমার পোষা প্রাণীর জন্য কোন খাবার নিরাপদ ও পুষ্টিকর?' : 'What food is safe and healthy for my pet?' },
     { label: t('ai:promptVaccine'), query: isBangla ? 'পোষা প্রাণীর প্রাথমিক ভ্যাকসিন রুটিন কেমন হয়?' : 'What is the standard vaccination schedule for pets?' },
     { label: t('ai:promptGrooming'), query: isBangla ? 'কত দিন পর পর লোম ব্রাশ ও গোসল করানো উচিত?' : 'How often should I groom and bathe my pet?' },
@@ -165,6 +177,93 @@ export function AIChat({
       </div>
     </div>
   );
+
+  const renderProposedBookingCard = (booking: ProposedBookingData) => {
+    if (booking.status === 'confirmed') {
+      return (
+        <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-800/60 bg-green-50 dark:bg-green-950/20 rounded-xl p-3 border border-green-300 dark:border-green-800 shadow-sm">
+          <p className="text-green-800 dark:text-green-300 font-bold text-xs mb-1">
+            ✅ {isBangla ? 'বুকিং নিশ্চিত হয়েছে' : 'Booking Confirmed'}
+          </p>
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+            {booking.clinic_name}
+          </p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+            {booking.service_name} • {booking.suggested_date} ({booking.suggested_time})
+          </p>
+          <div className="bg-white dark:bg-zinc-800 border border-green-300 dark:border-green-700/60 rounded-lg p-2.5 mt-2 flex justify-between items-center">
+            <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">
+              {isBangla ? 'বুকিং কোড:' : 'Booking Code:'}
+            </span>
+            <span className="text-sm font-black text-green-700 dark:text-green-400">
+              {booking.booking_code}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    if (booking.status === 'declined') {
+      return (
+        <div className="mt-3 pt-2 border-t border-gray-200 dark:border-zinc-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+            ❌ {t('ai:bookingDeclined')}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-3 pt-3 border-t border-primary/30 bg-green-50/70 dark:bg-green-950/20 rounded-xl p-3.5 border border-green-200 dark:border-green-800/40">
+        <p className="text-primary font-bold text-xs mb-2 flex items-center gap-1">
+          <span>📅</span> {t('ai:bookingProposedTitle')}
+        </p>
+
+        <div className="bg-white dark:bg-zinc-800 rounded-lg p-3 border border-stroke-subtle mb-3 space-y-1 text-xs">
+          <p className="text-content-secondary">
+            <span className="font-semibold text-content-primary">{t('ai:bookingClinic')}: </span>
+            {booking.clinic_name}
+          </p>
+          <p className="text-content-secondary">
+            <span className="font-semibold text-content-primary">{t('ai:bookingService')}: </span>
+            {booking.service_name}
+          </p>
+          <p className="text-content-secondary">
+            <span className="font-semibold text-content-primary">{t('ai:bookingDate')}: </span>
+            {booking.suggested_date} ({booking.suggested_time})
+          </p>
+          {booking.price != null && (
+            <p className="text-content-secondary">
+              <span className="font-semibold text-content-primary">{t('ai:bookingFee')}: </span>
+              ৳ {booking.price}
+            </p>
+          )}
+        </div>
+
+        <p className="text-xs font-semibold text-content-primary mb-2.5">
+          {t('ai:bookingConfirm')}
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => handleSendMessage(isBangla ? 'হ্যাঁ, বুক করুন' : 'Yes, Confirm')}
+            className="flex-1 px-4 py-2 bg-primary hover:bg-green-700 text-white font-bold text-xs rounded-xl shadow transition"
+          >
+            {t('ai:bookingConfirmBtn')}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSendMessage(isBangla ? 'না, বাতিল' : 'No, Cancel')}
+            className="px-4 py-2 bg-white dark:bg-zinc-800 border border-stroke-subtle text-content-secondary hover:text-content-primary font-semibold text-xs rounded-xl transition"
+          >
+            {t('ai:bookingDeclineBtn')}
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col h-[82vh] bg-app-card border border-stroke-subtle rounded-3xl shadow-sm overflow-hidden">
@@ -301,6 +400,9 @@ export function AIChat({
                 {item.emergency_flag && item.emergency_clinics && item.emergency_clinics.length > 0 && (
                   renderEmergencyClinicCards(item.emergency_clinics)
                 )}
+
+                {/* AI-4: Proposed Booking Card */}
+                {item.proposed_booking && renderProposedBookingCard(item.proposed_booking)}
 
                 {/* Emergency Action Buttons */}
                 {item.emergency_flag && (

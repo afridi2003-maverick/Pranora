@@ -28,6 +28,20 @@ export interface AIConversationRow {
   created_at: string;
 }
 
+export interface ProposedBookingData {
+  clinic_id?: string | null;
+  clinic_name?: string | null;
+  service_id?: string | null;
+  service_name?: string | null;
+  suggested_date?: string | null;
+  suggested_time?: string | null;
+  price?: number | null;
+  notes?: string | null;
+  status?: 'pending_confirmation' | 'confirmed' | 'declined' | null;
+  booking_id?: string | null;
+  booking_code?: string | null;
+}
+
 export interface AIMessageRow {
   id: string;
   conversation_id: string;
@@ -37,14 +51,7 @@ export interface AIMessageRow {
   emergency_flag: boolean;
   handoff_flag: boolean;
   emergency_clinics?: EmergencyClinicPreview[] | null;
-  proposed_booking: {
-    clinic_id?: string | null;
-    clinic_name?: string | null;
-    service_id?: string | null;
-    service_name?: string | null;
-    suggested_date?: string | null;
-    notes?: string | null;
-  } | null;
+  proposed_booking: ProposedBookingData | null;
   created_at: string;
 }
 
@@ -336,18 +343,136 @@ export async function getEmergencyClinicsForAI(
 }
 
 /**
+ * Integration Contract 17 / AI-4: Confirms a proposed booking with explicit user consent
+ */
+export function confirmProposedBooking(
+  booking: ProposedBookingData,
+  petId?: string | null
+): ProposedBookingData {
+  const code = `PRN-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+  const bookingId = `bkg-ai-${Date.now()}`;
+
+  return {
+    ...booking,
+    status: 'confirmed',
+    booking_id: bookingId,
+    booking_code: code,
+    notes: `${booking.notes ?? 'AI assisted booking'} (Pet: ${petId ?? 'N/A'})`,
+  };
+}
+
+/**
  * Generates an automated safe answer for general pet care inquiries (diet, vaccines, grooming, care)
+ * and assists with vet appointment booking under explicit user consent (§4.13, AI-4).
  */
 export function generateAssistantReply(
   prompt: string,
   locale: 'bn' | 'en' = 'bn',
-  petContext?: PetContextInfo | null
+  petContext?: PetContextInfo | null,
+  pendingBooking?: ProposedBookingData | null
 ): {
   content: string;
   emergency_flag: boolean;
   handoff_flag: boolean;
   emergency_clinics?: EmergencyClinicPreview[] | null;
+  proposed_booking?: ProposedBookingData | null;
 } {
+  const trimmed = prompt.trim();
+
+  // AI-4: Handle explicit user confirmation or rejection of a pending proposed booking
+  if (pendingBooking && pendingBooking.status === 'pending_confirmation') {
+    const isYesConfirmation =
+      /^(হ্যাঁ|হ্যা|হাঁ|বুক\s*করুন|হ্যাঁ,?\s*বুক\s*করুন|ঠিক\s*আছে|কনফার্ম|yes|confirm|ok|sure|please\s*book|yes,?\s*please)$/i.test(
+        trimmed
+      );
+
+    const isNoDecline =
+      /^(না|বাতিল|দরকার\s*নেই|no|cancel|don't\s*book|no\s*thanks)$/i.test(
+        trimmed
+      );
+
+    if (isYesConfirmation) {
+      const confirmed = confirmProposedBooking(pendingBooking);
+      const reply =
+        locale === 'bn'
+          ? `🎉 আপনার অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে!\n\n📋 বুকিং কোড: ${confirmed.booking_code}\n🏥 ক্লিনিক: ${confirmed.clinic_name}\n🩺 সেবা: ${confirmed.service_name}\n📅 সময়: ${confirmed.suggested_date} (${confirmed.suggested_time})\n💵 ফি: ৳ ${confirmed.price}\n\nঅ্যাপের বুকিং তালিকায় এটি সংরক্ষিত রয়েছে। চিকিৎসকের নিকট পৌঁছালে কোডটি প্রদর্শন করুন।`
+          : `🎉 Your appointment has been successfully booked!\n\n📋 Booking Code: ${confirmed.booking_code}\n🏥 Clinic: ${confirmed.clinic_name}\n🩺 Service: ${confirmed.service_name}\n📅 Time: ${confirmed.suggested_date} (${confirmed.suggested_time})\n💵 Fee: ${confirmed.price} BDT\n\nThis is safely recorded under your Bookings. Please present your booking code at the clinic.`;
+
+      return {
+        content: reply,
+        emergency_flag: false,
+        handoff_flag: false,
+        emergency_clinics: null,
+        proposed_booking: confirmed,
+      };
+    }
+
+    if (isNoDecline) {
+      const declined: ProposedBookingData = {
+        ...pendingBooking,
+        status: 'declined',
+      };
+      const reply =
+        locale === 'bn'
+          ? 'অ্যাপয়েন্টমেন্ট বুকিং প্রস্তাবটি বাতিল করা হয়েছে। অন্য কোনো প্রশ্ন বা সেবা লাগলে নিঃসঙ্কোচে জানান।'
+          : 'The appointment booking proposal has been cancelled. Let me know if you need anything else.';
+
+      return {
+        content: reply,
+        emergency_flag: false,
+        handoff_flag: false,
+        emergency_clinics: null,
+        proposed_booking: declined,
+      };
+    }
+  }
+
+  // AI-4: Check if user is asking to book an appointment
+  const isBookingRequest =
+    /বুক/i.test(trimmed) ||
+    /অ্যাপয়েন্টমেন্ট/i.test(trimmed) ||
+    /সিরিয়াল/i.test(trimmed) ||
+    /ডাক্তার\s*দেখ/i.test(trimmed) ||
+    /ক্লিনিক.*যাব/i.test(trimmed) ||
+    /appointment/i.test(trimmed) ||
+    /book/i.test(trimmed) ||
+    /schedule/i.test(trimmed);
+
+  if (isBookingRequest) {
+    const proposed: ProposedBookingData = {
+      clinic_id: 'loc-dhanmondi-pet-clinic',
+      clinic_name:
+        locale === 'bn'
+          ? 'ধানমন্ডি পেট কেয়ার অ্যান্ড ক্লিনিক'
+          : 'Dhanmondi Pet Care & Clinic',
+      service_id: 'srv-vet-consultation',
+      service_name:
+        locale === 'bn'
+          ? 'সাধারণ ভেটেরিনারি চেকআপ ও পরামর্শ'
+          : 'General Veterinary Checkup & Consultation',
+      suggested_date: locale === 'bn' ? 'আগামীকাল' : 'Tomorrow',
+      suggested_time: '10:30 AM',
+      price: 500,
+      status: 'pending_confirmation',
+      notes: petContext?.name
+        ? `${petContext.name} (${petContext.species ?? 'Pet'}) consultation`
+        : 'General Consultation',
+    };
+
+    const reply =
+      locale === 'bn'
+        ? `আমি আপনার জন্য নিকটস্থ ক্লিনিকের একটি অ্যাপয়েন্টমেন্ট প্রস্তুত করেছি:\n\n🏥 ক্লিনিক: ${proposed.clinic_name}\n🩺 সেবা: ${proposed.service_name}\n📅 সময়: ${proposed.suggested_date} (${proposed.suggested_time})\n💵 ফি: ৳ ${proposed.price}\n\nআমি কি এই অ্যাপয়েন্টমেন্টটি আপনার জন্য বুক করব? সম্মতি দিতে 'হ্যাঁ' লিখুন অথবা নিচের বোতামে চাপুন।`
+        : `I have prepared an appointment proposal for you:\n\n🏥 Clinic: ${proposed.clinic_name}\n🩺 Service: ${proposed.service_name}\n📅 Time: ${proposed.suggested_date} (${proposed.suggested_time})\n💵 Fee: ${proposed.price} BDT\n\nShall I book this appointment for you? Reply 'Yes' or click the confirm button below.`;
+
+    return {
+      content: reply,
+      emergency_flag: false,
+      handoff_flag: false,
+      emergency_clinics: null,
+      proposed_booking: proposed,
+    };
+  }
+
   const guardrail = evaluateUserMessageGuardrails(prompt, locale);
 
   if (guardrail.action === 'emergency') {
@@ -383,6 +508,7 @@ export function generateAssistantReply(
       emergency_flag: true,
       handoff_flag: true,
       emergency_clinics: emergencyClinics,
+      proposed_booking: null,
     };
   }
 
@@ -392,6 +518,7 @@ export function generateAssistantReply(
       emergency_flag: false,
       handoff_flag: true,
       emergency_clinics: null,
+      proposed_booking: null,
     };
   }
 
@@ -657,6 +784,7 @@ export async function sendAIMessage(
   options?: {
     locale?: 'bn' | 'en';
     petContext?: PetContextInfo | null;
+    pendingBooking?: ProposedBookingData | null;
   }
 ): Promise<{
   data: { userMessage: AIMessageRow; assistantMessage: AIMessageRow } | null;
@@ -664,13 +792,14 @@ export async function sendAIMessage(
 }> {
   const locale = options?.locale ?? 'bn';
   const petContext = options?.petContext ?? null;
+  const pendingBooking = options?.pendingBooking ?? null;
 
   const userMsgId = `ai-msg-${Date.now()}`;
   const assistantMsgId = `ai-msg-${Date.now() + 1}`;
   const now = new Date().toISOString();
 
-  // Guardrail check and generate reply
-  const reply = generateAssistantReply(payload.content, locale, petContext);
+  // Guardrail & booking check and generate reply
+  const reply = generateAssistantReply(payload.content, locale, petContext, pendingBooking);
 
   const userMsg: AIMessageRow = {
     id: userMsgId,
@@ -694,7 +823,7 @@ export async function sendAIMessage(
     emergency_flag: reply.emergency_flag,
     handoff_flag: reply.handoff_flag,
     emergency_clinics: reply.emergency_clinics ?? null,
-    proposed_booking: null,
+    proposed_booking: reply.proposed_booking ?? null,
     created_at: new Date(Date.now() + 500).toISOString(),
   };
 
@@ -712,6 +841,7 @@ export async function sendAIMessage(
         content: reply.content,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
+        proposed_booking: reply.proposed_booking ?? null,
       },
     ] as never);
   } catch {

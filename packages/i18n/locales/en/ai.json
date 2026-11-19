@@ -21,6 +21,7 @@
   "promptVaccine": "When should vaccines be given?",
   "promptGrooming": "How often should I bathe my pet?",
   "promptEmergencyTest": "Emergency signs & vet help",
+  "promptBookingHelp": "Help me book an appointment with a vet",
   "petContextBanner": "Share pet context (species & age)",
   "emergencyBannerTitle": "EMERGENCY DETECTED",
   "viewEmergencyMap": "Open Emergency Clinic Map",
@@ -42,5 +43,14 @@
   "lifeStagePuppy": "Puppy / Kitten",
   "lifeStageAdult": "Adult",
   "lifeStageSenior": "Senior",
-  "selectPetPrompt": "Select a pet to personalize advice"
+  "selectPetPrompt": "Select a pet to personalize advice",
+  "bookingProposedTitle": "Proposed Veterinary Appointment",
+  "bookingClinic": "Clinic",
+  "bookingService": "Service",
+  "bookingDate": "Date & Time",
+  "bookingFee": "Fee",
+  "bookingConfirmBtn": "Yes, Confirm Booking",
+  "bookingDeclineBtn": "No, Cancel",
+  "bookingSuccess": "Appointment confirmed successfully! Booking Code:",
+  "bookingDeclined": "Appointment proposal declined. Let me know if you need any other help."
 }
