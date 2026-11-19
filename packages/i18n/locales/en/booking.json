@@ -1,17 +1,46 @@
 {
-  "pageTitle": "Booking",
+  "pageTitle": "Book Appointment",
   "book": "Book",
   "selectService": "Select Service",
   "selectPet": "Select Pet",
   "selectDate": "Select Date",
   "selectSlot": "Select Time Slot",
-  "serialMode": "Take a Serial Number",
+  "serialMode": "Session Serials",
   "serialInfo": "Your serial: {{number}}",
   "confirmBooking": "Confirm Booking",
   "myBookings": "My Bookings",
   "upcoming": "Upcoming",
   "past": "Past",
   "noBookings": "No bookings yet",
+  "steps": {
+    "service": "Service",
+    "pet": "Pet",
+    "datetime": "Time & Date",
+    "details": "Details",
+    "confirm": "Confirm"
+  },
+  "problem": {
+    "label": "Describe the problem or reason for visit",
+    "placeholder": "e.g. My pet has a slight fever and loss of appetite for 2 days...",
+    "optional": "(Optional)"
+  },
+  "success": {
+    "title": "Booking Request Submitted!",
+    "subtitle": "Your appointment request has been sent to the clinic.",
+    "codeLabel": "Booking Reference Code",
+    "instructions": "Please arrive 10 minutes before your appointment time or serial session.",
+    "serialNotice": "Your assigned serial number is {{serial}}. Please show this reference code at the clinic reception."
+  },
+  "slots": {
+    "loading": "Checking available slots...",
+    "available": "Available",
+    "booked": "Fully Booked",
+    "remaining": "{{count}} left",
+    "noSlots": "No slots available on this date. Please pick another date.",
+    "closed": "The clinic is closed on this date.",
+    "session": "Session Hours: {{start}} – {{end}}",
+    "nextSerial": "Next available serial: {{serial}}"
+  },
   "status": {
     "pending": "Pending",
     "confirmed": "Confirmed",
@@ -34,11 +63,12 @@
   "payment": {
     "method": "Payment Method",
     "cash": "Cash at Clinic",
+    "cashDesc": "Pay directly at the clinic desk upon arrival",
     "bkash": "bKash",
     "nagad": "Nagad",
     "rocket": "Rocket",
     "card": "Card",
-    "amount": "Amount",
+    "amount": "Total Fee",
     "fee": "Fee"
   },
   "summary": {
@@ -47,7 +77,23 @@
     "pet": "Pet",
     "date": "Date",
     "time": "Time",
-    "serial": "Serial",
-    "vet": "Vet"
+    "serial": "Serial Number",
+    "vet": "Assigned Vet",
+    "problem": "Problem Note",
+    "price": "Price"
+  },
+  "actions": {
+    "next": "Continue",
+    "back": "Back",
+    "submit": "Confirm & Book",
+    "viewBookings": "View My Bookings",
+    "backToClinic": "Back to Clinic"
+  },
+  "errors": {
+    "selectService": "Please select a service to proceed",
+    "selectSlot": "Please select a time slot",
+    "selectSerial": "Please select an available serial number",
+    "bookingFailed": "Failed to complete booking. Please try again.",
+    "noLocation": "No clinic selected. Please choose a clinic first."
   }
 }
