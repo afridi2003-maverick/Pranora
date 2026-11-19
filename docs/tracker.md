@@ -98,7 +98,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ADP-1 | Public listings without login; filters species / age / district | Brehat | M | S3 | DB-9, UI-1, I18N-1 | ✅ |
 | ADP-2 | Create listing from pet profile (verified shelter / approved individual) | Brehat | M | S5 | ADP-1, PET-5, (AUTH-5), (ADM-1) | ✅ |
 | ADP-3 | Adoption application form | Brehat | M | S5 | ADP-1, (AUTH-1), (ADP-2) | ✅ |
-| ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ⬜ |
+| ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ✅ |
 | ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ⬜ |
 | ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ⬜ |
 

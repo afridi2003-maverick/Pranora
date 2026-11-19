@@ -29,14 +29,25 @@ export default function AdoptionScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity
-          onPress={() => router.push('/adoption/create')}
-          className="bg-emerald-600 px-3 py-1.5 rounded-lg"
-        >
-          <Text className="text-white text-xs font-bold">
-            + {isBangla ? 'তালিকা তৈরি' : 'Create'}
-          </Text>
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-2">
+          <TouchableOpacity
+            onPress={() => router.push('/adoption/applications')}
+            className="bg-emerald-100 px-2.5 py-1.5 rounded-lg border border-emerald-300"
+          >
+            <Text className="text-emerald-900 text-xs font-bold">
+              📋 {isBangla ? 'আবেদন' : 'Apps'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/adoption/create')}
+            className="bg-emerald-600 px-3 py-1.5 rounded-lg"
+          >
+            <Text className="text-white text-xs font-bold">
+              + {isBangla ? 'তালিকা' : 'Create'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <AdoptionListScreen onApply={handleApply} />

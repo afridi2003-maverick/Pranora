@@ -1,4 +1,4 @@
-import type { AdoptionListingRow } from '@pranora/api';
+import type { AdoptionListingRow, AdoptionApplicationWithListing } from '@pranora/api';
 
 export const MOCK_ADOPTION_LISTINGS: AdoptionListingRow[] = [
   {
@@ -222,4 +222,62 @@ export const MOCK_ELIGIBLE_PETS: EligiblePetForAdoption[] = [
     has_active_listing: false,
   },
 ];
+
+export const MOCK_MY_APPLICATIONS: AdoptionApplicationWithListing[] = [
+  {
+    application: {
+      id: 'app-001',
+      listing_id: 'adp-001',
+      applicant_id: 'user-current',
+      home_type: 'own_flat',
+      has_other_pets: true,
+      experience: 'আগে দেশি বিড়াল ও কুকুর পোষার ৪ বছরের অভিজ্ঞতা আছে।',
+      reason: 'টফির মতো মিষ্টি ও চঞ্চল ছানাকে আমাদের পরিবারের অংশ করতে চাই। বাসায় পর্যাপ্ত খোলামেলা জায়গা আছে।',
+      status: 'under_review',
+      reviewed_by: 'user-shelter-1',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+      decision_note: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[0]!,
+  },
+  {
+    application: {
+      id: 'app-002',
+      listing_id: 'adp-002',
+      applicant_id: 'user-current',
+      home_type: 'rented_flat',
+      has_other_pets: false,
+      experience: null,
+      reason: 'সিম্বাকে আমাদের বাসায় ভালো রাখতে পারব। বাড়িওয়ালার পোষা প্রাণী রাখার লিখিত অনুমতি আছে।',
+      status: 'approved',
+      reviewed_by: 'user-shelter-2',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+      decision_note: 'আবেদনকারীর তথ্য ও প্রস্তুতি সন্তোষজনক। দুই-পক্ষীয় হস্তান্তরের তারিখ নির্ধারণ করা যেতে পারে।',
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[1]!,
+  },
+  {
+    application: {
+      id: 'app-003',
+      listing_id: 'adp-003',
+      applicant_id: 'user-current',
+      home_type: 'own_flat',
+      has_other_pets: true,
+      experience: 'পূর্বে বিড়াল ছিল।',
+      reason: 'বাসার পরিবেশ সুন্দর।',
+      status: 'rejected',
+      reviewed_by: 'user-rescuer-3',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      decision_note: 'অন্য একজন অভিজ্ঞ অভিভাবকের আবেদন গৃহীত হওয়ায় এই আবেদনটি বাতিল করা হয়েছে। অন্য প্রাণীর জন্য আবেদন করার অনুরোধ রইল।',
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[2]!,
+  },
+];
+
 

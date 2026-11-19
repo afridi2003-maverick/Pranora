@@ -36,13 +36,21 @@ export default function AdoptionPublicPage() {
               : 'Browse profiles of rescued pets lovingly sheltered across Bangladesh. Freely explore without logging in.'}
           </p>
 
-          <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Button
               variant="primary"
               size="sm"
               onClick={() => router.push('/adoption/create')}
             >
-              ➕ {isBangla ? 'পোষা প্রাণী দত্তকের জন্য তালিকাভুক্ত করুন (ADP-2)' : 'List Pet for Adoption (ADP-2)'}
+              ➕ {isBangla ? 'পোষা প্রাণী তালিকাভুক্ত করুন (ADP-2)' : 'List Pet for Adoption (ADP-2)'}
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push('/adoption/applications')}
+            >
+              📋 {isBangla ? 'আমার আবেদন ট্র্যাকার (ADP-4)' : 'My Applications (ADP-4)'}
             </Button>
           </div>
         </div>

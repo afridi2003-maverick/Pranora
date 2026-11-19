@@ -47,6 +47,11 @@ export interface AdoptionApplicationRow {
   updated_at: string;
 }
 
+export interface AdoptionApplicationWithListing {
+  application: AdoptionApplicationRow;
+  listing: AdoptionListingRow;
+}
+
 export interface AdoptionHandoverRow {
   id: string;
   listing_id: string;
@@ -383,6 +388,53 @@ export async function getMyApplications(
 
   if (error) throw error;
   return (data ?? []) as unknown as AdoptionApplicationRow[];
+}
+
+/** Get applications submitted by current user with associated listing details (ADP-4) */
+export async function getMyApplicationsWithListings(
+  client: TypedSupabaseClient,
+  applicantId: string
+): Promise<AdoptionApplicationWithListing[]> {
+  const { data: apps, error: appsError } = await client
+    .from('adoption_applications')
+    .select('*')
+    .eq('applicant_id', applicantId)
+    .order('created_at', { ascending: false });
+
+  if (appsError) throw appsError;
+  if (!apps || apps.length === 0) return [];
+
+  const listingIds = apps.map((a: any) => a.listing_id);
+  const { data: listings, error: listingsError } = await client
+    .from('adoption_listings')
+    .select('*')
+    .in('id', listingIds);
+
+  if (listingsError) throw listingsError;
+
+  const listingMap = new Map((listings || []).map((l: any) => [l.id, l as unknown as AdoptionListingRow]));
+
+  return apps.map((app: any) => ({
+    application: app as unknown as AdoptionApplicationRow,
+    listing: listingMap.get(app.listing_id) || ({} as AdoptionListingRow),
+  }));
+}
+
+/** Withdraw an un-decided adoption application */
+export async function withdrawAdoptionApplication(
+  client: TypedSupabaseClient,
+  applicationId: string,
+  applicantId: string
+): Promise<boolean> {
+  const { error } = await client
+    .from('adoption_applications')
+    .update({ status: 'withdrawn', updated_at: new Date().toISOString() })
+    .eq('id', applicationId)
+    .eq('applicant_id', applicantId)
+    .in('status', ['submitted', 'under_review']);
+
+  if (error) throw error;
+  return true;
 }
 
 /** Get applications received for a listing (for poster / shelter review) */
