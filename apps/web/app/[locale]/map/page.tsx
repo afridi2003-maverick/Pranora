@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { Button, Card, Chip, SearchBar, EmptyState } from '@pranora/ui';
+import { Button, Chip, SearchBar, EmptyState } from '@pranora/ui';
 import {
   getNearbyClinicsWithFallback,
   type NearbyClinicResult,
@@ -998,10 +998,12 @@ export default function WebMapPage() {
                       onClick={() => {
                         setSelectedDivisionId(div.id);
                         const districts = getDistrictsByDivision(div.id);
-                        if (districts.length > 0) {
-                          setSelectedDistrictId(districts[0].id);
-                          const upazilas = getUpazilasByDistrict(districts[0].id);
-                          if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstDistrict = districts[0];
+                        if (firstDistrict) {
+                          setSelectedDistrictId(firstDistrict.id);
+                          const upazilas = getUpazilasByDistrict(firstDistrict.id);
+                          const firstUpazila = upazilas[0];
+                          if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                         }
                       }}
                       className={`p-2 rounded-lg text-xs font-bangla text-center border transition cursor-pointer ${
@@ -1028,7 +1030,8 @@ export default function WebMapPage() {
                       onClick={() => {
                         setSelectedDistrictId(dist.id);
                         const upazilas = getUpazilasByDistrict(dist.id);
-                        if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstUpazila = upazilas[0];
+                        if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                       }}
                       className={`p-1.5 rounded-md text-xs font-bangla text-center border transition cursor-pointer ${
                         selectedDistrictId === dist.id

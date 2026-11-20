@@ -11,12 +11,10 @@ import {
   buildBookingUrl,
   buildDirectionsUrl,
   buildTelUrl,
-  searchAreas,
   getDivisions,
   getDistrictsByDivision,
   getUpazilasByDistrict,
   getUpazilaById,
-  type AreaSearchResult,
 } from '@pranora/api';
 
 const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 };
@@ -251,6 +249,7 @@ export default function ServiceProvidersPage() {
       <main className="max-w-6xl mx-auto px-4 py-6">
         {displayedProviders.length === 0 ? (
           <EmptyState
+            icon={<span className="text-2xl">🏥</span>}
             title={isBangla ? 'কোনো ক্লিনিক পাওয়া যায়নি' : 'No Clinics Found'}
             description={
               isBangla
@@ -509,10 +508,12 @@ export default function ServiceProvidersPage() {
                       onClick={() => {
                         setSelectedDivisionId(div.id);
                         const districts = getDistrictsByDivision(div.id);
-                        if (districts.length > 0) {
-                          setSelectedDistrictId(districts[0].id);
-                          const upazilas = getUpazilasByDistrict(districts[0].id);
-                          if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstDistrict = districts[0];
+                        if (firstDistrict) {
+                          setSelectedDistrictId(firstDistrict.id);
+                          const upazilas = getUpazilasByDistrict(firstDistrict.id);
+                          const firstUpazila = upazilas[0];
+                          if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                         }
                       }}
                       className={`p-1.5 rounded-lg text-xs font-bangla border ${
@@ -534,7 +535,8 @@ export default function ServiceProvidersPage() {
                       onClick={() => {
                         setSelectedDistrictId(dist.id);
                         const upazilas = getUpazilasByDistrict(dist.id);
-                        if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstUpazila = upazilas[0];
+                        if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                       }}
                       className={`p-1.5 rounded-md text-xs font-bangla border ${
                         selectedDistrictId === dist.id ? 'bg-blue-600 text-white font-bold' : 'bg-gray-50'
