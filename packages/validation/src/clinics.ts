@@ -55,6 +55,32 @@ export const providerLocationDetailSchema = z.object({
 export type ProviderLocationDetail = z.infer<typeof providerLocationDetailSchema>;
 
 /**
+ * BVC Registration Number Validator (REL-5)
+ * Conforms to Bangladesh Veterinary Council format: BVC-XXXX or BVC/YYYY/XXXX or numeric
+ */
+export const bvcRegNoRegex = /^(BVC[-\s/])?[A-Z0-9/-]{3,15}$/i;
+
+export function validateBvcRegistration(regNo: string | null | undefined): {
+  isValid: boolean;
+  normalized: string;
+  error?: string;
+} {
+  if (!regNo || !regNo.trim()) {
+    return { isValid: false, normalized: '', error: 'BVC registration number is required' };
+  }
+  const clean = regNo.trim().toUpperCase();
+  if (!bvcRegNoRegex.test(clean)) {
+    return {
+      isValid: false,
+      normalized: clean,
+      error: 'Invalid BVC registration format. Example: BVC-4521 or 4521/DLS',
+    };
+  }
+  const normalized = clean.startsWith('BVC') ? clean : `BVC-${clean}`;
+  return { isValid: true, normalized };
+}
+
+/**
  * Vet profile schema (BVC registration, degrees, fees)
  * schema.md §4.4 (vets)
  */
