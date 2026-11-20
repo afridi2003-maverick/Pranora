@@ -109,11 +109,11 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ✅ |
 | MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ✅ |
 | MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ✅ |
-| MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ⬜ |
-| MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ⬜ |
+| MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ✅ |
+| MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ✅ |
 | MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ✅ |
 | MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ✅ |
-| MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ⬜ |
+| MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ✅ |
 | MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ✅ |
 
 ### ⭐ Services
