@@ -242,4 +242,58 @@ export function checkCancellationCutoff(
   };
 }
 
+/**
+ * APT-6: Vet Schedule Rule Schema
+ */
+export const scheduleRuleSchema = z.object({
+  id: z.string().uuid().optional(),
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  weekday: z.number().int().min(0).max(6),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Format must be HH:MM or HH:MM:SS'),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Format must be HH:MM or HH:MM:SS'),
+  mode: scheduleModeSchema.default('slot'),
+  slotMinutes: z.number().int().positive().default(20),
+  capacity: z.number().int().positive().default(1),
+  maxSerials: z.number().int().positive().nullable().optional(),
+  isActive: z.boolean().default(true),
+});
+export type ScheduleRule = z.infer<typeof scheduleRuleSchema>;
+
+/**
+ * APT-6: Availability Exception Schema (Holidays, Special days off)
+ */
+export const availabilityExceptionSchema = z.object({
+  id: z.string().uuid().optional(),
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format must be YYYY-MM-DD'),
+  isClosed: z.boolean().default(true),
+  note: z.string().max(255).nullable().optional(),
+});
+export type AvailabilityException = z.infer<typeof availabilityExceptionSchema>;
+
+/**
+ * APT-6: Save Schedule Input
+ */
+export const saveScheduleInputSchema = z.object({
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  rules: z.array(scheduleRuleSchema),
+});
+export type SaveScheduleInput = z.infer<typeof saveScheduleInputSchema>;
+
+/**
+ * APT-6: Add Availability Exception Input
+ */
+export const addExceptionInputSchema = z.object({
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format must be YYYY-MM-DD'),
+  isClosed: z.boolean().default(true),
+  note: z.string().max(255).optional(),
+});
+export type AddExceptionInput = z.infer<typeof addExceptionInputSchema>;
+
+
 

@@ -92,14 +92,14 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ✅ |
 | RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ✅ |
 
-### Adoption (দত্তক)
+### Adoption (দত্তক)yes
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | ADP-1 | Public listings without login; filters species / age / district | Brehat | M | S3 | DB-9, UI-1, I18N-1 | ✅ |
 | ADP-2 | Create listing from pet profile (verified shelter / approved individual) | Brehat | M | S5 | ADP-1, PET-5, (AUTH-5), (ADM-1) | ✅ |
 | ADP-3 | Adoption application form | Brehat | M | S5 | ADP-1, (AUTH-1), (ADP-2) | ✅ |
 | ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ✅ |
-| ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ⬜ |
+| ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ✅ |
 | ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ✅ |
 
 ### ⭐ Nearest Vet Map
@@ -129,14 +129,14 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ✅ |
 | APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ✅ |
 | APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ✅ |
-| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ⬜ |
+| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ✅ |
 | PAY-1 | Cash at clinic | Tain | S | S3 | APT-1 | ✅ |
 
 ### Provider, Shelter & Admin
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ✅ |
-| PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ⬜ |
+| PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ✅ |
 | PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ✅ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |
 | ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ✅ |
@@ -167,7 +167,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ⬜ |
 | PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
-| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ⬜ |
+| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
 | CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ⬜ |
 | CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ⬜ |

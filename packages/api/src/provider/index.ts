@@ -1,6 +1,12 @@
 import type { TypedSupabaseClient } from '../client';
-import type { ProviderOnboardingInput } from '@pranora/validation';
-import type { ProviderType } from '@pranora/validation';
+import type {
+  ProviderOnboardingInput,
+  ProviderType,
+  ProviderDashboardStats,
+  SerialQueueItem,
+} from '@pranora/validation';
+
+export type { ProviderDashboardStats, SerialQueueItem };
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -128,3 +134,82 @@ export async function getMyProviderLocations(
   if (error) throw error;
   return (data ?? []) as unknown as ProviderLocationRow[];
 }
+
+/**
+ * PRV-2: Fetch dashboard metric summary for a provider location
+ */
+export async function getProviderDashboardSummary(
+  client: TypedSupabaseClient,
+  locationId: string
+): Promise<ProviderDashboardStats> {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const { data: bookings, error } = await client
+    .from('bookings' as any)
+    .select('id, type, status, serial_no, price, payment_status, starts_at')
+    .eq('location_id', locationId)
+    .gte('starts_at', todayStart.toISOString())
+    .lte('starts_at', todayEnd.toISOString());
+
+  if (error) throw error;
+  const list = (bookings ?? []) as any[];
+
+  const todayAppointments = list.filter((b) => b.type === 'slot');
+  const serialBookings = list.filter((b) => b.type === 'serial');
+  const completed = list.filter((b) => b.status === 'completed');
+  const pending = list.filter((b) => b.status === 'pending');
+
+  const todayRevenue = list
+    .filter((b) => b.payment_status === 'paid' && b.price != null)
+    .reduce((acc, curr) => acc + Number(curr.price || 0), 0);
+
+  // Lowest incomplete serial is currently serving
+  const activeSerials = serialBookings.filter((b) => b.status !== 'completed' && b.status !== 'cancelled_by_owner');
+  const currentServing = activeSerials.length > 0
+    ? Math.min(...activeSerials.map((s) => s.serial_no ?? 1))
+    : 1;
+
+  return {
+    todayAppointmentsCount: todayAppointments.length,
+    activeSerialsCount: serialBookings.length,
+    currentServingSerial: currentServing,
+    todayRevenue,
+    pendingRequestsCount: pending.length,
+    completedTodayCount: completed.length,
+  };
+}
+
+/**
+ * PRV-2: Fetch serial queue list for patient live tracking
+ */
+export async function getProviderSerialQueue(
+  client: TypedSupabaseClient,
+  locationId: string
+): Promise<SerialQueueItem[]> {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const { data, error } = await client
+    .from('bookings' as any)
+    .select('id, code, serial_no, status, starts_at, problem_note, pets(name, species)')
+    .eq('location_id', locationId)
+    .eq('type', 'serial')
+    .gte('starts_at', todayStart.toISOString())
+    .order('serial_no', { ascending: true });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    serialNo: row.serial_no ?? 1,
+    bookingId: row.id,
+    code: row.code,
+    patientName: row.pets?.name || 'Patient',
+    species: row.pets?.species || 'Pet',
+    status: row.status === 'in_progress' ? 'serving' : row.status === 'completed' ? 'completed' : 'waiting',
+    estimatedTime: row.starts_at ? new Date(row.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : undefined,
+  }));
+}
+

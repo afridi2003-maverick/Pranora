@@ -59,3 +59,31 @@ export const providerOnboardingSchema = z.object({
   documents: z.array(z.string().url('Document URL must be valid')).default([]),
 });
 export type ProviderOnboardingInput = z.infer<typeof providerOnboardingSchema>;
+
+/**
+ * PRV-2: Provider dashboard metrics schema
+ */
+export const providerDashboardStatsSchema = z.object({
+  todayAppointmentsCount: z.number().int().nonnegative(),
+  activeSerialsCount: z.number().int().nonnegative(),
+  currentServingSerial: z.number().int().nonnegative().optional(),
+  todayRevenue: z.number().nonnegative(),
+  pendingRequestsCount: z.number().int().nonnegative(),
+  completedTodayCount: z.number().int().nonnegative(),
+});
+export type ProviderDashboardStats = z.infer<typeof providerDashboardStatsSchema>;
+
+/**
+ * PRV-2: Serial queue item schema
+ */
+export const serialQueueItemSchema = z.object({
+  serialNo: z.number().int().positive(),
+  bookingId: z.string().uuid(),
+  code: z.string(),
+  patientName: z.string(),
+  species: z.string(),
+  status: z.enum(['waiting', 'serving', 'completed', 'skipped']),
+  estimatedTime: z.string().optional(),
+});
+export type SerialQueueItem = z.infer<typeof serialQueueItemSchema>;
+

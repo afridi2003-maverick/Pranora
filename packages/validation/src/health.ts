@@ -74,3 +74,23 @@ export const AddPetDocumentSchema = z.object({
 });
 export type AddPetDocumentInput = z.infer<typeof AddPetDocumentSchema>;
 
+/**
+ * APT-5: Digital prescription schema (vet only)
+ */
+export const digitalPrescriptionSchema = z.object({
+  petId: z.string().uuid(),
+  bookingId: z.string().uuid().optional().nullable(),
+  vetId: z.string().uuid(),
+  visitDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'health:validation.invalid_date'),
+  diagnosis: z.string().min(1, 'health:validation.diagnosis_required').max(500),
+  findings: z.string().max(2000).optional().nullable(),
+  weightKg: z.number().positive().max(200).optional().nullable(),
+  temperatureC: z.number().min(30).max(45).optional().nullable(),
+  medicines: z.array(PrescriptionItemSchema).min(1, 'health:validation.medicine_required'),
+  advice: z.string().max(2000).optional().nullable(),
+  followUpDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'health:validation.invalid_date').optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+});
+export type DigitalPrescriptionInput = z.infer<typeof digitalPrescriptionSchema>;
+
+
