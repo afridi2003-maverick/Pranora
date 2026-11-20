@@ -2,6 +2,7 @@
   "name": "pranora",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@12.18.0",
   "scripts": {
     "dev": "turbo dev",
@@ -10,7 +11,8 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "test": "turbo test",
+    "test": "node --experimental-strip-types tests/e2e/runner.ts",
+    "test:e2e": "node --experimental-strip-types tests/e2e/runner.ts",
     "clean": "turbo clean",
     "db:types": "supabase gen types typescript --local > packages/types/src/database.types.ts"
   },
