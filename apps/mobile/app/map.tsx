@@ -457,10 +457,12 @@ export default function MobileMapScreen() {
                       onPress={() => {
                         setSelectedDivisionId(div.id);
                         const districts = getDistrictsByDivision(div.id);
-                        if (districts.length > 0) {
-                          setSelectedDistrictId(districts[0].id);
-                          const upazilas = getUpazilasByDistrict(districts[0].id);
-                          if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstDistrict = districts[0];
+                        if (firstDistrict) {
+                          setSelectedDistrictId(firstDistrict.id);
+                          const upazilas = getUpazilasByDistrict(firstDistrict.id);
+                          const firstUpazila = upazilas[0];
+                          if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                         }
                       }}
                       className={`px-3 py-2 rounded-lg border ${
@@ -493,7 +495,8 @@ export default function MobileMapScreen() {
                       onPress={() => {
                         setSelectedDistrictId(dist.id);
                         const upazilas = getUpazilasByDistrict(dist.id);
-                        if (upazilas.length > 0) setSelectedUpazilaId(upazilas[0].id);
+                        const firstUpazila = upazilas[0];
+                        if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
                       }}
                       className={`px-3 py-2 rounded-lg border ${
                         selectedDistrictId === dist.id

@@ -1,4 +1,4 @@
-import { MOCK_CLINIC_DETAILS, getAllMockClinics } from './mock';
+import { getAllMockClinics } from './mock';
 import { calculateDistanceMeters } from '../map';
 
 /**
@@ -185,8 +185,9 @@ export function getProvidersByServiceSlug(
   const results: ProviderServiceOffering[] = [];
 
   for (const clinic of allClinics) {
-    const detail = MOCK_CLINIC_DETAILS[clinic.locationId];
-    if (!detail) continue;
+    const loc = clinic.location;
+    const prv = clinic.provider;
+    const detail = clinic;
 
     // Check if clinic has this service
     const matchingService = detail.services.find(
@@ -195,31 +196,34 @@ export function getProvidersByServiceSlug(
 
     if (!matchingService) continue;
 
+    const isGovt = prv.type === 'govt_vet_hospital' || (prv.nameEn?.toLowerCase().includes('central veterinary hospital') ?? false);
+    const isOpenNow = loc.is24h || true;
+
     // Filter checks
-    if (options?.openNow && !clinic.isOpenNow) continue;
-    if (options?.govt === 'govt' && !clinic.isGovernment) continue;
-    if (options?.govt === 'private' && clinic.isGovernment) continue;
+    if (options?.openNow && !isOpenNow) continue;
+    if (options?.govt === 'govt' && !isGovt) continue;
+    if (options?.govt === 'private' && isGovt) continue;
     if (options?.maxPrice && matchingService.price > options.maxPrice) continue;
 
-    const distanceM = calculateDistanceMeters(userLat, userLng, clinic.lat, clinic.lng);
+    const distanceM = calculateDistanceMeters(userLat, userLng, loc.lat, loc.lng);
 
     results.push({
-      locationId: clinic.locationId,
-      providerId: clinic.providerId,
-      clinicNameBn: (clinic.nameBn || clinic.nameEn) ?? '',
-      clinicNameEn: clinic.nameEn ?? '',
-      addressBn: (clinic.addressBn || clinic.addressEn) ?? '',
-      addressEn: clinic.addressEn ?? '',
-      phone: clinic.phone ?? '+8801700000000',
-      ratingAvg: clinic.ratingAvg,
-      ratingCount: clinic.ratingCount,
-      isGovernment: clinic.isGovernment,
-      is24h: clinic.is24h,
-      hasEmergency: clinic.hasEmergency,
-      offersHomeVisit: clinic.offersHomeVisit,
-      isOpenNow: clinic.isOpenNow,
-      lat: clinic.lat,
-      lng: clinic.lng,
+      locationId: loc.id,
+      providerId: prv.id,
+      clinicNameBn: (prv.nameBn || prv.nameEn) ?? '',
+      clinicNameEn: prv.nameEn ?? '',
+      addressBn: (loc.addressBn || loc.addressEn) ?? '',
+      addressEn: loc.addressEn ?? '',
+      phone: loc.phone ?? '+8801700000000',
+      ratingAvg: prv.ratingAvg,
+      ratingCount: prv.ratingCount,
+      isGovernment: isGovt,
+      is24h: loc.is24h,
+      hasEmergency: loc.hasEmergency,
+      offersHomeVisit: loc.offersHomeVisit,
+      isOpenNow,
+      lat: loc.lat,
+      lng: loc.lng,
       distanceM,
       serviceId: matchingService.serviceId,
       serviceSlug: matchingService.serviceSlug ?? resolvedSlug,
