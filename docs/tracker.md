@@ -120,7 +120,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | SVC-1 | Services tab / `/services` page from catalog | Zihad | M | S3 | DB-7, UI-1, I18N-1 | ✅ |
-| SVC-2 | Provider list per service (list/map toggle) | Zimia | M | S5 | SVC-1, MAP-2 | ⬜ |
+| SVC-2 | Provider list per service (list/map toggle) | Zimia | M | S5 | SVC-1, MAP-2 | ✅ |
 
 ### Booking
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
