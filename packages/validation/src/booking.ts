@@ -119,6 +119,50 @@ export const rescheduleBookingSchema = z.object({
 export type RescheduleBookingInput = z.infer<typeof rescheduleBookingSchema>;
 
 /**
+ * Valid state transitions for the booking lifecycle
+ */
+export const VALID_STATUS_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
+  pending: ['confirmed', 'cancelled_by_provider', 'cancelled_by_owner', 'expired'],
+  confirmed: ['in_progress', 'completed', 'cancelled_by_provider', 'cancelled_by_owner', 'no_show'],
+  in_progress: ['completed', 'cancelled_by_provider'],
+  completed: [],
+  cancelled_by_owner: [],
+  cancelled_by_provider: [],
+  no_show: [],
+  expired: [],
+};
+
+/**
+ * Returns true if a state transition is permitted by the lifecycle state machine
+ */
+export function isValidBookingStatusTransition(
+  from: BookingStatus,
+  to: BookingStatus
+): boolean {
+  if (from === to) return true;
+  return VALID_STATUS_TRANSITIONS[from]?.includes(to) ?? false;
+}
+
+/**
+ * Input schema for updating a booking's status (update_booking_status RPC)
+ */
+export const updateBookingStatusSchema = z.object({
+  bookingId: z.string().uuid('Invalid booking ID'),
+  status: bookingStatusSchema,
+  reason: z.string().max(500, 'Reason cannot exceed 500 characters').optional(),
+});
+export type UpdateBookingStatusInput = z.infer<typeof updateBookingStatusSchema>;
+
+/**
+ * PAY-1: Input schema for recording cash payment at clinic (record_cash_payment RPC)
+ */
+export const recordCashPaymentSchema = z.object({
+  bookingId: z.string().uuid('Invalid booking ID'),
+  amount: z.number().positive('Amount must be positive').optional(),
+});
+export type RecordCashPaymentInput = z.infer<typeof recordCashPaymentSchema>;
+
+/**
  * Integration Contract 6: Route params for entering booking flow (/book)
  * Route contract: /book?locationId=&vetId=&serviceId=
  */
@@ -130,4 +174,126 @@ export const bookingRouteParamsSchema = z.object({
   date: z.string().regex(isoDateRegex, 'Date must be formatted as YYYY-MM-DD').optional(),
 });
 export type BookingRouteParams = z.infer<typeof bookingRouteParamsSchema>;
+
+/**
+ * APT-3: Common cancellation reasons
+ */
+export const CANCELLATION_REASONS = [
+  'Schedule conflict',
+  'Pet health improved / not needed',
+  'Found alternative care',
+  'Financial reasons',
+  'Emergency arose',
+  'Other',
+] as const;
+
+/**
+ * APT-3: Helper to evaluate whether an appointment can still be cancelled or rescheduled
+ * based on provider_locations.cancel_cutoff_hours (default 2h).
+ */
+export function checkCancellationCutoff(
+  startsAt: string | null | undefined,
+  cutoffHours = 2
+): {
+  canModify: boolean;
+  isPastAppointment: boolean;
+  hoursRemaining: number;
+  minutesRemaining: number;
+  formattedRemaining: string;
+} {
+  if (!startsAt) {
+    return {
+      canModify: true,
+      isPastAppointment: false,
+      hoursRemaining: 999,
+      minutesRemaining: 99999,
+      formattedRemaining: '—',
+    };
+  }
+
+  const apptTime = new Date(startsAt).getTime();
+  const now = Date.now();
+  const cutoffMs = cutoffHours * 60 * 60 * 1000;
+  const deadline = apptTime - cutoffMs;
+
+  const isPastAppointment = now >= apptTime;
+  const canModify = now < deadline;
+
+  const msToAppt = Math.max(0, apptTime - now);
+  const minutesRemaining = Math.floor(msToAppt / 60000);
+  const hoursRemaining = Math.floor(minutesRemaining / 60);
+
+  let formattedRemaining: string;
+  if (canModify) {
+    const msToDeadline = deadline - now;
+    const minsToDeadline = Math.floor(msToDeadline / 60000);
+    const hrsToDeadline = Math.floor(minsToDeadline / 60);
+    formattedRemaining = hrsToDeadline > 0 ? `${hrsToDeadline}h ${minsToDeadline % 60}m` : `${minsToDeadline}m`;
+  } else {
+    formattedRemaining = 'Cut-off passed';
+  }
+
+  return {
+    canModify,
+    isPastAppointment,
+    hoursRemaining,
+    minutesRemaining,
+    formattedRemaining,
+  };
+}
+
+/**
+ * APT-6: Vet Schedule Rule Schema
+ */
+export const scheduleRuleSchema = z.object({
+  id: z.string().uuid().optional(),
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  weekday: z.number().int().min(0).max(6),
+  startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Format must be HH:MM or HH:MM:SS'),
+  endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, 'Format must be HH:MM or HH:MM:SS'),
+  mode: scheduleModeSchema.default('slot'),
+  slotMinutes: z.number().int().positive().default(20),
+  capacity: z.number().int().positive().default(1),
+  maxSerials: z.number().int().positive().nullable().optional(),
+  isActive: z.boolean().default(true),
+});
+export type ScheduleRule = z.infer<typeof scheduleRuleSchema>;
+
+/**
+ * APT-6: Availability Exception Schema (Holidays, Special days off)
+ */
+export const availabilityExceptionSchema = z.object({
+  id: z.string().uuid().optional(),
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format must be YYYY-MM-DD'),
+  isClosed: z.boolean().default(true),
+  note: z.string().max(255).nullable().optional(),
+});
+export type AvailabilityException = z.infer<typeof availabilityExceptionSchema>;
+
+/**
+ * APT-6: Save Schedule Input
+ */
+export const saveScheduleInputSchema = z.object({
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  rules: z.array(scheduleRuleSchema),
+});
+export type SaveScheduleInput = z.infer<typeof saveScheduleInputSchema>;
+
+/**
+ * APT-6: Add Availability Exception Input
+ */
+export const addExceptionInputSchema = z.object({
+  locationId: z.string().uuid(),
+  vetId: z.string().uuid().nullable().optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format must be YYYY-MM-DD'),
+  isClosed: z.boolean().default(true),
+  note: z.string().max(255).optional(),
+});
+export type AddExceptionInput = z.infer<typeof addExceptionInputSchema>;
+
+
 

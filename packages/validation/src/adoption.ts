@@ -94,6 +94,16 @@ export type AdoptionFollowupAnswerInput = z.infer<
   typeof AdoptionFollowupAnswerSchema
 >;
 
+export const SubmitAdoptionFollowupSchema = z.object({
+  followup_id: z.string().uuid(),
+  wellbeing: z.enum(['good', 'okay', 'needs_help']),
+  note: z.string().max(1000).nullable().optional(),
+  photos: z.array(z.string().url()).max(6).default([]),
+});
+export type SubmitAdoptionFollowupInput = z.infer<
+  typeof SubmitAdoptionFollowupSchema
+>;
+
 export const AdoptionAgeGroupSchema = z.enum(['all', 'baby', 'young', 'adult', 'senior']);
 export type AdoptionAgeGroup = z.infer<typeof AdoptionAgeGroupSchema>;
 
@@ -107,3 +117,30 @@ export const AdoptionFilterSchema = z.object({
   offset: z.number().int().min(0).default(0),
 });
 export type AdoptionFilterInput = z.infer<typeof AdoptionFilterSchema>;
+
+/**
+ * ADP-5: Adoption Application Review Item Schema
+ */
+export const adoptionReviewItemSchema = z.object({
+  id: z.string().uuid(),
+  listingId: z.string().uuid(),
+  applicantId: z.string().uuid(),
+  applicantName: z.string(),
+  applicantPhone: z.string().nullable().optional(),
+  applicantEmail: z.string().nullable().optional(),
+  petName: z.string(),
+  petSpecies: z.string(),
+  petPhotoUrl: z.string().nullable().optional(),
+  listingTitle: z.string(),
+  homeType: HomeTypeSchema,
+  hasOtherPets: z.boolean(),
+  experience: z.string().nullable().optional(),
+  reason: z.string(),
+  status: AdoptionApplicationStatusSchema,
+  reviewedBy: z.string().nullable().optional(),
+  reviewedAt: z.string().nullable().optional(),
+  decisionNote: z.string().nullable().optional(),
+  createdAt: z.string(),
+});
+export type AdoptionReviewItem = z.infer<typeof adoptionReviewItemSchema>;
+

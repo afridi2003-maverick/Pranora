@@ -11,7 +11,7 @@ import type { AdoptionListingRow } from '@pranora/api';
 import type { SpeciesType } from '@pranora/types';
 import { AdoptionCard } from './AdoptionCard';
 import { AdoptionDetailModal } from './AdoptionDetailModal';
-import { MOCK_ADOPTION_LISTINGS, DISTRICT_MAP } from './mockData';
+import { MOCK_ADOPTION_LISTINGS, MOCK_SAVED_LISTING_IDS, DISTRICT_MAP } from './mockData';
 
 interface AdoptionListScreenProps {
   initialListings?: AdoptionListingRow[];
@@ -43,8 +43,19 @@ export function AdoptionListScreen({
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
   const [selectedAge, setSelectedAge] = useState<string>('all');
   const [search, setSearch] = useState<string>('');
+  const [savedOnly, setSavedOnly] = useState<boolean>(false);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set(MOCK_SAVED_LISTING_IDS));
   const [selectedListing, setSelectedListing] = useState<AdoptionListingRow | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const handleToggleSave = (id: string) => {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const handleOpenDetail = (listing: AdoptionListingRow) => {
     setSelectedListing(listing);
@@ -77,15 +88,19 @@ export function AdoptionListScreen({
           return false;
         }
       }
+      if (savedOnly && !savedIds.has(item.id)) {
+        return false;
+      }
       return true;
     });
-  }, [initialListings, selectedSpecies, selectedDistrictId, selectedAge, search]);
+  }, [initialListings, selectedSpecies, selectedDistrictId, selectedAge, search, savedOnly, savedIds]);
 
   const resetFilters = () => {
     setSelectedSpecies('all');
     setSelectedDistrictId(null);
     setSelectedAge('all');
     setSearch('');
+    setSavedOnly(false);
   };
 
   return (
@@ -100,9 +115,22 @@ export function AdoptionListScreen({
         />
       </View>
 
-      {/* Species Filter Scroll */}
+      {/* Species & Saved Filter Scroll */}
       <View className="mb-3">
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-2 py-1">
+          {/* Saved Only Pill */}
+          <TouchableOpacity
+            onPress={() => setSavedOnly(!savedOnly)}
+            className={`px-3 py-1.5 rounded-full border flex-row items-center gap-1.5 ${
+              savedOnly ? 'bg-rose-600 border-rose-600' : 'bg-gray-100 border-gray-200'
+            }`}
+          >
+            <Text style={{ fontSize: 13, color: savedOnly ? '#ffffff' : '#e11d48' }}>♥</Text>
+            <Text className={`text-xs font-bold ${savedOnly ? 'text-white' : 'text-gray-800'}`}>
+              {isBangla ? 'সংরক্ষিত' : 'Saved'} ({savedIds.size})
+            </Text>
+          </TouchableOpacity>
+
           {SPECIES_OPTIONS.map((s) => {
             const isSelected = selectedSpecies === s.id;
             return (
@@ -209,6 +237,8 @@ export function AdoptionListScreen({
               key={listing.id}
               listing={listing}
               onPress={handleOpenDetail}
+              onSave={handleToggleSave}
+              isSaved={savedIds.has(listing.id)}
             />
           ))}
         </View>
@@ -235,6 +265,8 @@ export function AdoptionListScreen({
         visible={isDetailOpen}
         onClose={handleCloseDetail}
         onApply={onApply}
+        onSave={handleToggleSave}
+        isSaved={selectedListing ? savedIds.has(selectedListing.id) : false}
       />
     </ScrollView>
   );

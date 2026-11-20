@@ -12,4 +12,7 @@ export * from './rescue';
 export * from './adoption';
 export * from './services';
 export * from './health';
+export * from './ai';
+export * from './shelter';
+export * from './provider';
 

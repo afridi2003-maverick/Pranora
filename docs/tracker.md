@@ -85,22 +85,22 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | RSC-1 | Report an animal (injured / lost / found / abandoned): photos (EXIF stripped), location, urgency; lost links own pet + last seen | Brehat | L | S3 | DB-8, UI-1, I18N-1, (AUTH-1), (PET-1) | ✅ |
-| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ⬜ |
+| RSC-2 | Review queue for admin / shelter, urgent first | Tain | M | S4 | RSC-1, (PRV-3) | ✅ |
 | RSC-3 | Assign rescuer; accept / decline | Brehat | M | S4 | RSC-1, (RSC-2), (AUTH-5) | ✅ |
 | RSC-4 | Case page: status, notes, photo updates | Brehat | M | S4 | RSC-3 | ✅ |
 | RSC-5 | Reporter status tracker (`my_report_status`) | Brehat | S | S3 | RSC-1 | ✅ |
 | RSC-6 | Urgent report alert (push + SMS) + 15-min escalation | Brehat | M | S5 | RSC-1, NOTIF-1 | ✅ |
 | RSC-7 | Record outcome and close case | Brehat | S | S4 | RSC-4 | ✅ |
 
-### Adoption (দত্তক)
+### Adoption (দত্তক)yes
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | ADP-1 | Public listings without login; filters species / age / district | Brehat | M | S3 | DB-9, UI-1, I18N-1 | ✅ |
-| ADP-2 | Create listing from pet profile (verified shelter / approved individual) | Brehat | M | S5 | ADP-1, PET-5, (AUTH-5), (ADM-1) | ⬜ |
-| ADP-3 | Adoption application form | Brehat | M | S5 | ADP-1, (AUTH-1), (ADP-2) | ⬜ |
-| ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ⬜ |
-| ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ⬜ |
-| ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ⬜ |
+| ADP-2 | Create listing from pet profile (verified shelter / approved individual) | Brehat | M | S5 | ADP-1, PET-5, (AUTH-5), (ADM-1) | ✅ |
+| ADP-3 | Adoption application form | Brehat | M | S5 | ADP-1, (AUTH-1), (ADP-2) | ✅ |
+| ADP-4 | Application status tracking | Brehat | S | S6 | ADP-3 | ✅ |
+| ADP-5 | Human review & decision (`decide_adoption_application`) | Tain | M | S6 | ADP-3, (PRV-3) | ✅ |
+| ADP-6 | Two-sided handover + ownership transfer (one per listing) | Brehat | L | S6 | ADP-3, PET-5, (ADP-5) | ✅ |
 
 ### ⭐ Nearest Vet Map
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
@@ -109,35 +109,35 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | MAP-1a | App map screen (react-native-maps) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1), (AUTH-4) | ✅ |
 | MAP-1b | Web map page (Google Maps, split view) | Zimia | M | S4 | SET-3, UI-1, I18N-1, (MAP-1) | ✅ |
 | MAP-2 | Distance-sorted list / bottom sheet | Zimia | M | S4 | MAP-1, MAP-1a, (MAP-1b), (MAP-SEED) | ✅ |
-| MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ⬜ |
-| MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ⬜ |
+| MAP-3 | Filters (open now, 24/7, emergency, species, fee, govt) | Zimia | M | S5 | MAP-2 | ✅ |
+| MAP-4 | Area search + division/district/upazila picker | Zimia | M | S6 | MAP-2, DB-2 | ✅ |
 | MAP-5 | Clinic detail page | Zimia | M | S3 | DB-4, UI-1, I18N-1, (MAP-1) | ✅ |
 | MAP-6 | Call / Directions / Book actions | Zimia | S | S3 | MAP-5, (APT-1) | ✅ |
-| MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ⬜ |
+| MAP-7 | Emergency mode | Zimia | M | S5 | MAP-3 | ✅ |
 | MAP-SEED | Seed clinic data (DLS upazila hospitals + Dhaka private clinics) | Zimia | L | S3 | DB-1, (DB-4), (DB-2) | ✅ |
 
 ### ⭐ Services
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | SVC-1 | Services tab / `/services` page from catalog | Zihad | M | S3 | DB-7, UI-1, I18N-1 | ✅ |
-| SVC-2 | Provider list per service (list/map toggle) | Zimia | M | S5 | SVC-1, MAP-2 | ⬜ |
+| SVC-2 | Provider list per service (list/map toggle) | Zimia | M | S5 | SVC-1, MAP-2 | ✅ |
 
 ### Booking
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| APT-1 | Booking flow (service → pet → slot or serial → confirm) | Tain | L | S3 | APT-1a, UI-1, I18N-1, (PET-1), (MAP-5), (MAP-SEED) | ⬜ |
-| APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ⬜ |
-| APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ⬜ |
-| APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ⬜ |
-| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ⬜ |
-| PAY-1 | Cash at clinic | Tain | S | S3 | APT-1 | ⬜ |
+| APT-1 | Booking flow (service → pet → slot or serial → confirm) | Tain | L | S3 | APT-1a, UI-1, I18N-1, (PET-1), (MAP-5), (MAP-SEED) | ✅ |
+| APT-1a | `available_slots` + `create_booking` RPC (slots + serials) | Tain | L | S2 | DB-5 | ✅ |
+| APT-2 | Status lifecycle + provider confirm | Tain | M | S3 | APT-1 | ✅ |
+| APT-3 | Reschedule / cancel until clinic cut-off | Tain | M | S5 | APT-2 | ✅ |
+| APT-6 | Vet schedule: weekly hours, holidays, slots or serials | Tain | M | S6 | DB-5, (AUTH-5), (PRV-1) | ✅ |
+| PAY-1 | Cash at clinic | Tain | S | S3 | APT-1 | ✅ |
 
 ### Provider, Shelter & Admin
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
-| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ⬜ |
-| PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ⬜ |
-| PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ⬜ |
+| PRV-1 | Provider onboarding (info, map pin, hours, services, documents) | Tain | M | S5 | DB-4, UI-1, I18N-1, (AUTH-5), (ADM-1) | ✅ |
+| PRV-2 | Provider dashboard: bookings, schedule, serial list | Tain | M | S5 | PRV-1, APT-1a, (APT-2) | ✅ |
+| PRV-3 | Shelter onboarding + dashboard (queue, cases, listings, applications) | Tain | L | S4 | DB-8, UI-1, I18N-1, (AUTH-5), (DB-9) | ✅ |
 | ADM-1 | Admin: verification of vets, shelters, rescuers, adoption listers | Afridi | M | S4 | DB-6, DB-4, UI-1, (AUTH-5) | ✅ |
 | ADM-2 | Admin: remove fake listings/reports, clinic data moderation, suggestions | Afridi | M | S5 | ADM-1, RSC-1, ADP-1, (MAP-SEED) | ✅ |
 | ADM-3 | Admin: urgent rescue report queue | Afridi | S | S4 | ADM-1, RSC-1 | ✅ |
@@ -154,7 +154,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ✅ |
 | REL-3 | Play Store + App Store + pranora.com.bd launch | Afridi | M | S8 | REL-1, REL-2, REL-4, REL-5 | ⬜ |
 | REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ⬜ |
-| REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ⬜ |
+| REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ✅ |
 
 ## Phase 2 (P1)
 
@@ -167,21 +167,21 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ⬜ |
 | PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
-| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ⬜ |
+| APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
 | CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ⬜ |
 | CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ⬜ |
 | CALL-3 | Call history | Tain | S | S8 | CALL-1 | ⬜ |
-| AI-1 | AI chat (bn/en) with guardrails | Zihad | L | S6 | AUTH-1, I18N-1, UI-1 | ⬜ |
-| AI-2 | Emergency-sign detection → go to vet | Zihad | M | S7 | AI-1, MAP-7 | ⬜ |
-| AI-3 | Pet context with consent | Zihad | S | S7 | AI-1, HLT-3 | ⬜ |
-| AI-4 | Booking help (books only after explicit yes) | Zihad | M | S7 | AI-1, APT-1a, MAP-1 | ⬜ |
+| AI-1 | AI chat (bn/en) with guardrails | Zihad | L | S6 | AUTH-1, I18N-1, UI-1 | ✅ |
+| AI-2 | Emergency-sign detection → go to vet | Zihad | M | S7 | AI-1, MAP-7 | ✅ |
+| AI-3 | Pet context with consent | Zihad | S | S7 | AI-1, HLT-3 | ✅ |
+| AI-4 | Booking help (books only after explicit yes) | Zihad | M | S7 | AI-1, APT-1a, MAP-1 | ✅ |
 | AI-5 | Hand-off to clinic / support | Zihad | S | S8 | AI-1, MAP-5 | ⬜ |
 | AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ⬜ |
 | ADM-4 | Audit log | Afridi | M | S6 | ADM-1 | ✅ |
-| ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ⬜ |
+| ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ✅ |
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ⬜ |
-| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ⬜ |
+| ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ✅ |
 | RSC-8 | Duplicate report detection + merge | Brehat | M | S7 | RSC-1 | ⬜ |
 | RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ⬜ |
 | RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | Brehat | M | S8 | RSC-1, NOTIF-1 | ⬜ |

@@ -1,4 +1,9 @@
-import type { AdoptionListingRow } from '@pranora/api';
+import type {
+  AdoptionListingRow,
+  AdoptionApplicationWithListing,
+  AdoptionHandoverRow,
+  AdoptionFollowupRow,
+} from '@pranora/api';
 
 export const MOCK_ADOPTION_LISTINGS: AdoptionListingRow[] = [
   {
@@ -165,3 +170,250 @@ export const DISTRICT_MAP: Record<number, { bn: string; en: string }> = {
   7: { bn: 'রংপুর', en: 'Rangpur' },
   8: { bn: 'ময়মনসিংহ', en: 'Mymensingh' },
 };
+
+export interface EligiblePetForAdoption {
+  id: string;
+  name: string;
+  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+  gender: 'male' | 'female' | 'unknown';
+  date_of_birth: string | null;
+  age_months: number;
+  breed_name?: string | null;
+  photo_url: string | null;
+  is_vaccinated: boolean;
+  is_neutered: boolean;
+  shelter_id?: string | null;
+  has_active_listing: boolean;
+}
+
+export const MOCK_ELIGIBLE_PETS: EligiblePetForAdoption[] = [
+  {
+    id: 'pet-user-101',
+    name: 'লাকি (Lucky)',
+    species: 'dog',
+    gender: 'male',
+    date_of_birth: '2024-03-15',
+    age_months: 8,
+    breed_name: 'দেশি কুকুর / Deshi',
+    photo_url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800',
+    is_vaccinated: true,
+    is_neutered: false,
+    has_active_listing: false,
+  },
+  {
+    id: 'pet-user-102',
+    name: 'মিনি (Mini)',
+    species: 'cat',
+    gender: 'female',
+    date_of_birth: '2023-11-01',
+    age_months: 12,
+    breed_name: 'দেশি বিড়াল / Domestic Short Hair',
+    photo_url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
+    is_vaccinated: true,
+    is_neutered: true,
+    has_active_listing: false,
+  },
+  {
+    id: 'pet-user-103',
+    name: 'ব্রাউনি (Brownie)',
+    species: 'rabbit',
+    gender: 'male',
+    date_of_birth: '2024-06-10',
+    age_months: 5,
+    breed_name: 'ডাচ র্যাবিট / Dutch Rabbit',
+    photo_url: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800',
+    is_vaccinated: false,
+    is_neutered: false,
+    has_active_listing: false,
+  },
+];
+
+export const MOCK_MY_APPLICATIONS: AdoptionApplicationWithListing[] = [
+  {
+    application: {
+      id: 'app-001',
+      listing_id: 'adp-001',
+      applicant_id: 'user-current',
+      home_type: 'own_flat',
+      has_other_pets: true,
+      experience: 'আগে দেশি বিড়াল ও কুকুর পোষার ৪ বছরের অভিজ্ঞতা আছে।',
+      reason: 'টফির মতো মিষ্টি ও চঞ্চল ছানাকে আমাদের পরিবারের অংশ করতে চাই। বাসায় পর্যাপ্ত খোলামেলা জায়গা আছে।',
+      status: 'under_review',
+      reviewed_by: 'user-shelter-1',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+      decision_note: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[0]!,
+  },
+  {
+    application: {
+      id: 'app-002',
+      listing_id: 'adp-002',
+      applicant_id: 'user-current',
+      home_type: 'rented_flat',
+      has_other_pets: false,
+      experience: null,
+      reason: 'সিম্বাকে আমাদের বাসায় ভালো রাখতে পারব। বাড়িওয়ালার পোষা প্রাণী রাখার লিখিত অনুমতি আছে।',
+      status: 'approved',
+      reviewed_by: 'user-shelter-2',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+      decision_note: 'আবেদনকারীর তথ্য ও প্রস্তুতি সন্তোষজনক। দুই-পক্ষীয় হস্তান্তরের তারিখ নির্ধারণ করা যেতে পারে।',
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[1]!,
+  },
+  {
+    application: {
+      id: 'app-003',
+      listing_id: 'adp-003',
+      applicant_id: 'user-current',
+      home_type: 'own_flat',
+      has_other_pets: true,
+      experience: 'পূর্বে বিড়াল ছিল।',
+      reason: 'বাসার পরিবেশ সুন্দর।',
+      status: 'rejected',
+      reviewed_by: 'user-rescuer-3',
+      reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      decision_note: 'অন্য একজন অভিজ্ঞ অভিভাবকের আবেদন গৃহীত হওয়ায় এই আবেদনটি বাতিল করা হয়েছে। অন্য প্রাণীর জন্য আবেদন করার অনুরোধ রইল।',
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+      updated_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[2]!,
+  },
+];
+
+export interface HandoverFullDetails {
+  handover: AdoptionHandoverRow;
+  listing: AdoptionListingRow;
+  petName: string;
+  giverName: string;
+  adopterName: string;
+}
+
+export const MOCK_HANDOVERS: Record<string, HandoverFullDetails> = {
+  'hnd-001': {
+    handover: {
+      id: 'hnd-001',
+      listing_id: 'adp-002',
+      application_id: 'app-002',
+      pet_id: 'pet-adp-2',
+      from_user_id: 'user-shelter-2',
+      to_user_id: 'user-current',
+      giver_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+      adopter_confirmed_at: null,
+      completed_at: null,
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[1]!,
+    petName: 'সিম্বা (Simba)',
+    giverName: 'উত্তরার আশ্রয়কেন্দ্র (Uttara Shelter)',
+    adopterName: 'জিহাদ রহমান (Zihad Rahman)',
+  },
+  'hnd-002': {
+    handover: {
+      id: 'hnd-002',
+      listing_id: 'adp-006',
+      application_id: 'app-006',
+      pet_id: 'pet-adp-6',
+      from_user_id: 'user-shelter-3',
+      to_user_id: 'user-current',
+      giver_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      adopter_confirmed_at: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+      completed_at: new Date(Date.now() - 1000 * 60 * 60 * 22).toISOString(),
+      created_at: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
+    },
+    listing: MOCK_ADOPTION_LISTINGS[3] || MOCK_ADOPTION_LISTINGS[0]!,
+    petName: 'মায়া (Maya)',
+    giverName: 'রাজশাহী প্রাণিসেবক ফাউন্ডেশন',
+    adopterName: 'জিহাদ রহমান (Zihad Rahman)',
+  },
+};
+
+export function findHandoverByIdOrListing(idOrListingId: string): HandoverFullDetails | undefined {
+  if (MOCK_HANDOVERS[idOrListingId]) {
+    return MOCK_HANDOVERS[idOrListingId];
+  }
+  return Object.values(MOCK_HANDOVERS).find(
+    (h) =>
+      h.handover.id === idOrListingId ||
+      h.handover.listing_id === idOrListingId ||
+      h.handover.application_id === idOrListingId
+  );
+}
+
+export interface FollowupWithHandover {
+  followup: AdoptionFollowupRow;
+  handover: AdoptionHandoverRow;
+  listing: AdoptionListingRow;
+  petName: string;
+}
+
+export const MOCK_ADOPTION_FOLLOWUPS: Record<string, FollowupWithHandover> = {
+  'flw-001': {
+    followup: {
+      id: 'flw-001',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString().split('T')[0]!,
+      sent_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-002': {
+    followup: {
+      id: 'flw-002',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+  'flw-003': {
+    followup: {
+      id: 'flw-003',
+      handover_id: 'hnd-002',
+      due_on: new Date(Date.now() + 1000 * 60 * 60 * 24 * 150).toISOString().split('T')[0]!,
+      sent_at: null,
+      answered_at: null,
+      wellbeing: null,
+      note: null,
+      photos: [],
+    },
+    handover: MOCK_HANDOVERS['hnd-002']!.handover,
+    listing: MOCK_HANDOVERS['hnd-002']!.listing,
+    petName: 'মায়া (Maya)',
+  },
+};
+
+export function findFollowupById(followupId: string): FollowupWithHandover | undefined {
+  return MOCK_ADOPTION_FOLLOWUPS[followupId];
+}
+
+export function getFollowupsForHandover(handoverId: string): FollowupWithHandover[] {
+  return Object.values(MOCK_ADOPTION_FOLLOWUPS).filter(
+    (f) => f.followup.handover_id === handoverId
+  );
+}
+
+export const MOCK_SAVED_LISTING_IDS: string[] = ['adp-001', 'adp-003'];
+
+export function isListingFavorited(listingId: string): boolean {
+  return MOCK_SAVED_LISTING_IDS.includes(listingId);
+}
+
+
+

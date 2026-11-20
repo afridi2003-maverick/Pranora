@@ -1,0 +1,125 @@
+{
+  "title": "Shelter & Rescue Center",
+  "onboarding": {
+    "title": "Register Your Shelter",
+    "subtitle": "Join Pranora to manage animal rescues, emergency intakes, and adoption placements.",
+    "steps": {
+      "info": "Shelter Info",
+      "location": "Location",
+      "capacity": "Capacity & Intake",
+      "review": "Review & Submit"
+    },
+    "fields": {
+      "nameEn": "Shelter Name (English)",
+      "nameBn": "Shelter Name (Bangla)",
+      "phone": "Official Phone Number",
+      "email": "Official Email Address",
+      "address": "Street Address / Landmark",
+      "addressBn": "ঠিকানা (বাংলা)",
+      "division": "Division",
+      "district": "District",
+      "upazila": "Upazila",
+      "capacity": "Total Animal Capacity",
+      "supportedSpecies": "Supported Species",
+      "emergencyIntake": "Available for 24/7 Emergency Intakes",
+      "documents": "Registration / Authorization Documents (URLs)"
+    },
+    "placeholders": {
+      "nameEn": "e.g. Dhaka Animal Rescue Shelter",
+      "nameBn": "যেমন: ঢাকা এনিমেল রেসকিউ শেল্টার",
+      "phone": "+8801XXXXXXXXX",
+      "email": "contact@shelter.org",
+      "address": "House 12, Road 4, Sector 7, Uttara, Dhaka",
+      "capacity": "50",
+      "docUrl": "https://example.com/certificate.pdf"
+    },
+    "submit": "Submit for Verification",
+    "submitting": "Submitting...",
+    "success": "Shelter Registered Successfully!",
+    "pendingMessage": "Your registration has been submitted. Our admin team will verify your documents within 24-48 hours. You can explore your shelter dashboard in the meantime.",
+    "goToDashboard": "Go to Shelter Dashboard"
+  },
+  "dashboard": {
+    "title": "Shelter Dashboard",
+    "subtitle": "Overview of rescue queue, active cases, and adoption listings",
+    "stats": {
+      "totalCapacity": "Total Capacity",
+      "occupancy": "Current Occupancy",
+      "pendingQueue": "Pending Queue",
+      "activeCases": "Active Cases",
+      "availableListings": "Adoption Listings",
+      "pendingApps": "Applications"
+    },
+    "tabs": {
+      "queue": "Rescue Queue",
+      "cases": "Active Cases",
+      "listings": "Adoption Listings",
+      "applications": "Applications"
+    },
+    "queue": {
+      "title": "Incoming Rescue & Animal Reports",
+      "empty": "No unassigned rescue reports right now.",
+      "admit": "Admit to Shelter",
+      "admitting": "Admitting...",
+      "reject": "Decline Report",
+      "urgency": "Urgency",
+      "reporter": "Reporter"
+    },
+    "cases": {
+      "title": "Shelter Rescue Cases",
+      "empty": "No active rescue cases currently in shelter care.",
+      "close": "Close Case",
+      "closing": "Closing...",
+      "viewDetails": "View Case",
+      "status": "Status",
+      "outcome": "Outcome"
+    },
+    "listings": {
+      "title": "Shelter Adoption Listings",
+      "empty": "No active adoption listings.",
+      "createListing": "+ Create Adoption Listing",
+      "gender": "Gender",
+      "age": "Age",
+      "months": "months"
+    },
+    "applications": {
+      "title": "Adoption Applications Received",
+      "empty": "No pending applications received for your listings.",
+      "approve": "Approve",
+      "reject": "Reject",
+      "applicant": "Applicant",
+      "reason": "Reason",
+      "homeType": "Home Type"
+    }
+  },
+  "reviewQueue": {
+    "title": "Animal Rescue Review Queue",
+    "subtitle": "Urgent reports are prioritized at the top of the queue. Review and dispatch cases promptly.",
+    "filters": {
+      "all": "All Reports",
+      "urgency": "Filter Urgency",
+      "species": "Filter Species",
+      "allUrgency": "All Urgencies",
+      "allSpecies": "All Species"
+    },
+    "urgency": {
+      "critical": "Critical (Life Threatening)",
+      "high": "High Priority",
+      "medium": "Medium Urgency",
+      "low": "Low / Routine"
+    },
+    "stats": {
+      "criticalAlert": "Critical Reports",
+      "highPriority": "High Priority",
+      "totalPending": "Awaiting Review"
+    },
+    "actions": {
+      "admit": "Admit & Create Case",
+      "decline": "Decline",
+      "callReporter": "Call Reporter",
+      "openLocation": "View Map",
+      "assignRescuer": "Assign Rescuer"
+    },
+    "empty": "No reports matching current filter criteria."
+  }
+}
