@@ -265,6 +265,11 @@ function ReminderCard({ reminder, petName, locale, t, onDone, onDelete }: Remind
             {t(`health:reminders.types.${reminder.type}`)}
           </span>
           <span className="text-xs text-content-secondary">{petName}</span>
+          {(reminder.type === 'vaccine' || reminder.type === 'checkup') && (
+            <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span>📱</span> {t('health:reminders.sms_badge')}
+            </span>
+          )}
           {reminder.repeatDays && (
             <span className="text-xs text-content-secondary italic">
               {t('health:reminders.repeat', { days: reminder.repeatDays })}
@@ -382,6 +387,19 @@ export default function RemindersPage() {
           <Button variant="primary" onClick={() => setShowModal(true)}>
             + {t('health:reminders.add_reminder')}
           </Button>
+        </div>
+
+        {/* SMS Reminder Active Notice Banner (HLT-6) */}
+        <div className="mb-6 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xl">📱</span>
+            <span className="text-sm font-medium text-emerald-900">
+              {t('health:reminders.sms_opt_in_notice')}
+            </span>
+          </div>
+          <span className="text-xs font-semibold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+            Active
+          </span>
         </div>
 
         {/* Content */}

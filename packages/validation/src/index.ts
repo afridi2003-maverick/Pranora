@@ -11,4 +11,5 @@ export * from './services';
 export * from './health';
 export * from './moderation';
 export * from './reminders';
+export * from './sms';
 

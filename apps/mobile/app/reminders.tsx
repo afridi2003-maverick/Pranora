@@ -275,6 +275,9 @@ function ReminderRow({ item, t, onDone, onDelete }: ReminderRowProps) {
         <View style={styles.rowMeta}>
           <Text style={styles.rowType}>{t(`health:reminders.types.${item.type}`)}</Text>
           <Text style={styles.rowPet}>{petName(item.petId)}</Text>
+          {(item.type === 'vaccine' || item.type === 'checkup') && (
+            <Text style={styles.rowSms}>📱 {t('health:reminders.sms_badge')}</Text>
+          )}
           {item.repeatDays && (
             <Text style={styles.rowRepeat}>
               {t('health:reminders.repeat', { days: item.repeatDays })}
@@ -356,6 +359,11 @@ export default function RemindersScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* SMS Reminder Notice (HLT-6) */}
+      <View style={styles.smsNotice}>
+        <Text style={styles.smsNoticeText}>📱 {t('health:reminders.sms_opt_in_notice')}</Text>
+      </View>
+
       {reminders.length === 0 ? (
         <View style={styles.empty}>
           <Text style={styles.emptyIcon}>🔔</Text>
@@ -394,6 +402,8 @@ const styles = StyleSheet.create({
   header:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, paddingBottom: 8, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#E5EDE9' },
   headerTitle:  { fontSize: 20, fontWeight: '700', color: '#1A2E25' },
   headerSub:    { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  smsNotice:    { backgroundColor: '#ECFDF5', paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderColor: '#A7F3D0' },
+  smsNoticeText:{ fontSize: 12, fontWeight: '500', color: '#065F46' },
   addBtn:       { backgroundColor: '#2F7B53', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
   addBtnText:   { color: '#fff', fontSize: 13, fontWeight: '600' },
 
@@ -404,6 +414,7 @@ const styles = StyleSheet.create({
   rowMeta:      { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 4 },
   rowType:      { fontSize: 11, fontWeight: '600', color: '#2F7B53', backgroundColor: '#E8F5EE', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20 },
   rowPet:       { fontSize: 11, color: '#6B7280' },
+  rowSms:       { fontSize: 10, fontWeight: '600', color: '#047857', backgroundColor: '#D1FAE5', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 20 },
   rowRepeat:    { fontSize: 11, color: '#6B7280', fontStyle: 'italic' },
   rowTitle:     { fontSize: 15, fontWeight: '600', color: '#1A2E25' },
   rowDate:      { fontSize: 12, color: '#6B7280', marginTop: 2 },

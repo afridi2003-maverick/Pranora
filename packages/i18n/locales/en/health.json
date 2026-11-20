@@ -98,6 +98,9 @@
     "mark_done": "Mark as Done",
     "delete": "Delete",
     "delete_confirm": "Are you sure you want to delete this reminder?",
+    "sms_badge": "SMS Alert",
+    "sms_toggle": "Send SMS Alert to Phone",
+    "sms_opt_in_notice": "SMS reminders active for vaccine & appointments",
     "types": {
       "vaccine":   "Vaccine",
       "deworming": "Deworming",
