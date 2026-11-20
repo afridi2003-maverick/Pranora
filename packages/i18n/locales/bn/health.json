@@ -98,6 +98,9 @@
     "mark_done": "সম্পন্ন হিসেবে চিহ্নিত করুন",
     "delete": "মুছুন",
     "delete_confirm": "আপনি কি এই স্মরণিকাটি মুছতে চান?",
+    "sms_badge": "SMS সতর্কতা",
+    "sms_toggle": "মোবাইলে SMS সতর্কতা পাঠান",
+    "sms_opt_in_notice": "টিকা ও অ্যাপয়েন্টমেন্টের জন্য SMS সক্রিয়",
     "types": {
       "vaccine":   "টিকা",
       "deworming": "কৃমিনাশক",
