@@ -5,7 +5,7 @@ import type {
 } from '@pranora/validation';
 export type { NearbyClinicResult };
 import type { TypedSupabaseClient } from '../client';
-import { getAllMockClinics } from '../clinics/mock.ts';
+import { getAllMockClinics } from '../clinics/mock';
 
 /**
  * Raw row shape returned from the Postgres nearby_clinics function (schema.md §5.2)
