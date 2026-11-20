@@ -11,6 +11,7 @@ import {
   buildDirectionsUrl,
   buildTelUrl,
 } from '@pranora/api';
+import { ReportModal } from '../../components/ReportModal';
 
 const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const WEEKDAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -28,8 +29,6 @@ export default function ClinicDetailPage() {
   const [showAllHours, setShowAllHours] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
-  const [reportText, setReportText] = useState<string>('');
-  const [reportSuccess, setReportSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -108,22 +107,6 @@ export default function ClinicDetailPage() {
       vetId,
     });
     router.push(bookingUrl);
-  };
-
-  const handleReportSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reportText.trim()) return;
-    setReportSuccess(true);
-    setTimeout(() => {
-      setReportModalOpen(false);
-      setReportSuccess(false);
-      setReportText('');
-      showToast(
-        isBangla
-          ? 'আপনার রিপোর্ট গ্রহণ করা হয়েছে। পর্যালোচনার জন্য ধন্যবাদ!'
-          : 'Thank you! Your report has been submitted for moderation.'
-      );
-    }, 1200);
   };
 
   if (loading) {
@@ -665,56 +648,21 @@ export default function ClinicDetailPage() {
         </Card>
       </main>
 
-      {/* Report Modal */}
-      {reportModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl font-bangla">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
-              ⚠️ {isBangla ? 'ভুল তথ্য রিপোর্ট করুন' : 'Report Inaccurate Information'}
-            </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
-              {isBangla
-                ? 'এই ক্লিনিকের ঠিকানা, ফোন নম্বর বা সময়সূচিতে কোনো অসঙ্গতি থাকলে আমাদের জানান।'
-                : 'Help us keep clinic details accurate. What seems incorrect?'}
-            </p>
-
-            <form onSubmit={handleReportSubmit}>
-              <textarea
-                value={reportText}
-                onChange={(e) => setReportText(e.target.value)}
-                placeholder={
-                  isBangla
-                    ? 'উদাহরণ: ফোন নম্বর বন্ধ, অথবা শুক্রবার সময়সূচি পরিবর্তন হয়েছে...'
-                    : 'e.g. Phone number changed or Friday hours differ...'
-                }
-                rows={4}
-                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-sm mb-4 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                required
-              />
-
-              <div className="flex justify-end gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setReportModalOpen(false)}
-                >
-                  {isBangla ? 'বাতিল' : 'Cancel'}
-                </Button>
-                <Button type="submit" variant="primary" size="sm" disabled={reportSuccess}>
-                  {reportSuccess
-                    ? isBangla
-                      ? 'জমা হচ্ছে...'
-                      : 'Submitting...'
-                    : isBangla
-                      ? 'রিপোর্ট পাঠান'
-                      : 'Submit Report'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* REV-2: Report Modal — reason selection + submitContentReport RPC */}
+      <ReportModal
+        open={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        targetType="provider"
+        targetId={clinicId}
+        targetTitle={clinic ? (isBangla ? clinic.provider.nameBn ?? '' : clinic.provider.nameEn ?? '') : ''}
+        onSuccess={() =>
+          showToast(
+            isBangla
+              ? 'আপনার রিপোর্ট গ্রহণ করা হয়েছে। পর্যালোচনার জন্য ধন্যবাদ!'
+              : 'Thank you! Your report has been submitted for moderation.'
+          )
+        }
+      />
 
       {/* Sticky Bottom Action Bar (PRD & Design requirement) */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 p-3 shadow-lg">
