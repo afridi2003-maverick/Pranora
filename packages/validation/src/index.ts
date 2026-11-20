@@ -15,3 +15,4 @@ export * from './reminders';
 export * from './sms';
 export * from './shelter';
 export * from './provider';
+export * from './reviews';
