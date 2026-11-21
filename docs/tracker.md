@@ -190,7 +190,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
 | REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ⬜ |
-| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ⬜ |
+| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ⬜ |
 | MAP-10 | Service layers on map | Zimia | S | S8 | MAP-8/9, SVC-2 | ⬜ |
 | MAP-11 | Suggest a clinic | Zimia | M | S8 | MAP-5, ADM-2 | ⬜ |

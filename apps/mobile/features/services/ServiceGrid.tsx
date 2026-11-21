@@ -23,6 +23,7 @@ const CATEGORY_CONFIG: CategoryConfig[] = [
   { slug: 'emergency',    icon: '🚨', isMvp: true,  navigateTo: '/emergency' },
   { slug: 'rescue',       icon: '🛟', isMvp: true,  navigateTo: '/rescue/report' },
   { slug: 'adoption',     icon: '🏠', isMvp: true,  navigateTo: '/adoption' },
+  { slug: 'tips',         icon: '📚', isMvp: true,  navigateTo: '/tips' },
   { slug: 'grooming',     icon: '✂️', isMvp: false, navigateTo: null },
   { slug: 'boarding',     icon: '🏨', isMvp: false, navigateTo: null },
   { slug: 'home_visit',   icon: '🏡', isMvp: false, navigateTo: null },
@@ -54,6 +55,9 @@ export function ServiceGrid({ onSelectCategory, loading = false }: ServiceGridPr
   }
 
   const getCategoryName = (slug: string): string => {
+    if (slug === 'tips') {
+      return isBangla ? 'পরামর্শ ও টিপস' : 'Care Tips';
+    }
     // Safe key lookup with fallback
     const key = `services:categories.${slug}`;
     const name = t(key as Parameters<typeof t>[0]);

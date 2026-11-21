@@ -18,6 +18,7 @@ export const CATEGORIES: CategoryItem[] = [
   { slug: 'emergency',      icon: '🚨', isMvp: true,  navigateTo: '/emergency' },
   { slug: 'rescue',         icon: '🛟', isMvp: true,  navigateTo: '/rescue/report' },
   { slug: 'adoption',       icon: '🏠', isMvp: true,  navigateTo: '/adoption' },
+  { slug: 'tips',           icon: '📚', isMvp: true,  navigateTo: '/tips' },
   { slug: 'grooming',       icon: '✂️', isMvp: false, navigateTo: null },
   { slug: 'boarding',       icon: '🏨', isMvp: false, navigateTo: null },
   { slug: 'home_visit',     icon: '🏡', isMvp: false, navigateTo: null },
@@ -38,6 +39,9 @@ export function ServiceGrid() {
   };
 
   const getCategoryName = (slug: string): string => {
+    if (slug === 'tips') {
+      return t('services:tips.title') || 'পরামর্শ ও নিবন্ধ';
+    }
     const key = `services:categories.${slug}`;
     const name = t(key as Parameters<typeof t>[0]);
     return name || slug;
