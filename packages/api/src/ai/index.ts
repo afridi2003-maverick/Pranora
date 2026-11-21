@@ -9,6 +9,7 @@ import type {
 import { getNearbyClinicsWithFallback } from '../map';
 
 export type { HandoffClinicPreview, HandoffData };
+export * from './voice';
 
 export interface EmergencyClinicPreview {
   locationId: string;
@@ -979,7 +980,7 @@ export async function sendAIMessage(
     conversation_id: payload.conversation_id,
     role: 'assistant',
     content: reply.content,
-    is_voice: false,
+    is_voice: payload.is_voice ?? false,
     emergency_flag: reply.emergency_flag,
     handoff_flag: reply.handoff_flag,
     emergency_clinics: reply.emergency_clinics ?? null,
@@ -1000,6 +1001,7 @@ export async function sendAIMessage(
         conversation_id: payload.conversation_id,
         role: 'assistant',
         content: reply.content,
+        is_voice: payload.is_voice ?? false,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
         proposed_booking: reply.proposed_booking ?? null,

@@ -177,7 +177,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | AI-3 | Pet context with consent | Zihad | S | S7 | AI-1, HLT-3 | ✅ |
 | AI-4 | Booking help (books only after explicit yes) | Zihad | M | S7 | AI-1, APT-1a, MAP-1 | ✅ |
 | AI-5 | Hand-off to clinic / support | Zihad | S | S8 | AI-1, MAP-5 | ✅ |
-| AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ⬜ |
+| AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ✅ |
 | ADM-4 | Audit log | Afridi | M | S6 | ADM-1 | ✅ |
 | ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ⬜ |
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ⬜ |

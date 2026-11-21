@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
 import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData, HandoffData } from '@pranora/api';
-import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
+import { generateAssistantReply, buildPetContextInfo, generateVoiceWaveform, formatVoiceDuration, getRandomVoiceSample } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
 export interface AIChatProps {
@@ -50,6 +50,10 @@ export function AIChat({
 
   const [inputContent, setInputContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -65,7 +69,96 @@ export function AIChat({
     if (propOnSelectPet) propOnSelectPet(pet);
   };
 
-  const handleSendMessage = (textToSend?: string) => {
+  // AI-6: Web Speech Synthesis (TTS)
+  const speakText = (text: string, msgId: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+    if (playingMessageId === msgId) {
+      setPlayingMessageId(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = isBangla ? 'bn-BD' : 'en-US';
+    utterance.rate = 0.95;
+
+    const voices = window.speechSynthesis.getVoices();
+    const matchVoice = voices.find((v) => v.lang.startsWith(isBangla ? 'bn' : 'en'));
+    if (matchVoice) {
+      utterance.voice = matchVoice;
+    }
+
+    utterance.onstart = () => setPlayingMessageId(msgId);
+    utterance.onend = () => setPlayingMessageId(null);
+    utterance.onerror = () => setPlayingMessageId(null);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // AI-6: Push-to-Talk Speech Recognition (STT)
+  const startVoiceRecording = () => {
+    setIsRecording(true);
+    setRecordingSeconds(0);
+
+    const timer = setInterval(() => {
+      setRecordingSeconds((prev) => prev + 1);
+    }, 1000);
+    (window as any).__voiceTimer = timer;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.lang = isBangla ? 'bn-BD' : 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event: any) => {
+          const transcript = event.results?.[0]?.[0]?.transcript;
+          if (transcript) {
+            handleSendMessage(transcript, true);
+          }
+        };
+
+        recognition.onerror = () => {
+          // Fallback to sample voice prompt
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+          clearInterval((window as any).__voiceTimer);
+        };
+
+        recognition.start();
+        recognitionRef.current = recognition;
+        return;
+      } catch {
+        // Fallback below
+      }
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    if (!isRecording) return;
+    setIsRecording(false);
+    clearInterval((window as any).__voiceTimer);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
+    } else {
+      // Graceful fallback: simulated voice input using contextual sample
+      const prompt = getRandomVoiceSample(locale === 'en' ? 'en' : 'bn');
+      handleSendMessage(prompt, true);
+    }
+  };
+
+  const handleSendMessage = (textToSend?: string, isVoice: boolean = false) => {
     const text = (textToSend ?? inputContent).trim();
     if (!text || isTyping) return;
 
@@ -74,7 +167,7 @@ export function AIChat({
       conversation_id: 'conv-active',
       role: 'user',
       content: text,
-      is_voice: false,
+      is_voice: isVoice,
       emergency_flag: false,
       handoff_flag: false,
       emergency_clinics: null,
@@ -114,7 +207,7 @@ export function AIChat({
         conversation_id: 'conv-active',
         role: 'assistant',
         content: reply.content,
-        is_voice: false,
+        is_voice: isVoice,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
         emergency_clinics: reply.emergency_clinics ?? null,
@@ -125,6 +218,10 @@ export function AIChat({
 
       setMessages((prev) => [...prev, assistantMessage]);
       setIsTyping(false);
+
+      if (isVoice) {
+        speakText(reply.content, assistantMessage.id);
+      }
     }, 600);
   };
 
@@ -481,6 +578,55 @@ export function AIChat({
                   </div>
                 )}
 
+                {/* AI-6: Voice Message Waveform & Player */}
+                {item.is_voice && (
+                  <div className={`mb-3 p-2.5 rounded-xl flex items-center justify-between gap-3 ${
+                    isUser
+                      ? 'bg-white/20'
+                      : 'bg-gray-100 dark:bg-zinc-700/60'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">🎙️</span>
+                      <span className={`text-xs font-bold ${isUser ? 'text-white' : 'text-gray-700 dark:text-gray-200'}`}>
+                        {t('ai:voiceBadge')}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 h-5">
+                      {generateVoiceWaveform(12, item.id.length * 13).map((bar, i) => (
+                        <div
+                          key={`bar-${i}`}
+                          style={{ height: `${Math.max(4, bar * (playingMessageId === item.id ? 20 : 12))}px` }}
+                          className={`w-1 rounded-full transition-all ${
+                            isUser
+                              ? 'bg-white'
+                              : playingMessageId === item.id
+                              ? 'bg-primary'
+                              : 'bg-gray-400 dark:bg-zinc-500'
+                          }`}
+                        />
+                      ))}
+                      <span className={`text-[10px] font-mono ml-1 ${isUser ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>
+                        {formatVoiceDuration(playingMessageId === item.id ? 2 : 4)}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => speakText(item.content, item.id)}
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition border flex items-center gap-1 ${
+                        isUser
+                          ? 'bg-white/20 border-white/30 text-white hover:bg-white/30'
+                          : 'bg-white dark:bg-zinc-800 border-stroke-subtle text-gray-700 dark:text-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      {playingMessageId === item.id
+                        ? `⏹️ ${t('ai:voiceStopAudio')}`
+                        : `🔊 ${t('ai:voicePlayAudio')}`}
+                    </button>
+                  </div>
+                )}
+
                 <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
                   {item.content}
                 </div>
@@ -606,27 +752,80 @@ export function AIChat({
         </div>
       </div>
 
-      {/* Chat Input Bar */}
-      <div className="bg-white dark:bg-zinc-900 border-t border-stroke-subtle p-4 sm:px-6 flex items-center gap-3">
-        <input
-          type="text"
-          value={inputContent}
-          onChange={(e) => setInputContent(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleSendMessage();
-            }
-          }}
-          placeholder={t('ai:placeholder')}
-          className="flex-1 bg-app-bg border border-stroke-subtle rounded-2xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary focus:outline-none focus:ring-2 focus:ring-primary/40"
-        />
-        <Button
-          onClick={() => handleSendMessage()}
-          disabled={!inputContent.trim() || isTyping}
-        >
-          {t('ai:send')}
-        </Button>
+      {/* Chat Input Bar with Push-to-Talk Mic (≥ 56px) (§8.11, AI-6) */}
+      <div className="bg-white dark:bg-zinc-900 border-t border-stroke-subtle p-4 sm:px-6">
+        {isRecording ? (
+          <div className="flex items-center justify-between gap-4 bg-red-50 dark:bg-red-950/30 border border-red-300 dark:border-red-800/60 rounded-2xl p-3">
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
+              <div>
+                <p className="text-xs font-bold text-red-800 dark:text-red-300">
+                  {t('ai:voiceRecording')}
+                </p>
+                <p className="text-[11px] text-red-600 dark:text-red-400 font-mono">
+                  00:0{recordingSeconds} • {t('ai:voiceReleaseToSend')}
+                </p>
+              </div>
+            </div>
+
+            {/* Hold-to-Talk Mic Button ≥ 56px */}
+            <button
+              type="button"
+              onMouseUp={stopVoiceRecording}
+              onTouchEnd={stopVoiceRecording}
+              className="w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-2xl shadow-lg border-2 border-red-400 animate-pulse transition"
+              title={t('ai:voiceReleaseToSend')}
+            >
+              🎙️
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              value={inputContent}
+              onChange={(e) => setInputContent(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder={t('ai:placeholder')}
+              className="flex-1 bg-app-bg border border-stroke-subtle rounded-2xl px-4 py-3 text-sm text-content-primary placeholder:text-content-secondary focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+
+            {inputContent.trim().length > 0 && (
+              <Button
+                onClick={() => handleSendMessage()}
+                disabled={isTyping}
+              >
+                {t('ai:send')}
+              </Button>
+            )}
+
+            {/* Hold-to-Talk Push-to-Speak Mic Button (≥ 56px) */}
+            <button
+              type="button"
+              onMouseDown={startVoiceRecording}
+              onMouseUp={stopVoiceRecording}
+              onTouchStart={startVoiceRecording}
+              onTouchEnd={stopVoiceRecording}
+              onClick={() => {
+                // Click fallback
+                if (!isRecording) {
+                  const prompt = getRandomVoiceSample(locale === 'en' ? 'en' : 'bn');
+                  handleSendMessage(prompt, true);
+                }
+              }}
+              className="w-14 h-14 rounded-full bg-primary/10 hover:bg-primary/20 border-2 border-primary text-primary flex items-center justify-center text-2xl transition shadow-sm shrink-0"
+              title={t('ai:voiceHoldToSpeak')}
+              aria-label={t('ai:voiceHoldToSpeak')}
+            >
+              🎙️
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

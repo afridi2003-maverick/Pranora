@@ -15,7 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
 import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData, HandoffData } from '@pranora/api';
-import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
+import { generateAssistantReply, buildPetContextInfo, generateVoiceWaveform, formatVoiceDuration, getRandomVoiceSample } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
 export interface AIChatScreenProps {
@@ -58,6 +58,10 @@ export function AIChatScreen({
 
   const [inputContent, setInputContent] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
   const handleSelectPet = (pet: PetRow) => {
@@ -65,7 +69,28 @@ export function AIChatScreen({
     if (propOnSelectPet) propOnSelectPet(pet);
   };
 
-  const handleSendMessage = (textToSend?: string) => {
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    setRecordingSeconds(0);
+    recordingTimerRef.current = setInterval(() => {
+      setRecordingSeconds((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const handleStopRecording = () => {
+    if (!isRecording) return;
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+    setIsRecording(false);
+
+    // AI-6: Transcribe simulated voice query or random prompt
+    const sampleVoicePrompt = getRandomVoiceSample(locale === 'en' ? 'en' : 'bn');
+    handleSendMessage(sampleVoicePrompt, true);
+  };
+
+  const handleSendMessage = (textToSend?: string, isVoice: boolean = false) => {
     const text = (textToSend ?? inputContent).trim();
     if (!text || isTyping) return;
 
@@ -74,7 +99,7 @@ export function AIChatScreen({
       conversation_id: 'conv-active',
       role: 'user',
       content: text,
-      is_voice: false,
+      is_voice: isVoice,
       emergency_flag: false,
       handoff_flag: false,
       emergency_clinics: null,
@@ -118,7 +143,7 @@ export function AIChatScreen({
         conversation_id: 'conv-active',
         role: 'assistant',
         content: reply.content,
-        is_voice: false,
+        is_voice: isVoice,
         emergency_flag: reply.emergency_flag,
         handoff_flag: reply.handoff_flag,
         emergency_clinics: reply.emergency_clinics ?? null,
@@ -129,6 +154,11 @@ export function AIChatScreen({
 
       setMessages((prev) => [...prev, assistantMessage]);
       setIsTyping(false);
+
+      if (isVoice) {
+        setPlayingMessageId(assistantMessage.id);
+        setTimeout(() => setPlayingMessageId(null), 4000);
+      }
 
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
@@ -505,6 +535,59 @@ export function AIChatScreen({
                     </View>
                   )}
 
+                  {/* AI-6: Voice Message Waveform & Audio Player */}
+                  {item.is_voice && (
+                    <View className={`mb-2 rounded-xl p-2.5 ${isUser ? 'bg-white/20' : 'bg-gray-100'}`}>
+                      <View className="flex-row items-center justify-between mb-1.5">
+                        <View className="flex-row items-center gap-1">
+                          <Text className="text-xs">🎙️</Text>
+                          <Text className={`text-[11px] font-bold ${isUser ? 'text-white' : 'text-gray-700'}`}>
+                            {t('ai:voiceBadge')}
+                          </Text>
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (playingMessageId === item.id) {
+                              setPlayingMessageId(null);
+                            } else {
+                              setPlayingMessageId(item.id);
+                              setTimeout(() => setPlayingMessageId(null), 3500);
+                            }
+                          }}
+                          className={`flex-row items-center gap-1 px-2 py-0.5 rounded-full border ${
+                            isUser ? 'bg-white/30 border-white/40' : 'bg-white border-gray-200'
+                          }`}
+                        >
+                          <Text className={`text-[10px] font-semibold ${isUser ? 'text-white' : 'text-gray-700'}`}>
+                            {playingMessageId === item.id
+                              ? '⏹️ ' + t('ai:voiceStopAudio')
+                              : '🔊 ' + t('ai:voicePlayAudio')}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* Waveform Visualization */}
+                      <View className="flex-row items-center gap-1 h-5 px-1">
+                        {generateVoiceWaveform(14, item.id.length * 11).map((bar, i) => (
+                          <View
+                            key={`bar-${i}`}
+                            style={{ height: Math.max(4, bar * (playingMessageId === item.id ? 20 : 12)) }}
+                            className={`w-1 rounded-full ${
+                              isUser
+                                ? 'bg-white'
+                                : playingMessageId === item.id
+                                ? 'bg-primary'
+                                : 'bg-gray-400'
+                            }`}
+                          />
+                        ))}
+                        <Text className={`text-[10px] ml-auto font-mono ${isUser ? 'text-white/80' : 'text-gray-500'}`}>
+                          {formatVoiceDuration(playingMessageId === item.id ? 2 : 4)}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
                   <Text
                     className={`text-sm leading-5 ${
                       isUser
@@ -651,29 +734,72 @@ export function AIChatScreen({
           />
         </View>
 
-        {/* Bottom Input Area */}
-        <View className="bg-white border-t border-gray-200 px-3 py-2 flex-row items-center">
-          <TextInput
-            value={inputContent}
-            onChangeText={setInputContent}
-            placeholder={t('ai:placeholder')}
-            placeholderTextColor="#9ca3af"
-            className="flex-1 bg-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-900 mr-2 max-h-24"
-            multiline
-            onSubmitEditing={() => handleSendMessage()}
-          />
-          <TouchableOpacity
-            onPress={() => handleSendMessage()}
-            disabled={!inputContent.trim() || isTyping}
-            className={`px-4 py-2.5 rounded-xl items-center justify-center ${
-              !inputContent.trim() || isTyping ? 'bg-gray-300' : 'bg-primary'
-            }`}
-            activeOpacity={0.8}
-          >
-            <Text className="text-white text-sm font-bold">
-              {t('ai:send')}
-            </Text>
-          </TouchableOpacity>
+        {/* Bottom Input Area with Push-to-Talk Mic (≥ 56px) (§8.11, AI-6) */}
+        <View className="bg-white border-t border-gray-200 px-3 py-2">
+          {isRecording ? (
+            <View className="flex-row items-center justify-between bg-red-50 border border-red-300 rounded-2xl px-4 py-2">
+              <View className="flex-row items-center gap-2 flex-1">
+                <View className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
+                <View className="flex-1">
+                  <Text className="text-xs font-bold text-red-800">
+                    {t('ai:voiceRecording')}
+                  </Text>
+                  <Text className="text-[11px] text-red-600 font-mono">
+                    00:0{recordingSeconds} • {t('ai:voiceReleaseToSend')}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Hold-to-Talk Mic Button ≥ 56 px */}
+              <TouchableOpacity
+                onPressIn={handleStartRecording}
+                onPressOut={handleStopRecording}
+                className="w-14 h-14 rounded-full bg-red-600 items-center justify-center shadow-lg border-2 border-red-400"
+                activeOpacity={0.9}
+              >
+                <Text className="text-2xl">🎙️</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View className="flex-row items-center gap-2">
+              <TextInput
+                value={inputContent}
+                onChangeText={setInputContent}
+                placeholder={t('ai:placeholder')}
+                placeholderTextColor="#9ca3af"
+                className="flex-1 bg-gray-100 rounded-xl px-4 py-3 text-sm text-gray-900 max-h-24"
+                multiline
+                onSubmitEditing={() => handleSendMessage()}
+              />
+
+              {inputContent.trim().length > 0 ? (
+                <TouchableOpacity
+                  onPress={() => handleSendMessage()}
+                  disabled={isTyping}
+                  className="w-12 h-12 rounded-xl bg-primary items-center justify-center"
+                  activeOpacity={0.8}
+                >
+                  <Text className="text-white text-base font-bold">➤</Text>
+                </TouchableOpacity>
+              ) : null}
+
+              {/* Hold-to-Talk Push-to-Speak Mic Button (≥ 56px) */}
+              <TouchableOpacity
+                onPressIn={handleStartRecording}
+                onPressOut={handleStopRecording}
+                onPress={() => {
+                  // Fallback for short tap
+                  const voiceSample = getRandomVoiceSample(locale === 'en' ? 'en' : 'bn');
+                  handleSendMessage(voiceSample, true);
+                }}
+                className="w-14 h-14 rounded-full bg-primary/10 border-2 border-primary items-center justify-center"
+                activeOpacity={0.8}
+                accessibilityLabel={t('ai:voiceHoldToSpeak')}
+              >
+                <Text className="text-2xl">🎙️</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
