@@ -3,8 +3,12 @@ import type {
   CreateAIConversationInput,
   SendAIMessageInput,
   GuardrailCheckResult,
+  HandoffClinicPreview,
+  HandoffData,
 } from '@pranora/validation';
 import { getNearbyClinicsWithFallback } from '../map';
+
+export type { HandoffClinicPreview, HandoffData };
 
 export interface EmergencyClinicPreview {
   locationId: string;
@@ -52,6 +56,7 @@ export interface AIMessageRow {
   handoff_flag: boolean;
   emergency_clinics?: EmergencyClinicPreview[] | null;
   proposed_booking: ProposedBookingData | null;
+  handoff_data?: HandoffData | null;
   created_at: string;
 }
 
@@ -210,22 +215,46 @@ const MEDICINE_PATTERNS_EN = [
   /prescription/i,
 ];
 
-const HANDOFF_PATTERNS = [
-  /human/i,
-  /specialist/i,
-  /doctor/i,
-  /vet/i,
+const HANDOFF_PATTERNS_BN = [
+  /মানুষের/i,
   /মানুষ/i,
   /বিশেষজ্ঞ/i,
   /ডাক্তার/i,
   /কল/i,
+  /ভেটেরিনার/i,
+  /পশু\s*চিকিৎসক/i,
+  /সাপোর্ট/i,
+  /কাস্টমার\s*কেয়ার/i,
+  /হেল্পলাইন/i,
+  /সরাসরি\s*কথা/i,
+  /কথা\s*বলতে\s*চাই/i,
+  /কাউকে\s*ডাকুন/i,
+  /কল\s*করতে/i,
+];
+
+const HANDOFF_PATTERNS_EN = [
+  /human/i,
+  /specialist/i,
+  /doctor/i,
+  /vet\b/i,
+  /veterinarian/i,
+  /talk\s*to\s*(someone|person|agent|vet|doctor|human)/i,
+  /speak\s*with/i,
+  /support/i,
+  /customer\s*service/i,
+  /helpline/i,
+  /call\s*someone/i,
+  /real\s*person/i,
+  /human\s*support/i,
 ];
 
 /**
  * Checks guardrails according to PRD §4.13 & AI-2:
+ * Checks guardrails according to PRD §4.13 & AI-1, AI-2, AI-5:
  * 1. Strict emergency signs -> triggers emergency flag + instant emergency veterinary guidance.
  * 2. Never diagnose illnesses or prescribe medication/dosage.
  * 3. Human handoff recommendation when unsure or explicitly requested.
+ * 3. Human handoff recommendation when unsure or explicitly requested (AI-5).
  */
 export function evaluateUserMessageGuardrails(
   content: string,
@@ -269,7 +298,9 @@ export function evaluateUserMessageGuardrails(
     };
   }
 
-  const isHandoff = HANDOFF_PATTERNS.some((regex) => regex.test(content));
+  const isHandoff =
+    HANDOFF_PATTERNS_BN.some((regex) => regex.test(content)) ||
+    HANDOFF_PATTERNS_EN.some((regex) => regex.test(content));
 
   return {
     action: isHandoff ? 'handoff' : 'allow',
@@ -343,6 +374,44 @@ export async function getEmergencyClinicsForAI(
 }
 
 /**
+ * AI-5: Resolves top recommended licensed veterinary clinics for hand-off
+ */
+export function getHandoffClinicsForAI(): HandoffClinicPreview[] {
+  return [
+    {
+      locationId: 'loc-dhanmondi-pet-clinic',
+      nameBn: 'ধানমন্ডি পেট কেয়ার অ্যান্ড ক্লিনিক',
+      nameEn: 'Dhanmondi Pet Care & Clinic',
+      addressBn: 'সাত মসজিদ রোড, ধানমন্ডি, ঢাকা',
+      addressEn: 'Sat Masjid Road, Dhanmondi, Dhaka',
+      phone: '+8801799887766',
+      distanceKm: '1.1 km',
+      isOpen: true,
+    },
+    {
+      locationId: 'loc-gulshan-vet',
+      nameBn: 'গুলশান অ্যানিমেল হেলথ কেয়ার',
+      nameEn: 'Gulshan Animal Health Care',
+      addressBn: 'রোড ১১, বনানী/গুলশান, ঢাকা',
+      addressEn: 'Road 11, Banani/Gulshan, Dhaka',
+      phone: '+8801733445566',
+      distanceKm: '3.8 km',
+      isOpen: true,
+    },
+    {
+      locationId: 'loc-uttara-pet-vet',
+      nameBn: 'উত্তরা ভেটেরিনারি কেয়ার সেন্টার',
+      nameEn: 'Uttara Veterinary Care Center',
+      addressBn: 'সেক্টর ৭, উত্তরা, ঢাকা',
+      addressEn: 'Sector 7, Uttara, Dhaka',
+      phone: '+8801822334455',
+      distanceKm: '6.5 km',
+      isOpen: true,
+    },
+  ];
+}
+
+/**
  * Integration Contract 17 / AI-4: Confirms a proposed booking with explicit user consent
  */
 export function confirmProposedBooking(
@@ -376,6 +445,7 @@ export function generateAssistantReply(
   handoff_flag: boolean;
   emergency_clinics?: EmergencyClinicPreview[] | null;
   proposed_booking?: ProposedBookingData | null;
+  handoff_data?: HandoffData | null;
 } {
   const trimmed = prompt.trim();
 
@@ -404,6 +474,7 @@ export function generateAssistantReply(
         handoff_flag: false,
         emergency_clinics: null,
         proposed_booking: confirmed,
+        handoff_data: null,
       };
     }
 
@@ -423,6 +494,7 @@ export function generateAssistantReply(
         handoff_flag: false,
         emergency_clinics: null,
         proposed_booking: declined,
+        handoff_data: null,
       };
     }
   }
@@ -470,6 +542,7 @@ export function generateAssistantReply(
       handoff_flag: false,
       emergency_clinics: null,
       proposed_booking: proposed,
+      handoff_data: null,
     };
   }
 
@@ -509,16 +582,51 @@ export function generateAssistantReply(
       handoff_flag: true,
       emergency_clinics: emergencyClinics,
       proposed_booking: null,
+      handoff_data: null,
     };
   }
 
   if (guardrail.action === 'block_diagnosis_medicine') {
+    const handoffData: HandoffData = {
+      reason: 'medical_consultation',
+      clinics: getHandoffClinicsForAI(),
+      support_phone: '+880 9612-772667',
+      support_label_bn: 'প্রাণোরা ভেটেরিনারি হেল্পলাইন',
+      support_label_en: 'Pranora Veterinary Helpline',
+    };
+
     return {
       content: guardrail.safeResponse ?? '',
       emergency_flag: false,
       handoff_flag: true,
       emergency_clinics: null,
       proposed_booking: null,
+      handoff_data: handoffData,
+    };
+  }
+
+  // AI-5: Explicit user request to speak with a human agent, vet, or clinic support
+  if (guardrail.action === 'handoff') {
+    const handoffData: HandoffData = {
+      reason: 'user_requested',
+      clinics: getHandoffClinicsForAI(),
+      support_phone: '+880 9612-772667',
+      support_label_bn: 'প্রাণোরা ভেটেরিনারি হেল্পলাইন',
+      support_label_en: 'Pranora Veterinary Helpline',
+    };
+
+    const reply =
+      locale === 'bn'
+        ? 'অবশ্যই! আমাদের নিবন্ধিত ভেটেরিনারি ক্লিনিক এবং সেন্ট্রাল সাপোর্ট টিমের সাথে সরাসরি যোগাযোগের জন্য নিচে যোগাযোগের নম্বর ও তথ্য দেওয়া হলো। আপনি সরাসরি ক্লিনিকে কল করে বিশেষজ্ঞের সাথে পরামর্শ করতে পারেন অথবা আমাদের ডেডিকেটেড হেল্পলাইনে কথা বলতে পারেন।'
+        : 'Certainly! Here is the direct contact information for recommended licensed veterinary clinics and our support team. You can call a clinic directly for professional guidance or reach our dedicated helpline.';
+
+    return {
+      content: reply,
+      emergency_flag: false,
+      handoff_flag: true,
+      emergency_clinics: null,
+      proposed_booking: null,
+      handoff_data: handoffData,
     };
   }
 
@@ -605,7 +713,7 @@ export function generateAssistantReply(
           : `${petPrefix}A balanced diet is vital for your pet. Avoid toxic items like chocolate, onions, garlic, raisins, and sweets. Always provide fresh water and age-appropriate formulated food.${disclaimerEn}`;
     }
 
-    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null, proposed_booking: null, handoff_data: null };
   }
 
   // Vaccination
@@ -623,7 +731,7 @@ export function generateAssistantReply(
           : `${petPrefix}Core vaccinations such as Rabies and annual combination boosters are essential. Check the "Vaccinations" section in the app for your schedule.${disclaimerEn}`;
     }
 
-    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null, proposed_booking: null, handoff_data: null };
   }
 
   // Bath / Grooming
@@ -646,7 +754,55 @@ export function generateAssistantReply(
           : `${petPrefix}Regular brushing prevents matting and reduces shedding. Cats groom themselves frequently, while dogs can be bathed once or twice a month using pet-safe shampoo.${disclaimerEn}`;
     }
 
-    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null };
+    return { content: reply, emergency_flag: false, handoff_flag: false, emergency_clinics: null, proposed_booking: null, handoff_data: null };
+  }
+
+  // AI-5: Check for uncertain, ambiguous, or general illness symptoms requiring clinic hand-off
+  const SICKNESS_PATTERNS = [
+    /বমি/i,
+    /ডায়রিয়া/i,
+    /পাতলা\s*পায়খানা/i,
+    /জ্বর/i,
+    /খাচ্ছে\s*না/i,
+    /অসুস্থ/i,
+    /ল্যাংড়া/i,
+    /ঘা/i,
+    /ব্যথা/i,
+    /vomit/i,
+    /diarrhea/i,
+    /fever/i,
+    /not\s*eating/i,
+    /sick/i,
+    /limping/i,
+    /wound/i,
+    /infection/i,
+    /pain/i,
+    /letharg/i,
+  ];
+
+  const hasSicknessSymptom = SICKNESS_PATTERNS.some((p) => p.test(prompt));
+  if (hasSicknessSymptom) {
+    const handoffData: HandoffData = {
+      reason: 'uncertain',
+      clinics: getHandoffClinicsForAI(),
+      support_phone: '+880 9612-772667',
+      support_label_bn: 'প্রাণোরা ভেটেরিনারি হেল্পলাইন',
+      support_label_en: 'Pranora Veterinary Helpline',
+    };
+
+    const reply =
+      locale === 'bn'
+        ? `${petPrefix}আপনার পোষা প্রাণীর এমন লক্ষণে দ্রুত একজন ভেটেরিনারি চিকিৎসকের সরাসরি পরামর্শ নেওয়া জরুরি। পোষা প্রাণীকে পানিশূন্যতা থেকে রক্ষা করতে পরিষ্কার পানি দিন এবং কখনোই মানুষের ওষুধ খাওয়াবেন না। বিশেষজ্ঞের সরাসরি পরামর্শ পেতে নিচের যেকোনো ক্লিনিকে বা হেল্পলাইনে কল করুন।${allergyNotice}${disclaimerBn}`
+        : `${petPrefix}For symptoms like these, direct clinical evaluation by a licensed veterinarian is strongly advised. Keep your pet hydrated with fresh water and never administer human medications. Please contact a recommended clinic or our support helpline below for direct guidance.${allergyNotice}${disclaimerEn}`;
+
+    return {
+      content: reply,
+      emergency_flag: false,
+      handoff_flag: true,
+      emergency_clinics: null,
+      proposed_booking: null,
+      handoff_data: handoffData,
+    };
   }
 
   // Default friendly advice
@@ -660,6 +816,8 @@ export function generateAssistantReply(
     emergency_flag: false,
     handoff_flag: guardrail.handoff,
     emergency_clinics: null,
+    proposed_booking: null,
+    handoff_data: null,
   };
 }
 
@@ -687,6 +845,7 @@ let mockMessages: AIMessageRow[] = [
     handoff_flag: false,
     emergency_clinics: null,
     proposed_booking: null,
+    handoff_data: null,
     created_at: new Date(Date.now() - 3600000).toISOString(),
   },
 ];
@@ -811,6 +970,7 @@ export async function sendAIMessage(
     handoff_flag: false,
     emergency_clinics: null,
     proposed_booking: null,
+    handoff_data: null,
     created_at: now,
   };
 
@@ -824,6 +984,7 @@ export async function sendAIMessage(
     handoff_flag: reply.handoff_flag,
     emergency_clinics: reply.emergency_clinics ?? null,
     proposed_booking: reply.proposed_booking ?? null,
+    handoff_data: reply.handoff_data ?? null,
     created_at: new Date(Date.now() + 500).toISOString(),
   };
 

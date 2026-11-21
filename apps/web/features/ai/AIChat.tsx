@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData } from '@pranora/api';
+import type { PetRow, AIMessageRow, AIConversationRow, EmergencyClinicPreview, ProposedBookingData, HandoffData } from '@pranora/api';
 import { generateAssistantReply, buildPetContextInfo } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 
@@ -42,6 +42,7 @@ export function AIChat({
         handoff_flag: false,
         emergency_clinics: null,
         proposed_booking: null,
+        handoff_data: null,
         created_at: new Date().toISOString(),
       },
     ];
@@ -78,6 +79,7 @@ export function AIChat({
       handoff_flag: false,
       emergency_clinics: null,
       proposed_booking: null,
+      handoff_data: null,
       created_at: new Date().toISOString(),
     };
 
@@ -117,6 +119,7 @@ export function AIChat({
         handoff_flag: reply.handoff_flag,
         emergency_clinics: reply.emergency_clinics ?? null,
         proposed_booking: reply.proposed_booking ?? null,
+        handoff_data: reply.handoff_data ?? null,
         created_at: new Date().toISOString(),
       };
 
@@ -126,6 +129,7 @@ export function AIChat({
   };
 
   const quickPrompts = [
+    { label: t('ai:quickHandoffBtn'), query: isBangla ? 'আমি একজন বিশেষজ্ঞ পশু চিকিৎসক বা সাপোর্টের সাথে সরাসরি কথা বলতে চাই' : 'I want to speak with a veterinary specialist or support agent directly' },
     { label: t('ai:bookingHelp'), query: isBangla ? 'একজন পশু চিকিৎসকের অ্যাপয়েন্টমেন্ট বুক করতে সাহায্য করুন' : 'Help me book an appointment with a vet' },
     { label: t('ai:promptFood'), query: isBangla ? 'আমার পোষা প্রাণীর জন্য কোন খাবার নিরাপদ ও পুষ্টিকর?' : 'What food is safe and healthy for my pet?' },
     { label: t('ai:promptVaccine'), query: isBangla ? 'পোষা প্রাণীর প্রাথমিক ভ্যাকসিন রুটিন কেমন হয়?' : 'What is the standard vaccination schedule for pets?' },
@@ -174,6 +178,88 @@ export function AIChat({
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+
+  const renderHandoffCard = (handoff: HandoffData) => (
+    <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/20 rounded-xl p-3.5 border border-blue-200 dark:border-blue-800/40">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="text-base">🩺</span>
+        <h4 className="text-blue-900 dark:text-blue-300 font-bold text-xs">
+          {t('ai:handoffCardTitle')}
+        </h4>
+      </div>
+      <p className="text-xs text-blue-800 dark:text-blue-300/80 leading-relaxed mb-3">
+        {t('ai:handoffCardDesc')}
+      </p>
+
+      {/* Suggested Nearby Clinics */}
+      {handoff.clinics && handoff.clinics.length > 0 && (
+        <div className="space-y-2 mb-3">
+          <p className="text-xs font-bold text-gray-800 dark:text-gray-200">
+            🏥 {t('ai:handoffClinicsHeader')}
+          </p>
+          {handoff.clinics.map((clinic) => (
+            <div
+              key={clinic.locationId}
+              className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg p-2.5 shadow-sm"
+            >
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
+                {isBangla ? clinic.nameBn : clinic.nameEn}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                {isBangla ? clinic.addressBn : clinic.addressEn}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-300 font-medium mt-0.5">
+                📍 {clinic.distanceKm}
+              </p>
+
+              <div className="flex gap-2 mt-2">
+                {clinic.phone && (
+                  <a
+                    href={`tel:${clinic.phone}`}
+                    className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white text-xs font-bold rounded-md transition"
+                  >
+                    📞 {t('ai:handoffCallVetBtn')}
+                  </a>
+                )}
+                <Link
+                  href={`/${localeParam}/map`}
+                  className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-md border border-gray-300 dark:border-zinc-600 transition"
+                >
+                  🗺️ {t('ai:goToMap')}
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Central Support Helpline */}
+      <div className="bg-white dark:bg-zinc-800 border border-blue-200 dark:border-blue-800/50 rounded-lg p-2.5">
+        <p className="text-xs font-bold text-blue-900 dark:text-blue-300 mb-0.5">
+          📞 {t('ai:handoffSupportHeader')}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          {handoff.support_phone ?? '+880 9612-772667'} ({t('ai:handoffSupportHours')})
+        </p>
+        <a
+          href={`tel:${handoff.support_phone ?? '+8809612772667'}`}
+          className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition"
+        >
+          📞 {t('ai:handoffCallSupportBtn')}
+        </a>
+      </div>
+
+      {/* Browse All Clinics */}
+      <div className="mt-2.5 text-center">
+        <Link
+          href={`/${localeParam}/clinics`}
+          className="text-blue-700 dark:text-blue-400 text-xs font-semibold hover:underline"
+        >
+          🔍 {t('ai:handoffViewClinics')}
+        </Link>
       </div>
     </div>
   );
@@ -278,28 +364,46 @@ export function AIChat({
           </p>
         </div>
 
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            setMessages([
-              {
-                id: `welcome-${Date.now()}`,
-                conversation_id: 'conv-active',
-                role: 'assistant',
-                content: t('ai:greeting'),
-                is_voice: false,
-                emergency_flag: false,
-                handoff_flag: false,
-                emergency_clinics: null,
-                proposed_booking: null,
-                created_at: new Date().toISOString(),
-              },
-            ]);
-          }}
-        >
-          🔄 {isBangla ? 'নতুন চ্যাট' : 'New Chat'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              handleSendMessage(
+                isBangla
+                  ? 'আমি একজন বিশেষজ্ঞ পশু চিকিৎসক বা সাপোর্টের সাথে সরাসরি কথা বলতে চাই'
+                  : 'I want to speak with a veterinary specialist or support agent directly'
+              );
+            }}
+            className="!text-blue-700 dark:!text-blue-300 !border-blue-200 dark:!border-blue-800"
+          >
+            🩺 {t('ai:quickHandoffBtn')}
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setMessages([
+                {
+                  id: `welcome-${Date.now()}`,
+                  conversation_id: 'conv-active',
+                  role: 'assistant',
+                  content: t('ai:greeting'),
+                  is_voice: false,
+                  emergency_flag: false,
+                  handoff_flag: false,
+                  emergency_clinics: null,
+                  proposed_booking: null,
+                  handoff_data: null,
+                  created_at: new Date().toISOString(),
+                },
+              ]);
+            }}
+          >
+            🔄 {isBangla ? 'নতুন চ্যাট' : 'New Chat'}
+          </Button>
+        </div>
       </div>
 
       {/* AI-3: Pet Context Selector & Explicit Consent Toggle */}
@@ -422,16 +526,40 @@ export function AIChat({
                   </div>
                 )}
 
-                {/* Specialist Handoff */}
+                {/* AI-5: Specialist & Clinic Handoff Card */}
                 {item.handoff_flag && !item.emergency_flag && (
-                  <div className="mt-3 pt-2 border-t border-gray-100 dark:border-zinc-700">
-                    <Link
-                      href={`/${localeParam}/clinics`}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-                    >
-                      <span>🩺 {t('ai:handoff')}</span>
-                    </Link>
-                  </div>
+                  item.handoff_data ? (
+                    renderHandoffCard(item.handoff_data)
+                  ) : (
+                    renderHandoffCard({
+                      reason: 'user_requested',
+                      clinics: [
+                        {
+                          locationId: 'loc-dhanmondi-pet-clinic',
+                          nameBn: 'ধানমন্ডি পেট কেয়ার অ্যান্ড ক্লিনিক',
+                          nameEn: 'Dhanmondi Pet Care & Clinic',
+                          addressBn: 'সাত মসজিদ রোড, ধানমন্ডি, ঢাকা',
+                          addressEn: 'Sat Masjid Road, Dhanmondi, Dhaka',
+                          phone: '+8801799887766',
+                          distanceKm: '1.1 km',
+                          isOpen: true,
+                        },
+                        {
+                          locationId: 'loc-gulshan-vet',
+                          nameBn: 'গুলশান অ্যানিমেল হেলথ কেয়ার',
+                          nameEn: 'Gulshan Animal Health Care',
+                          addressBn: 'রোড ১১, বনানী/গুলশান, ঢাকা',
+                          addressEn: 'Road 11, Banani/Gulshan, Dhaka',
+                          phone: '+8801733445566',
+                          distanceKm: '3.8 km',
+                          isOpen: true,
+                        },
+                      ],
+                      support_phone: '+880 9612-772667',
+                      support_label_bn: 'প্রাণোরা ভেটেরিনারি হেল্পলাইন',
+                      support_label_en: 'Pranora Veterinary Helpline',
+                    })
+                  )
                 )}
               </div>
 

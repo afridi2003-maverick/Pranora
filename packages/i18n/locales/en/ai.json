@@ -53,4 +53,16 @@
   "bookingDeclineBtn": "No, Cancel",
   "bookingSuccess": "Appointment confirmed successfully! Booking Code:",
   "bookingDeclined": "Appointment proposal declined. Let me know if you need any other help."
+  "bookingDeclined": "Appointment proposal declined. Let me know if you need any other help.",
+  "handoffCardTitle": "Veterinary Clinic & Specialist Support",
+  "handoffCardDesc": "For accurate clinical evaluation and your pet's safety, consulting a licensed veterinarian or support specialist directly is recommended.",
+  "handoffClinicsHeader": "Nearby Recommended Veterinary Clinics",
+  "handoffSupportHeader": "Pranora Veterinary Helpline",
+  "handoffSupportPhone": "+880 9612-772667",
+  "handoffSupportHours": "8:00 AM - 10:00 PM (Daily)",
+  "handoffCallVetBtn": "Call Clinic",
+  "handoffCallSupportBtn": "Call Helpline",
+  "handoffViewClinics": "View All Clinics",
+  "quickHandoffBtn": "Speak to a Vet",
+  "promptHandoff": "I want to speak with a veterinary specialist or support agent directly"
 }
