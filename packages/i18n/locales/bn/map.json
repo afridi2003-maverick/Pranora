@@ -36,7 +36,7 @@
     "feeRange": "{{min}}–{{max}} টাকা",
     "distance": "{{distance}} দূরে",
     "call": "কল করুন",
-    "directions": "পথ দেখুন",
+    "directions": "দিকনির্দেশনা",
     "book": "বুক করুন",
     "detail": "বিস্তারিত দেখুন",
     "services": "সেবাসমূহ",
@@ -79,7 +79,7 @@
   },
   "booking": {
     "mode": {
-      "slot": "টাইম স্লট",
+      "slot": "নির্দিষ্ট সময় (স্লট)",
       "serial": "সিরিয়াল নম্বর"
     }
   },

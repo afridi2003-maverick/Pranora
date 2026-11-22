@@ -153,6 +153,8 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | REL-1 | E2E tests for critical flows (harness + CI; each owner writes their flow's test) | Afridi | L | S7 | SET-4, AUTH-5, APT-3, RSC-7, ADP-6, MAP-7, HLT-7 | ✅ |
 | REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ✅ |
 | REL-3 | Play Store + App Store + pranora.com.bd launch | Afridi | M | S8 | REL-1, REL-2, REL-4, REL-5 | ⬜ |
+| REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ✅ |
+| REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ⬜ |
 | REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ⬜ |
 | REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ✅ |
 
@@ -176,8 +178,8 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | AI-2 | Emergency-sign detection → go to vet | Zihad | M | S7 | AI-1, MAP-7 | ✅ |
 | AI-3 | Pet context with consent | Zihad | S | S7 | AI-1, HLT-3 | ✅ |
 | AI-4 | Booking help (books only after explicit yes) | Zihad | M | S7 | AI-1, APT-1a, MAP-1 | ✅ |
-| AI-5 | Hand-off to clinic / support | Zihad | S | S8 | AI-1, MAP-5 | ⬜ |
-| AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ⬜ |
+| AI-5 | Hand-off to clinic / support | Zihad | S | S8 | AI-1, MAP-5 | ✅ |
+| AI-6 | AI voice (if Bangla STT/TTS is good enough) | Zihad | L | S6 | AI-1 | ✅ |
 | ADM-4 | Audit log | Afridi | M | S6 | ADM-1 | ✅ |
 | ADP-7 | Save listings | Brehat | S | S7 | ADP-1 | ✅ |
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ⬜ |
@@ -189,6 +191,8 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ⬜ |
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
 | REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
+| REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ⬜ |
+| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ✅ |
 | SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ⬜ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ⬜ |
@@ -201,7 +205,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 |---|---|---|---|---|---|---|
 | ADP-10 | Smart adoption matching | Brehat | L | S9 | ADP-9 | ⬜ |
 | CALL-4 | Call recording (both must consent) | Tain | M | S9 | CALL-2 | ⬜ |
-| SVC-SIT | Pet sitting & walking | Zihad | M | S9 | APT-1, PAY-2 | ⬜ |
+| SVC-SIT | Pet sitting & walking | Zihad | M | S9 | APT-1, PAY-2 | ✅ |
 | SVC-TRN | Training | Afridi | M | S9 | APT-1, PAY-2 | ⬜ |
 | SVC-TAXI | Pet taxi | Tain | M | S9 | APT-1, PAY-2, (MAP-1) | ⬜ |
 | LIV-1 | Livestock vets | Zimia | M | S9 | MAP-3 | ⬜ |

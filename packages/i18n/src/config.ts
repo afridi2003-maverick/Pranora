@@ -32,6 +32,8 @@ export const NAMESPACES = [
   'services',
   'notifications',
   'ai',
+  'tips',
+  'sitting',
   'shelter',
   'provider',
 ] as const;

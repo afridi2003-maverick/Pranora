@@ -10,7 +10,7 @@
   "confirmBooking": "বুকিং নিশ্চিত করুন",
   "myBookings": "আমার বুকিং",
   "upcoming": "আসন্ন",
-  "past": "অতীত",
+  "past": "পূর্ববর্তী",
   "noBookings": "কোনো বুকিং নেই",
   "steps": {
     "service": "সেবা",
@@ -42,7 +42,7 @@
     "nextSerial": "পরবর্তী উপলব্ধ সিরিয়াল: {{serial}}"
   },
   "status": {
-    "pending": "অপেক্ষামান",
+    "pending": "অপেক্ষমাণ",
     "confirmed": "নিশ্চিত হয়েছে",
     "inProgress": "চলছে",
     "completed": "সম্পন্ন",

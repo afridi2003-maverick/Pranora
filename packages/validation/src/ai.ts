@@ -20,6 +20,27 @@ export const ProposedBookingSchema = z.object({
 });
 export type ProposedBooking = z.infer<typeof ProposedBookingSchema>;
 
+export const HandoffClinicPreviewSchema = z.object({
+  locationId: z.string(),
+  nameBn: z.string().nullable(),
+  nameEn: z.string().nullable(),
+  addressBn: z.string().nullable(),
+  addressEn: z.string().nullable(),
+  phone: z.string().nullable(),
+  distanceKm: z.string(),
+  isOpen: z.boolean().optional(),
+});
+export type HandoffClinicPreview = z.infer<typeof HandoffClinicPreviewSchema>;
+
+export const HandoffDataSchema = z.object({
+  reason: z.enum(['user_requested', 'uncertain', 'medical_consultation']).optional().nullable(),
+  clinics: z.array(HandoffClinicPreviewSchema).optional().nullable(),
+  support_phone: z.string().optional().nullable(),
+  support_label_bn: z.string().optional().nullable(),
+  support_label_en: z.string().optional().nullable(),
+});
+export type HandoffData = z.infer<typeof HandoffDataSchema>;
+
 export const AIConversationSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
@@ -45,6 +66,7 @@ export const AIMessageSchema = z.object({
   is_voice: z.boolean().default(false),
   emergency_flag: z.boolean().default(false),
   handoff_flag: z.boolean().default(false),
+  handoff_data: HandoffDataSchema.optional().nullable(),
   proposed_booking: ProposedBookingSchema.optional().nullable(),
   created_at: z.string().optional(),
 });
