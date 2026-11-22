@@ -1,6 +1,7 @@
-export { VaccineListScreen } from './VaccineListScreen';
-export { RecordVaccineModal } from './RecordVaccineModal';
-export { MedicalHistoryScreen } from './MedicalHistoryScreen';
-export { UploadDocumentModal } from './UploadDocumentModal';
-export { AddMedicalRecordModal } from './AddMedicalRecordModal';
-export { VisitNoteForm } from './VisitNoteForm';
+export * from './VaccineListScreen';
+export * from './RecordVaccineModal';
+export * from './MedicalHistoryScreen';
+export * from './AddMedicalRecordModal';
+export * from './UploadDocumentModal';
+export * from './VisitNoteForm';
+export * from './DigitalPrescriptionScreen';

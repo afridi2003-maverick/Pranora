@@ -1,0 +1,46 @@
+{
+  "title": "Report Content",
+  "subtitle": "Help us keep Pranora safe and accurate",
+  "modal": {
+    "title_review": "Report Review",
+    "title_clinic": "Report Inaccurate Clinic Info",
+    "title_generic": "Report Content",
+    "reason_label": "Reason for reporting",
+    "reason_placeholder": "Select a reason",
+    "details_label": "Additional details (optional)",
+    "details_placeholder": "Describe the issue in more detail...",
+    "submit": "Submit Report",
+    "cancel": "Cancel",
+    "submitting": "Submitting...",
+    "already_reported": "You have already reported this content."
+  },
+  "reasons": {
+    "fake": "Fake or misleading content",
+    "spam": "Spam or promotional content",
+    "abusive": "Abusive or offensive behavior",
+    "scam": "Fraud or payment scam",
+    "inaccurate_info": "Wrong clinic info (address, phone, hours)",
+    "animal_cruelty": "Animal cruelty or abuse",
+    "duplicate": "Duplicate listing",
+    "other": "Other reason"
+  },
+  "review_reasons": {
+    "fake": "Fake or paid review",
+    "spam": "Spam or irrelevant content",
+    "abusive": "Abusive or offensive language",
+    "other": "Other reason"
+  },
+  "success": {
+    "title": "Report Submitted",
+    "message": "Thank you! Our moderation team will review this within 24 hours.",
+    "clinic": "Thank you! Our team will verify and update the clinic information.",
+    "review": "Thank you! Our team will review this content for policy violations."
+  },
+  "error": {
+    "submit_failed": "Failed to submit report. Please try again.",
+    "already_submitted": "You have already reported this. We will review it shortly."
+  },
+  "badge": "Report",
+  "clinic_report_hint": "Is the address, phone number, or hours incorrect?",
+  "review_report_hint": "Is this review fake, spam, or abusive?"
+}

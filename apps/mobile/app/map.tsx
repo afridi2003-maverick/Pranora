@@ -18,7 +18,14 @@ import {
   buildBookingUrl,
   buildDirectionsUrl,
   buildTelUrl,
+  searchAreas,
+  getDivisions,
+  getDistrictsByDivision,
+  getUpazilasByDistrict,
+  getUpazilaById,
+  type AreaSearchResult,
 } from '@pranora/api';
+import { Modal } from 'react-native';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
@@ -36,6 +43,39 @@ export default function MobileMapScreen() {
   const [filterEmergency, setFilterEmergency] = useState(params.emergency === 'true');
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
   const [selectedSpecies] = useState<'all' | 'dog' | 'cat'>('all');
+
+  // Area Picker state (MAP-4)
+  const [locationName, setLocationName] = useState('ধানমন্ডি, ঢাকা');
+  const [areaModalVisible, setAreaModalVisible] = useState(false);
+  const [selectedDivisionId, setSelectedDivisionId] = useState(3); // Default Dhaka
+  const [selectedDistrictId, setSelectedDistrictId] = useState(18); // Default Dhaka
+  const [selectedUpazilaId, setSelectedUpazilaId] = useState(1801); // Default Dhanmondi
+  const [showAreaSuggestions, setShowAreaSuggestions] = useState(false);
+
+  const areaSuggestions = useMemo(() => {
+    if (!search.trim()) return [];
+    return searchAreas(search);
+  }, [search]);
+
+  const handleSelectArea = (result: AreaSearchResult) => {
+    setUserCoords({ lat: result.lat, lng: result.lng });
+    setLocationName(isBangla ? result.nameBn : result.nameEn);
+    setShowAreaSuggestions(false);
+    setSearch('');
+  };
+
+  const availableDivisions = useMemo(() => getDivisions(), []);
+  const availableDistricts = useMemo(() => getDistrictsByDivision(selectedDivisionId), [selectedDivisionId]);
+  const availableUpazilas = useMemo(() => getUpazilasByDistrict(selectedDistrictId), [selectedDistrictId]);
+
+  const handleConfirmAreaPicker = () => {
+    const upazila = getUpazilaById(selectedUpazilaId) || availableUpazilas[0];
+    if (upazila) {
+      setUserCoords({ lat: upazila.lat, lng: upazila.lng });
+      setLocationName(isBangla ? upazila.nameBn : upazila.nameEn);
+    }
+    setAreaModalVisible(false);
+  };
 
   // Clinics state
   const [clinics, setClinics] = useState<NearbyClinicResult[]>([]);
@@ -115,11 +155,30 @@ export default function MobileMapScreen() {
     <View className="flex-1 bg-slate-900">
       {/* Top Floating Search & Filter Card */}
       <View className="absolute top-3 left-3 right-3 z-30 bg-white/95 rounded-2xl p-3 shadow-lg border border-gray-100">
+        {/* Current Location & Area Picker Button (MAP-4) */}
+        <View className="flex-row items-center justify-between pb-1.5 mb-1.5 border-b border-gray-100">
+          <View className="flex-row items-center gap-1">
+            <Text className="text-xs">🎯</Text>
+            <Text className="text-xs font-bold text-gray-800">{locationName}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => setAreaModalVisible(true)}
+            className="px-2 py-0.5 bg-green-100 rounded-md flex-row items-center gap-1"
+          >
+            <Text className="text-[10px] text-green-800 font-bold">
+              {isBangla ? 'এলাকা পরিবর্তন' : 'Change Area'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <View className="flex-row items-center gap-2 mb-2">
           <Text className="text-base">📍</Text>
           <TextInput
             value={search}
-            onChangeText={setSearch}
+            onChangeText={(txt) => {
+              setSearch(txt);
+              setShowAreaSuggestions(true);
+            }}
             placeholder={isBangla ? 'ক্লিনিকের নাম বা এলাকা খুঁজুন...' : 'Search clinic or area...'}
             className="flex-1 p-2 bg-gray-100 rounded-lg text-xs"
           />
@@ -135,6 +194,33 @@ export default function MobileMapScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Area Suggestions Dropdown (MAP-4) */}
+        {showAreaSuggestions && areaSuggestions.length > 0 && (
+          <View className="bg-white rounded-xl border border-gray-200 mt-1 mb-2 max-h-48 overflow-hidden">
+            <ScrollView nestedScrollEnabled>
+              {areaSuggestions.map((area) => (
+                <TouchableOpacity
+                  key={`${area.type}-${area.id}`}
+                  onPress={() => handleSelectArea(area)}
+                  className="p-2 border-b border-gray-100 flex-row items-center justify-between"
+                >
+                  <View>
+                    <Text className="text-xs font-bold text-gray-800">
+                      {isBangla ? area.nameBn : area.nameEn}
+                    </Text>
+                    <Text className="text-[10px] text-gray-500">
+                      {isBangla ? area.parentNameBn : area.parentNameEn}
+                    </Text>
+                  </View>
+                  <Text className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                    {area.type === 'upazila' ? (isBangla ? 'থানা' : 'Thana') : (isBangla ? 'জেলা' : 'District')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         {/* Filter Badges Horizontal Scroll */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-1.5 pt-1">
@@ -340,6 +426,148 @@ export default function MobileMapScreen() {
           </ScrollView>
         )}
       </View>
+      {/* Cascading Area Picker Modal (MAP-4) */}
+      <Modal
+        visible={areaModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setAreaModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/60 justify-end">
+          <View className="bg-white rounded-t-3xl p-4 max-h-[85%]">
+            <View className="flex-row items-center justify-between pb-3 border-b border-gray-100">
+              <Text className="text-base font-bold text-gray-900">
+                📍 {isBangla ? 'বিভাগ, জেলা ও এলাকা নির্বাচন' : 'Select Area'}
+              </Text>
+              <TouchableOpacity onPress={() => setAreaModalVisible(false)}>
+                <Text className="text-base text-gray-500 font-bold">✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="space-y-3 pt-2" showsVerticalScrollIndicator={false}>
+              {/* Step 1: Divisions */}
+              <View>
+                <Text className="text-xs font-bold text-gray-700 mb-1">
+                  ১. {isBangla ? 'বিভাগ' : 'Division'}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-1.5">
+                  {availableDivisions.map((div) => (
+                    <TouchableOpacity
+                      key={div.id}
+                      onPress={() => {
+                        setSelectedDivisionId(div.id);
+                        const districts = getDistrictsByDivision(div.id);
+                        const firstDistrict = districts[0];
+                        if (firstDistrict) {
+                          setSelectedDistrictId(firstDistrict.id);
+                          const upazilas = getUpazilasByDistrict(firstDistrict.id);
+                          const firstUpazila = upazilas[0];
+                          if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
+                        }
+                      }}
+                      className={`px-3 py-2 rounded-lg border ${
+                        selectedDivisionId === div.id
+                          ? 'bg-green-700 border-green-700'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      <Text
+                        className={`text-xs ${
+                          selectedDivisionId === div.id ? 'text-white font-bold' : 'text-gray-700'
+                        }`}
+                      >
+                        {isBangla ? div.nameBn : div.nameEn}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Step 2: Districts */}
+              <View>
+                <Text className="text-xs font-bold text-gray-700 mb-1">
+                  ২. {isBangla ? 'জেলা' : 'District'}
+                </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-1.5">
+                  {availableDistricts.map((dist) => (
+                    <TouchableOpacity
+                      key={dist.id}
+                      onPress={() => {
+                        setSelectedDistrictId(dist.id);
+                        const upazilas = getUpazilasByDistrict(dist.id);
+                        const firstUpazila = upazilas[0];
+                        if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
+                      }}
+                      className={`px-3 py-2 rounded-lg border ${
+                        selectedDistrictId === dist.id
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      <Text
+                        className={`text-xs ${
+                          selectedDistrictId === dist.id ? 'text-white font-bold' : 'text-gray-700'
+                        }`}
+                      >
+                        {isBangla ? dist.nameBn : dist.nameEn}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              {/* Step 3: Upazilas */}
+              <View>
+                <Text className="text-xs font-bold text-gray-700 mb-1">
+                  ৩. {isBangla ? 'উপজেলা / থানা' : 'Upazila / Thana'}
+                </Text>
+                <View className="flex-row flex-wrap gap-1.5">
+                  {availableUpazilas.map((u) => (
+                    <TouchableOpacity
+                      key={u.id}
+                      onPress={() => setSelectedUpazilaId(u.id)}
+                      className={`px-3 py-2 rounded-lg border ${
+                        selectedUpazilaId === u.id
+                          ? 'bg-green-100 border-green-600'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      <Text
+                        className={`text-xs ${
+                          selectedUpazilaId === u.id
+                            ? 'text-green-900 font-bold'
+                            : 'text-gray-700'
+                        }`}
+                      >
+                        {isBangla ? u.nameBn : u.nameEn}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </ScrollView>
+
+            <View className="flex-row justify-end gap-2 pt-4 border-t border-gray-100 mt-2">
+              <TouchableOpacity
+                onPress={() => setAreaModalVisible(false)}
+                className="px-4 py-2.5 rounded-lg bg-gray-100"
+              >
+                <Text className="text-xs font-bold text-gray-600">
+                  {isBangla ? 'বাতিল' : 'Cancel'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleConfirmAreaPicker}
+                className="px-6 py-2.5 rounded-lg bg-green-700"
+              >
+                <Text className="text-xs font-bold text-white">
+                  ✓ {isBangla ? 'অবস্থান নিশ্চিত করুন' : 'Confirm'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

@@ -55,5 +55,15 @@
   "roleVerified": {
     "title": "Role Verification Complete",
     "body": "Congratulations! Your profile as a {{role}} has been verified."
+    "title": "Urgent Rescue Report",
+    "body": "{{species}} in {{area}} — needs immediate attention",
+    "escalated": "Case escalated — no response in {{minutes}} minutes"
+  },
+  "smsReminders": {
+    "title": "SMS Reminders",
+    "optInLabel": "SMS Alerts Enabled",
+    "optInDesc": "Receive SMS for vaccine dates and clinic appointments",
+    "vaccineText": "[Pranora] Reminder: {{petName}}'s vaccine ({{title}}) is due on {{date}}. Please visit your nearest clinic on time.",
+    "appointmentText": "[Pranora] Appointment Reminder: Booking #{{code}} is scheduled for {{dateTime}}. Please arrive 10m early."
   }
 }

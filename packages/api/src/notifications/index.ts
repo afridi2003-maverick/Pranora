@@ -177,6 +177,9 @@ export async function deleteNotification(
 /**
  * Send a notification via the notify RPC (Integration Point 5)
  */
+export * from './reminders';
+export * from './sms';
+
 export async function notify(
   client: TypedSupabaseClient,
   payload: SendNotificationPayload

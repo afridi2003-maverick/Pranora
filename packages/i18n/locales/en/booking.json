@@ -1,17 +1,46 @@
 {
-  "pageTitle": "Booking",
+  "pageTitle": "Book Appointment",
   "book": "Book",
   "selectService": "Select Service",
   "selectPet": "Select Pet",
   "selectDate": "Select Date",
   "selectSlot": "Select Time Slot",
-  "serialMode": "Take a Serial Number",
+  "serialMode": "Session Serials",
   "serialInfo": "Your serial: {{number}}",
   "confirmBooking": "Confirm Booking",
   "myBookings": "My Bookings",
   "upcoming": "Upcoming",
   "past": "Past",
   "noBookings": "No bookings yet",
+  "steps": {
+    "service": "Service",
+    "pet": "Pet",
+    "datetime": "Time & Date",
+    "details": "Details",
+    "confirm": "Confirm"
+  },
+  "problem": {
+    "label": "Describe the problem or reason for visit",
+    "placeholder": "e.g. My pet has a slight fever and loss of appetite for 2 days...",
+    "optional": "(Optional)"
+  },
+  "success": {
+    "title": "Booking Request Submitted!",
+    "subtitle": "Your appointment request has been sent to the clinic.",
+    "codeLabel": "Booking Reference Code",
+    "instructions": "Please arrive 10 minutes before your appointment time or serial session.",
+    "serialNotice": "Your assigned serial number is {{serial}}. Please show this reference code at the clinic reception."
+  },
+  "slots": {
+    "loading": "Checking available slots...",
+    "available": "Available",
+    "booked": "Fully Booked",
+    "remaining": "{{count}} left",
+    "noSlots": "No slots available on this date. Please pick another date.",
+    "closed": "The clinic is closed on this date.",
+    "session": "Session Hours: {{start}} – {{end}}",
+    "nextSerial": "Next available serial: {{serial}}"
+  },
   "status": {
     "pending": "Pending",
     "confirmed": "Confirmed",
@@ -23,23 +52,42 @@
     "expired": "Expired"
   },
   "cancel": {
-    "label": "Cancel Booking",
-    "confirm": "Are you sure? This booking will be cancelled.",
-    "cutoffWarning": "The clinic's cancellation deadline has passed"
+    "label": "Cancel Appointment",
+    "confirm": "Are you sure you want to cancel this booking?",
+    "cutoffWarning": "The clinic's cancellation deadline has passed",
+    "cutoffPassed": "Cancellation deadline has passed (within cut-off window). Please contact the clinic directly.",
+    "cutoffNotice": "Free cancellation available until {{cutoff}}",
+    "reasonLabel": "Reason for Cancellation",
+    "reasonPlaceholder": "Please choose or describe why you are cancelling...",
+    "submitting": "Cancelling..."
   },
   "reschedule": {
     "label": "Reschedule",
-    "confirm": "Confirm New Time"
+    "title": "Reschedule Appointment",
+    "selectNewSlot": "Select New Date & Time Slot",
+    "confirm": "Confirm Reschedule",
+    "reasonLabel": "Reason for Rescheduling (Optional)",
+    "reasonPlaceholder": "e.g., Change in schedule, pet not available...",
+    "success": "Appointment rescheduled successfully!",
+    "submitting": "Rescheduling...",
+    "cutoffPassed": "Rescheduling is locked within {{cutoff}} hours of the appointment."
   },
   "payment": {
     "method": "Payment Method",
     "cash": "Cash at Clinic",
+    "cashDesc": "Pay directly at the clinic desk upon arrival",
     "bkash": "bKash",
     "nagad": "Nagad",
     "rocket": "Rocket",
     "card": "Card",
-    "amount": "Amount",
-    "fee": "Fee"
+    "amount": "Total Fee",
+    "fee": "Fee",
+    "collectCash": "Collect Cash",
+    "markPaid": "Mark as Paid",
+    "paid": "Paid",
+    "pending": "Pending",
+    "receipt": "Cash Receipt",
+    "receiptNotice": "Cash collected at reception desk"
   },
   "summary": {
     "clinic": "Clinic",
@@ -47,7 +95,53 @@
     "pet": "Pet",
     "date": "Date",
     "time": "Time",
-    "serial": "Serial",
-    "vet": "Vet"
+    "serial": "Serial Number",
+    "vet": "Assigned Vet",
+    "problem": "Problem Note",
+    "price": "Price"
+  },
+  "actions": {
+    "next": "Continue",
+    "back": "Back",
+    "submit": "Confirm & Book",
+    "viewBookings": "View My Bookings",
+    "backToClinic": "Back to Clinic"
+  },
+  "errors": {
+    "selectService": "Please select a service to proceed",
+    "selectSlot": "Please select a time slot",
+    "selectSerial": "Please select an available serial number",
+    "bookingFailed": "Failed to complete booking. Please try again.",
+    "noLocation": "No clinic selected. Please choose a clinic first."
+  },
+  "provider": {
+    "title": "Clinic Bookings & Schedule",
+    "subtitle": "Manage incoming visit requests and patient status lifecycle",
+    "tabs": {
+      "pending": "Pending Requests",
+      "confirmed": "Confirmed / Upcoming",
+      "inProgress": "In Progress",
+      "completed": "Completed & History"
+    },
+    "actions": {
+      "confirm": "Accept & Confirm",
+      "decline": "Decline Request",
+      "startVisit": "Start Visit / Check-in",
+      "complete": "Complete Visit",
+      "noShow": "Mark No-Show"
+    },
+    "declineModal": {
+      "title": "Decline Booking Request",
+      "reasonLabel": "Reason for declining",
+      "reasonPlaceholder": "e.g., Doctor is unavailable, emergency surgery...",
+      "confirm": "Confirm Decline",
+      "cancel": "Cancel"
+    },
+    "empty": {
+      "pending": "No pending booking requests",
+      "confirmed": "No confirmed bookings",
+      "inProgress": "No visits currently in progress",
+      "completed": "No past visits recorded"
+    }
   }
 }

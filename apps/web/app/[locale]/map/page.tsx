@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Chip, SearchBar, EmptyState } from '@pranora/ui';
 import {
@@ -10,14 +10,18 @@ import {
   buildBookingUrl,
   buildDirectionsUrl,
   buildTelUrl,
+  searchAreas,
+  getDivisions,
+  getDistrictsByDivision,
+  getUpazilasByDistrict,
+  getUpazilaById,
+  type AreaSearchResult,
 } from '@pranora/api';
 
 const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function WebMapPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const emergencyParam = searchParams?.get('emergency') === 'true';
   const { isBangla } = useLocale();
 
   // Location state
@@ -25,20 +29,112 @@ export default function WebMapPage() {
   const [locationPermission, setLocationPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
   const [locationName, setLocationName] = useState<string>('ধানমন্ডি, ঢাকা');
 
-  // Search & Filter state
+  // Search & Filter state (MAP-3)
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterOpenNow, setFilterOpenNow] = useState<boolean>(false);
   const [filter24h, setFilter24h] = useState<boolean>(false);
-  const [filterEmergency, setFilterEmergency] = useState<boolean>(emergencyParam);
+  const [filterEmergency, setFilterEmergency] = useState<boolean>(false);
   const [filterHomeVisit, setFilterHomeVisit] = useState<boolean>(false);
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
   const [selectedSpecies, setSelectedSpecies] = useState<'all' | 'dog' | 'cat' | 'bird' | 'rabbit'>('all');
+  const [maxFee, setMaxFee] = useState<number | null>(null);
+  const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+
+  // Area Picker state (MAP-4)
+  const [areaModalOpen, setAreaModalOpen] = useState<boolean>(false);
+  const [selectedDivisionId, setSelectedDivisionId] = useState<number>(3); // Default Dhaka
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number>(18); // Default Dhaka district
+  const [selectedUpazilaId, setSelectedUpazilaId] = useState<number>(1801); // Default Dhanmondi
+  const [showAreaSuggestions, setShowAreaSuggestions] = useState<boolean>(false);
+
+  const areaSuggestions = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    return searchAreas(searchQuery);
+  }, [searchQuery]);
+
+  const handleSelectArea = (result: AreaSearchResult) => {
+    setUserCoords({ lat: result.lat, lng: result.lng });
+    setLocationName(isBangla ? result.nameBn : result.nameEn);
+    setShowAreaSuggestions(false);
+    setSearchQuery('');
+  };
+
+  const availableDivisions = useMemo(() => getDivisions(), []);
+  const availableDistricts = useMemo(() => getDistrictsByDivision(selectedDivisionId), [selectedDivisionId]);
+  const availableUpazilas = useMemo(() => getUpazilasByDistrict(selectedDistrictId), [selectedDistrictId]);
+
+  const handleConfirmAreaPicker = () => {
+    const upazila = getUpazilaById(selectedUpazilaId) || availableUpazilas[0];
+    if (upazila) {
+      setUserCoords({ lat: upazila.lat, lng: upazila.lng });
+      setLocationName(isBangla ? upazila.nameBn : upazila.nameEn);
+    }
+    setAreaModalOpen(false);
+  };
 
   // View state
   const [mobileView, setMobileView] = useState<'split' | 'map' | 'list'>('split');
   const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
   const [clinics, setClinics] = useState<NearbyClinicResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Read URL query parameters on mount for shareable filter links (docs/app-flow.md §4)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get('open') === '1') setFilterOpenNow(true);
+      if (searchParams.get('open24') === '1') setFilter24h(true);
+      if (searchParams.get('emergency') === '1') setFilterEmergency(true);
+      if (searchParams.get('homeVisit') === '1') setFilterHomeVisit(true);
+      const g = searchParams.get('govt');
+      if (g === 'govt' || g === 'private') setFilterGovt(g);
+      const sp = searchParams.get('species');
+      if (sp === 'dog' || sp === 'cat' || sp === 'bird' || sp === 'rabbit') setSelectedSpecies(sp);
+      const fee = searchParams.get('maxFee');
+      if (fee && !isNaN(Number(fee))) setMaxFee(Number(fee));
+    }
+  }, []);
+
+  // Sync state changes to URL query parameters without reloading
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams();
+      if (filterOpenNow) searchParams.set('open', '1');
+      if (filter24h) searchParams.set('open24', '1');
+      if (filterEmergency) searchParams.set('emergency', '1');
+      if (filterHomeVisit) searchParams.set('homeVisit', '1');
+      if (filterGovt !== 'all') searchParams.set('govt', filterGovt);
+      if (selectedSpecies !== 'all') searchParams.set('species', selectedSpecies);
+      if (maxFee !== null) searchParams.set('maxFee', maxFee.toString());
+
+      const queryStr = searchParams.toString();
+      const newUrl = queryStr ? `${window.location.pathname}?${queryStr}` : window.location.pathname;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [filterOpenNow, filter24h, filterEmergency, filterHomeVisit, filterGovt, selectedSpecies, maxFee]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filterOpenNow) count++;
+    if (filter24h) count++;
+    if (filterEmergency) count++;
+    if (filterHomeVisit) count++;
+    if (filterGovt !== 'all') count++;
+    if (selectedSpecies !== 'all') count++;
+    if (maxFee !== null) count++;
+    return count;
+  }, [filterOpenNow, filter24h, filterEmergency, filterHomeVisit, filterGovt, selectedSpecies, maxFee]);
+
+  const handleResetFilters = () => {
+    setFilterOpenNow(false);
+    setFilter24h(false);
+    setFilterEmergency(false);
+    setFilterHomeVisit(false);
+    setFilterGovt('all');
+    setSelectedSpecies('all');
+    setMaxFee(null);
+    setSearchQuery('');
+  };
 
   // Request browser geolocation on mount
   useEffect(() => {
@@ -66,11 +162,12 @@ export default function WebMapPage() {
         const results = await getNearbyClinicsWithFallback({
           lat: userCoords.lat,
           lng: userCoords.lng,
-          radiusM: 20000,
+          radiusM: 25000,
           openNow: filterOpenNow,
           emergency: filterEmergency,
           homeVisit: filterHomeVisit,
           species: selectedSpecies !== 'all' ? selectedSpecies : undefined,
+          maxFee: maxFee !== null ? maxFee : undefined,
           limit: 50,
         });
 
@@ -91,9 +188,9 @@ export default function WebMapPage() {
     return () => {
       active = false;
     };
-  }, [userCoords, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies]);
+  }, [userCoords, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee]);
 
-  // Client-side search and ownership filter
+  // Client-side search and ownership filter (MAP-3)
   const displayedClinics = useMemo(() => {
     return clinics.filter((c) => {
       const name = (isBangla ? c.nameBn : c.nameEn) || c.nameEn || '';
@@ -107,10 +204,11 @@ export default function WebMapPage() {
       if (filter24h && !c.is24h) return false;
       if (filterGovt === 'govt' && !c.isGovernment) return false;
       if (filterGovt === 'private' && c.isGovernment) return false;
+      if (maxFee !== null && (c.feeFrom ?? 500) > maxFee) return false;
 
       return true;
     });
-  }, [clinics, searchQuery, filter24h, filterGovt, isBangla]);
+  }, [clinics, searchQuery, filter24h, filterGovt, maxFee, isBangla]);
 
   const selectedClinic = useMemo(() => {
     return clinics.find((c) => c.locationId === selectedClinicId) || displayedClinics[0];
@@ -158,9 +256,16 @@ export default function WebMapPage() {
                 <span>📍</span>
                 <span>{isBangla ? 'নিকটস্থ পশু চিকিৎসক ও ক্লিনিক' : 'Nearest Veterinary Map'}</span>
               </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-bangla flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-bangla flex items-center gap-1.5 mt-0.5">
                 <span>🎯</span>
-                <span>{locationName}</span>
+                <span className="font-semibold text-gray-800 dark:text-gray-200">{locationName}</span>
+                <button
+                  onClick={() => setAreaModalOpen(true)}
+                  className="text-xs text-green-700 dark:text-green-400 font-bold hover:underline ml-1 flex items-center gap-0.5"
+                >
+                  <span>✏️</span>
+                  <span>{isBangla ? 'এলাকা পরিবর্তন' : 'Change Area'}</span>
+                </button>
                 {locationPermission === 'denied' && (
                   <span className="text-amber-600 dark:text-amber-400 ml-1">
                     ({isBangla ? 'ডিফল্ট অবস্থান' : 'default location'})
@@ -194,14 +299,50 @@ export default function WebMapPage() {
             </div>
           </div>
 
-          {/* Search bar */}
-          <div className="flex-1 max-w-md">
+          {/* Search bar with Area Autocomplete (MAP-4) */}
+          <div className="flex-1 max-w-md relative">
             <SearchBar
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowAreaSuggestions(true);
+              }}
               placeholder={isBangla ? 'ক্লিনিকের নাম বা এলাকা খুঁজুন...' : 'Search clinic or area...'}
-              onClear={() => setSearchQuery('')}
+              onClear={() => {
+                setSearchQuery('');
+                setShowAreaSuggestions(false);
+              }}
             />
+
+            {/* Area Suggestions Dropdown (MAP-4) */}
+            {showAreaSuggestions && areaSuggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700">
+                <div className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900/50 text-[11px] font-bangla font-semibold text-gray-500 flex justify-between items-center">
+                  <span>📍 {isBangla ? 'এলাকা সাজেশন' : 'Area Suggestions'}</span>
+                  <button onClick={() => setShowAreaSuggestions(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                {areaSuggestions.map((area) => (
+                  <button
+                    key={`${area.type}-${area.id}`}
+                    onClick={() => handleSelectArea(area)}
+                    className="w-full text-left px-3 py-2 text-xs hover:bg-green-50 dark:hover:bg-green-950/30 flex items-center justify-between transition cursor-pointer"
+                  >
+                    <div>
+                      <div className="font-bangla font-semibold text-gray-800 dark:text-gray-200">
+                        {isBangla ? area.nameBn : area.nameEn}
+                        <span className="text-[10px] text-gray-400 ml-1.5 font-normal">({area.nameEn})</span>
+                      </div>
+                      <div className="text-[10px] text-gray-500 font-bangla">
+                        {isBangla ? area.parentNameBn : area.parentNameEn}
+                      </div>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-bangla">
+                      {area.type === 'upazila' ? (isBangla ? 'উপজেলা/থানা' : 'Thana') : (isBangla ? 'জেলা' : 'District')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Emergency Mode Quick Toggle */}
@@ -220,8 +361,37 @@ export default function WebMapPage() {
           </Button>
         </div>
 
-        {/* Filter Chips Bar */}
+        {/* Filter Chips Bar (MAP-3 & MAP-4) */}
         <div className="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs">
+          {/* Area Picker Chip (MAP-4) */}
+          <button
+            onClick={() => setAreaModalOpen(true)}
+            className="px-3 py-1.5 rounded-full border border-green-300 bg-green-50 dark:bg-green-900/30 text-green-900 dark:text-green-200 flex items-center gap-1.5 font-bangla font-semibold shrink-0 hover:bg-green-100 transition shadow-xs cursor-pointer"
+          >
+            <span>📍</span>
+            <span>{locationName}</span>
+            <span className="text-[10px] bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-100 px-1.5 py-0.5 rounded-full">
+              {isBangla ? 'পরিবর্তন' : 'Change'}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setFilterModalOpen(true)}
+            className={`px-3 py-1.5 rounded-full border flex items-center gap-1.5 font-bangla font-semibold transition shrink-0 ${
+              activeFilterCount > 0
+                ? 'bg-green-700 text-white border-green-700 shadow-xs'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <span>⚙️</span>
+            <span>{isBangla ? 'ফিল্টার' : 'Filters'}</span>
+            {activeFilterCount > 0 && (
+              <span className="w-5 h-5 bg-white text-green-800 text-[11px] rounded-full flex items-center justify-center font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+
           <Chip
             label={isBangla ? 'এখন খোলা' : 'Open Now'}
             isSelected={filterOpenNow}
@@ -250,6 +420,15 @@ export default function WebMapPage() {
 
           <span className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1 shrink-0" />
 
+          {/* Fee quick filter */}
+          <Chip
+            label={maxFee ? (isBangla ? `ফি সর্বোচ্চ ৳${maxFee}` : `Fee ≤ ৳${maxFee}`) : (isBangla ? 'ফি: যেকোনো' : 'Fee: Any')}
+            isSelected={maxFee !== null}
+            onSelect={() => setMaxFee((prev) => (prev ? null : 500))}
+          />
+
+          <span className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-1 shrink-0" />
+
           {/* Species filters */}
           {(['all', 'dog', 'cat', 'bird', 'rabbit'] as const).map((sp) => {
             const labels = {
@@ -268,6 +447,15 @@ export default function WebMapPage() {
               />
             );
           })}
+
+          {activeFilterCount > 0 && (
+            <button
+              onClick={handleResetFilters}
+              className="text-xs text-red-600 hover:text-red-700 font-bangla font-semibold px-2 py-1 rounded shrink-0 hover:bg-red-50 transition"
+            >
+              ✕ {isBangla ? 'ফিল্টার মুছুন' : 'Reset'}
+            </button>
+          )}
         </div>
       </header>
 
@@ -309,6 +497,11 @@ export default function WebMapPage() {
                     : 'No clinics match your current search and filter settings. Try relaxing filters.'
                 }
               />
+              <div className="mt-4 flex justify-center">
+                <Button size="sm" variant="secondary" onClick={handleResetFilters}>
+                  {isBangla ? 'ফিল্টার রিসেট করুন' : 'Reset Filters'}
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-gray-100 dark:divide-gray-800 p-2 space-y-2">
@@ -488,7 +681,6 @@ export default function WebMapPage() {
 
             {/* Interactive Clinic Map Markers */}
             {displayedClinics.map((c) => {
-              // Projected relative positions based on Dhaka coordinates offset
               const dx = (c.lng - userCoords.lng) * 4000;
               const dy = (userCoords.lat - c.lat) * 4000;
               const isSelected = c.locationId === selectedClinicId;
@@ -593,6 +785,307 @@ export default function WebMapPage() {
           </div>
         </section>
       </div>
+
+      {/* Advanced Filter Modal (MAP-3) */}
+      {filterModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl font-bangla max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span>⚙️</span>
+                <span>{isBangla ? 'উন্নত ফিল্টার' : 'Advanced Filters'}</span>
+              </h2>
+              <button
+                onClick={() => setFilterModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="py-4 space-y-4 text-sm">
+              {/* Ownership */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  {isBangla ? 'ক্লিনিকের ধরন' : 'Ownership & Type'}
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'all', label: isBangla ? 'সকল' : 'All' },
+                    { id: 'govt', label: isBangla ? '🏛️ সরকারি' : '🏛️ Govt' },
+                    { id: 'private', label: isBangla ? '🏥 বেসরকারি' : '🏥 Private' },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => setFilterGovt(opt.id as any)}
+                      className={`p-2 rounded-lg text-xs font-semibold border transition ${
+                        filterGovt === opt.id
+                          ? 'bg-green-50 border-green-600 text-green-900 dark:bg-green-900/30 dark:text-green-200'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Operating Features */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  {isBangla ? 'সেবা ও সময়' : 'Operating Facilities'}
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2.5 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterOpenNow}
+                      onChange={(e) => setFilterOpenNow(e.target.checked)}
+                      className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
+                    />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {isBangla ? 'এখন খোলা (Open Now)' : 'Open Now'}
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filter24h}
+                      onChange={(e) => setFilter24h(e.target.checked)}
+                      className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
+                    />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      {isBangla ? 'সার্বক্ষণিক ২৪/৭ খোলা' : '24/7 Always Open'}
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterEmergency}
+                      onChange={(e) => setFilterEmergency(e.target.checked)}
+                      className="rounded text-red-600 focus:ring-red-500 w-4 h-4"
+                    />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      🚨 {isBangla ? 'জরুরি সেবা উপলব্ধ' : 'Emergency Facilities'}
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterHomeVisit}
+                      onChange={(e) => setFilterHomeVisit(e.target.checked)}
+                      className="rounded text-green-600 focus:ring-green-500 w-4 h-4"
+                    />
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
+                      🏠 {isBangla ? 'বাসায় ডাক্তার সেবা (Home Visit)' : 'Home Vet Visit Available'}
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Consultation Fee Slider / Filter */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  {isBangla ? 'পরামর্শ ফি সীমা (টাকা)' : 'Max Consultation Fee (BDT)'}
+                </label>
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  {[
+                    { val: null, label: isBangla ? 'যেকোনো' : 'Any' },
+                    { val: 100, label: '≤ ৳১০০' },
+                    { val: 500, label: '≤ ৳৫০০' },
+                    { val: 1000, label: '≤ ৳১০০০' },
+                  ].map((fee) => (
+                    <button
+                      key={fee.label}
+                      onClick={() => setMaxFee(fee.val)}
+                      className={`p-2 rounded-lg text-xs font-semibold border transition ${
+                        maxFee === fee.val
+                          ? 'bg-green-50 border-green-600 text-green-900 dark:bg-green-900/30 dark:text-green-200'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {fee.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Species Treated */}
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  {isBangla ? 'চিকিৎসা করা প্রজাতি' : 'Species Treated'}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 'all', label: isBangla ? 'সকল' : 'All' },
+                    { id: 'dog', label: isBangla ? '🐕 কুকুর' : '🐕 Dog' },
+                    { id: 'cat', label: isBangla ? '🐈 বিড়াল' : '🐈 Cat' },
+                    { id: 'bird', label: isBangla ? '🦜 পাখি' : '🦜 Bird' },
+                    { id: 'rabbit', label: isBangla ? '🐇 খরগোশ' : '🐇 Rabbit' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSelectedSpecies(s.id as any)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+                        selectedSpecies === s.id
+                          ? 'bg-green-600 text-white border-green-600'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+              <button
+                onClick={handleResetFilters}
+                className="text-xs text-red-600 hover:text-red-700 font-semibold"
+              >
+                ✕ {isBangla ? 'সব মুছুন' : 'Reset All'}
+              </button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setFilterModalOpen(false)}
+                className="px-6 font-bangla"
+              >
+                {isBangla ? 'ফিল্টার প্রয়োগ করুন' : 'Apply Filters'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Cascading Area Picker Modal (MAP-4) */}
+      {areaModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-gray-700 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-bold font-bangla text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span>📍</span>
+                <span>{isBangla ? 'বিভাগ, জেলা ও এলাকা নির্বাচন করুন' : 'Select Division, District & Area'}</span>
+              </h3>
+              <button
+                onClick={() => setAreaModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 font-bangla">
+              {isBangla
+                ? 'আপনার কাঙ্ক্ষিত এলাকা বেছে নিলে ম্যাপটি স্বয়ংক্রিয়ভাবে সেখানে স্থানান্তরিত হবে।'
+                : 'Selecting an area will automatically center the map and show nearby clinics there.'}
+            </p>
+
+            <div className="space-y-4">
+              {/* Step 1: Division */}
+              <div>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-1.5">
+                  ১. {isBangla ? 'বিভাগ বেছে নিন' : 'Select Division'}
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {availableDivisions.map((div) => (
+                    <button
+                      key={div.id}
+                      onClick={() => {
+                        setSelectedDivisionId(div.id);
+                        const districts = getDistrictsByDivision(div.id);
+                        const firstDistrict = districts[0];
+                        if (firstDistrict) {
+                          setSelectedDistrictId(firstDistrict.id);
+                          const upazilas = getUpazilasByDistrict(firstDistrict.id);
+                          const firstUpazila = upazilas[0];
+                          if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
+                        }
+                      }}
+                      className={`p-2 rounded-lg text-xs font-bangla text-center border transition cursor-pointer ${
+                        selectedDivisionId === div.id
+                          ? 'bg-green-700 text-white border-green-700 font-bold shadow-xs'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {isBangla ? div.nameBn : div.nameEn}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 2: District */}
+              <div>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-1.5">
+                  ২. {isBangla ? 'জেলা বেছে নিন' : 'Select District'}
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 max-h-40 overflow-y-auto p-1 border border-gray-100 dark:border-gray-700 rounded-lg">
+                  {availableDistricts.map((dist) => (
+                    <button
+                      key={dist.id}
+                      onClick={() => {
+                        setSelectedDistrictId(dist.id);
+                        const upazilas = getUpazilasByDistrict(dist.id);
+                        const firstUpazila = upazilas[0];
+                        if (firstUpazila) setSelectedUpazilaId(firstUpazila.id);
+                      }}
+                      className={`p-1.5 rounded-md text-xs font-bangla text-center border transition cursor-pointer ${
+                        selectedDistrictId === dist.id
+                          ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-xs'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {isBangla ? dist.nameBn : dist.nameEn}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 3: Upazila / Thana */}
+              <div>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-1.5">
+                  ৩. {isBangla ? 'উপজেলা বা থানা বেছে নিন' : 'Select Upazila / Thana'}
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-44 overflow-y-auto p-1 border border-gray-100 dark:border-gray-700 rounded-lg">
+                  {availableUpazilas.length > 0 ? (
+                    availableUpazilas.map((u) => (
+                      <button
+                        key={u.id}
+                        onClick={() => setSelectedUpazilaId(u.id)}
+                        className={`p-2 rounded-md text-xs font-bangla text-left border transition flex items-center justify-between cursor-pointer ${
+                          selectedUpazilaId === u.id
+                            ? 'bg-green-50 border-green-600 text-green-900 dark:bg-green-900/40 dark:text-green-200 font-bold'
+                            : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span>{isBangla ? u.nameBn : u.nameEn}</span>
+                        {selectedUpazilaId === u.id && <span className="text-green-600">✓</span>}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="col-span-full py-4 text-center text-xs text-gray-400 font-bangla">
+                      {isBangla ? 'কোনো নির্দিষ্ট থানা পাওয়া যায়নি, জেলা সদর প্রযোজ্য' : 'District Sadar applies'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setAreaModalOpen(false)}>
+                {isBangla ? 'বাতিল' : 'Cancel'}
+              </Button>
+              <Button variant="primary" size="sm" onClick={handleConfirmAreaPicker} className="px-6 font-bangla">
+                ✓ {isBangla ? 'অবস্থান নিশ্চিত করুন' : 'Confirm Location'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

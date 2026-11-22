@@ -6,6 +6,9 @@ import type {
   AdoptionApplicationStatus,
   HomeType,
 } from '@pranora/types';
+import type { AdoptionReviewItem } from '@pranora/validation';
+
+export type { AdoptionReviewItem };
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -45,6 +48,11 @@ export interface AdoptionApplicationRow {
   decision_note: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface AdoptionApplicationWithListing {
+  application: AdoptionApplicationRow;
+  listing: AdoptionListingRow;
 }
 
 export interface AdoptionHandoverRow {
@@ -95,6 +103,26 @@ export interface CreateApplicationPayload {
   has_other_pets?: boolean;
   experience?: string | null;
   reason: string;
+}
+
+export interface ListerEligibilityResult {
+  isEligible: boolean;
+  role: 'shelter' | 'adoption_lister' | 'admin' | null;
+  status: 'verified' | 'pending' | 'none';
+  shelterId?: string | null;
+}
+
+export interface EligiblePetItem {
+  id: string;
+  name: string;
+  species: SpeciesType;
+  gender: PetGender;
+  date_of_birth: string | null;
+  age_months: number | null;
+  breed_name?: string | null;
+  photo_url: string | null;
+  is_neutered: boolean | null;
+  has_active_listing: boolean;
 }
 
 // ── Client Methods ──────────────────────────────────────────────────────────
@@ -178,6 +206,121 @@ export async function getMyAdoptionListings(
   return (data ?? []) as unknown as AdoptionListingRow[];
 }
 
+/**
+ * Check whether a user is an approved adoption lister or verified shelter staff (ADP-2)
+ */
+export async function checkAdoptionListerEligibility(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<ListerEligibilityResult> {
+  const { data: roles, error } = await client
+    .from('user_roles')
+    .select('role, status')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+
+  const rolesList = roles || [];
+  const isAdmin = rolesList.some((r) => r.role === 'admin' && r.status === 'verified');
+  if (isAdmin) {
+    return { isEligible: true, role: 'admin', status: 'verified' };
+  }
+
+  const shelterRole = rolesList.find((r) => r.role === 'shelter');
+  if (shelterRole?.status === 'verified') {
+    // Lookup associated shelter provider id
+    const { data: prov } = await client
+      .from('providers')
+      .select('id')
+      .eq('owner_user_id', userId)
+      .eq('type', 'shelter')
+      .maybeSingle();
+
+    return {
+      isEligible: true,
+      role: 'shelter',
+      status: 'verified',
+      shelterId: prov?.id ?? null,
+    };
+  }
+
+  const listerRole = rolesList.find((r) => r.role === 'adoption_lister');
+  if (listerRole?.status === 'verified') {
+    return { isEligible: true, role: 'adoption_lister', status: 'verified' };
+  }
+
+  if (shelterRole?.status === 'pending' || listerRole?.status === 'pending') {
+    return {
+      isEligible: false,
+      role: (shelterRole ? 'shelter' : 'adoption_lister') as any,
+      status: 'pending',
+    };
+  }
+
+  return { isEligible: false, role: null, status: 'none' };
+}
+
+/**
+ * Fetch pets owned by the user or their shelter, along with their active listing status (ADP-2)
+ */
+export async function getEligiblePetsForAdoption(
+  client: TypedSupabaseClient,
+  userId: string,
+  shelterId?: string | null
+): Promise<EligiblePetItem[]> {
+  // Query pets owned by user or shelter
+  let query = client
+    .from('pets' as any)
+    .select('id, name, species, gender, date_of_birth, photo_url, is_neutered, deleted_at')
+    .is('deleted_at', null);
+
+  if (shelterId) {
+    query = query.or(`owner_id.eq.${userId},shelter_id.eq.${shelterId}`);
+  } else {
+    query = query.eq('owner_id', userId);
+  }
+
+  const { data: petsData, error: petsError } = await query;
+  if (petsError) throw petsError;
+
+  const pets = (petsData || []) as any[];
+  if (pets.length === 0) return [];
+
+  const petIds = pets.map((p) => p.id);
+
+  // Check active listings
+  const { data: activeListings, error: listingsError } = await client
+    .from('adoption_listings')
+    .select('pet_id')
+    .in('pet_id', petIds)
+    .in('status', ['draft', 'available', 'reserved']);
+
+  if (listingsError) throw listingsError;
+
+  const activePetIdSet = new Set((activeListings || []).map((l) => l.pet_id));
+
+  return pets.map((p) => {
+    let ageMonths: number | null = null;
+    if (p.date_of_birth) {
+      const birth = new Date(p.date_of_birth).getTime();
+      const diffMs = Date.now() - birth;
+      ageMonths = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24 * 30.4375)));
+    }
+
+    return {
+      id: p.id,
+      name: p.name,
+      species: p.species,
+      gender: p.gender,
+      date_of_birth: p.date_of_birth,
+      age_months: ageMonths,
+      photo_url: p.photo_url,
+      is_neutered: p.is_neutered,
+      has_active_listing: activePetIdSet.has(p.id),
+    };
+  });
+}
+
 /** Create a new adoption listing */
 export async function createAdoptionListing(
   client: TypedSupabaseClient,
@@ -250,6 +393,53 @@ export async function getMyApplications(
   return (data ?? []) as unknown as AdoptionApplicationRow[];
 }
 
+/** Get applications submitted by current user with associated listing details (ADP-4) */
+export async function getMyApplicationsWithListings(
+  client: TypedSupabaseClient,
+  applicantId: string
+): Promise<AdoptionApplicationWithListing[]> {
+  const { data: apps, error: appsError } = await client
+    .from('adoption_applications')
+    .select('*')
+    .eq('applicant_id', applicantId)
+    .order('created_at', { ascending: false });
+
+  if (appsError) throw appsError;
+  if (!apps || apps.length === 0) return [];
+
+  const listingIds = apps.map((a: any) => a.listing_id);
+  const { data: listings, error: listingsError } = await client
+    .from('adoption_listings')
+    .select('*')
+    .in('id', listingIds);
+
+  if (listingsError) throw listingsError;
+
+  const listingMap = new Map((listings || []).map((l: any) => [l.id, l as unknown as AdoptionListingRow]));
+
+  return apps.map((app: any) => ({
+    application: app as unknown as AdoptionApplicationRow,
+    listing: listingMap.get(app.listing_id) || ({} as AdoptionListingRow),
+  }));
+}
+
+/** Withdraw an un-decided adoption application */
+export async function withdrawAdoptionApplication(
+  client: TypedSupabaseClient,
+  applicationId: string,
+  applicantId: string
+): Promise<boolean> {
+  const { error } = await client
+    .from('adoption_applications')
+    .update({ status: 'withdrawn', updated_at: new Date().toISOString() })
+    .eq('id', applicationId)
+    .eq('applicant_id', applicantId)
+    .in('status', ['submitted', 'under_review']);
+
+  if (error) throw error;
+  return true;
+}
+
 /** Get applications received for a listing (for poster / shelter review) */
 export async function getListingApplications(
   client: TypedSupabaseClient,
@@ -280,6 +470,21 @@ export async function getHandoverByListingId(
   return data as unknown as AdoptionHandoverRow | null;
 }
 
+/** Fetch handover record by its ID */
+export async function getHandoverById(
+  client: TypedSupabaseClient,
+  handoverId: string
+): Promise<AdoptionHandoverRow | null> {
+  const { data, error } = await client
+    .from('adoption_handovers')
+    .select('*')
+    .eq('id', handoverId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as AdoptionHandoverRow | null;
+}
+
 /** Fetch follow-ups for a handover */
 export async function getHandoverFollowups(
   client: TypedSupabaseClient,
@@ -293,6 +498,21 @@ export async function getHandoverFollowups(
 
   if (error) throw error;
   return (data ?? []) as unknown as AdoptionFollowupRow[];
+}
+
+/** Fetch a specific follow-up by ID */
+export async function getFollowupById(
+  client: TypedSupabaseClient,
+  followupId: string
+): Promise<AdoptionFollowupRow | null> {
+  const { data, error } = await client
+    .from('adoption_followups')
+    .select('*')
+    .eq('id', followupId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as AdoptionFollowupRow | null;
 }
 
 // ── RPC Invocations ─────────────────────────────────────────────────────────
@@ -327,6 +547,35 @@ export async function confirmHandover(
   return Boolean(data);
 }
 
+/** Adopter submits post-adoption follow-up welfare report */
+export async function submitAdoptionFollowup(
+  client: TypedSupabaseClient,
+  followupId: string,
+  wellbeing: 'good' | 'okay' | 'needs_help',
+  note?: string | null,
+  photos: string[] = []
+): Promise<boolean> {
+  const { data, error } = await client.rpc('submit_adoption_followup', {
+    p_followup_id: followupId,
+    p_wellbeing: wellbeing,
+    p_note: note ?? null,
+    p_photos: photos,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+/** Processes due follow-up milestones and notifies adopters */
+export async function processDueAdoptionFollowups(
+  client: TypedSupabaseClient
+): Promise<number> {
+  const { data, error } = await client.rpc('process_due_adoption_followups');
+
+  if (error) throw error;
+  return Number(data ?? 0);
+}
+
 /** Toggle favorite/save on an adoption listing */
 export async function toggleAdoptionFavorite(
   client: TypedSupabaseClient,
@@ -339,3 +588,98 @@ export async function toggleAdoptionFavorite(
   if (error) throw error;
   return Boolean(data);
 }
+
+/** Fetch list of listing IDs favorited by the current user */
+export async function getMyFavoriteListingIds(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<string[]> {
+  const { data, error } = await client
+    .from('adoption_favorites')
+    .select('listing_id')
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return (data ?? []).map((row: { listing_id: string }) => row.listing_id);
+}
+
+/** Fetch full adoption listings saved/favorited by the user */
+export async function getMySavedListings(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<AdoptionListingRow[]> {
+  const { data, error } = await client
+    .from('adoption_favorites')
+    .select('listing_id, adoption_listings(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? [])
+    .map((row: any) => row.adoption_listings)
+    .filter(Boolean) as AdoptionListingRow[];
+}
+
+/**
+ * ADP-5: Fetch adoption applications available for review by a shelter or poster
+ */
+export async function getReviewableAdoptionApplications(
+  client: TypedSupabaseClient,
+  shelterId?: string
+): Promise<AdoptionReviewItem[]> {
+  let query = client
+    .from('adoption_applications')
+    .select(`
+      id,
+      listing_id,
+      applicant_id,
+      home_type,
+      has_other_pets,
+      experience,
+      reason,
+      status,
+      reviewed_by,
+      reviewed_at,
+      decision_note,
+      created_at,
+      applicant:profiles!adoption_applications_applicant_id_fkey(full_name, phone, email),
+      listing:adoption_listings!adoption_applications_listing_id_fkey(
+        title_en,
+        title_bn,
+        shelter_id,
+        photos,
+        pet:pets(name, species)
+      )
+    `);
+
+  if (shelterId) {
+    query = query.eq('listing.shelter_id', shelterId);
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    listingId: row.listing_id,
+    applicantId: row.applicant_id,
+    applicantName: row.applicant?.full_name || 'Applicant',
+    applicantPhone: row.applicant?.phone || null,
+    applicantEmail: row.applicant?.email || null,
+    petName: row.listing?.pet?.name || 'Pet',
+    petSpecies: row.listing?.pet?.species || 'Animal',
+    petPhotoUrl: row.listing?.photos?.[0] || null,
+    listingTitle: row.listing?.title_en || row.listing?.title_bn || 'Adoption Listing',
+    homeType: row.home_type,
+    hasOtherPets: Boolean(row.has_other_pets),
+    experience: row.experience || null,
+    reason: row.reason,
+    status: row.status,
+    reviewedBy: row.reviewed_by || null,
+    reviewedAt: row.reviewed_at || null,
+    decisionNote: row.decision_note || null,
+    createdAt: row.created_at,
+  }));
+}
+

@@ -236,3 +236,5 @@ export function calculateDistanceMeters(
   return Math.round(R * c);
 }
 
+export * from './areas';
+

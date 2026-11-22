@@ -12,6 +12,7 @@ export interface FilterState {
   ageGroup?: 'all' | 'baby' | 'young' | 'adult';
   gender?: PetGender;
   search?: string;
+  savedOnly?: boolean;
 }
 
 interface AdoptionFiltersProps {
@@ -19,6 +20,7 @@ interface AdoptionFiltersProps {
   onChange: (updated: FilterState) => void;
   onReset: () => void;
   totalCount: number;
+  savedCount?: number;
 }
 
 const SPECIES_OPTIONS: { id: SpeciesType | 'all'; bn: string; en: string; icon: string }[] = [
@@ -42,6 +44,7 @@ export function AdoptionFilters({
   onChange,
   onReset,
   totalCount,
+  savedCount,
 }: AdoptionFiltersProps) {
   const { isBangla } = useLocale();
 
@@ -140,8 +143,31 @@ export function AdoptionFilters({
         </div>
       </div>
 
-      {/* Species Pills */}
+      {/* Species & Saved Pills */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {/* Saved Only Filter Pill */}
+        <button
+          type="button"
+          onClick={() => onChange({ ...filters, savedOnly: !filters.savedOnly })}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 border ${
+            filters.savedOnly
+              ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+              : 'bg-white dark:bg-neutral-900 border-stroke-subtle text-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800'
+          }`}
+        >
+          <span>♥</span>
+          <span>{isBangla ? 'সংরক্ষিত' : 'Saved'}</span>
+          {savedCount !== undefined && (
+            <span
+              className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                filters.savedOnly ? 'bg-white/30 text-white' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
+              }`}
+            >
+              {savedCount}
+            </span>
+          )}
+        </button>
+
         {SPECIES_OPTIONS.map((s) => {
           const isSelected =
             (s.id === 'all' && !filters.species) || filters.species === s.id;

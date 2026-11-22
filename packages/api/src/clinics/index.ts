@@ -10,6 +10,7 @@ import { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics } from './moc
 
 export { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics };
 export * from './actions';
+export * from './services-providers';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;
