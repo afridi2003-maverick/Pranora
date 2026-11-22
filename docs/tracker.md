@@ -154,8 +154,6 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ✅ |
 | REL-3 | Play Store + App Store + pranora.com.bd launch | Afridi | M | S8 | REL-1, REL-2, REL-4, REL-5 | ⬜ |
 | REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ✅ |
-| REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ⬜ |
-| REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ⬜ |
 | REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ✅ |
 
 ## Phase 2 (P1)
@@ -191,10 +189,8 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ⬜ |
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
 | REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
-| REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ⬜ |
-| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ✅ |
-| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ⬜ |
+| SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ⬜ |
 | MAP-10 | Service layers on map | Zimia | S | S8 | MAP-8/9, SVC-2 | ⬜ |
 | MAP-11 | Suggest a clinic | Zimia | M | S8 | MAP-5, ADM-2 | ⬜ |
