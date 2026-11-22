@@ -268,7 +268,7 @@ export function evaluateUserMessageGuardrails(
   if (isEmergency) {
     const safeResponse =
       locale === 'bn'
-        ? '🚨 জরুরি সতর্কতা: আপনার পোষা প্রাণীর লক্ষণগুলো অবিলম্বে জরুরি ভেটেরিনারি হস্তক্ষেপ দাবি করে। ঘরে চিকিৎসা দেওয়ার চেষ্টা করবেন না এবং কোনো মানুষের ওষুধ দেবেন না। নিচে নিকটস্থ ২৪/৭ জরুরি ক্লিনিকগুলোর তালিকা ও দিকনির্দেশনা দেওয়া হলো। দ্রুততম সময়ে ক্লিনিকে পৌঁছান।'
+        ? '🚨 জরুরি সতর্কতা: আপনার পোষা প্রাণীর উপসর্গগুলো তাৎক্ষণিক জরুরি ভেটেরিনারি চিকিৎসার দাবি রাখে। ঘরে বসে চিকিৎসার চেষ্টা করবেন না এবং ভুলেও মানুষের কোনো ওষুধ দেবেন না। নিচে নিকটস্থ ২৪/৭ জরুরি ভেটেরিনারি ক্লিনিকগুলোর তালিকা ও দিকনির্দেশনা দেওয়া হলো। দ্রুততম সময়ে ক্লিনিকে যোগাযোগ করুন বা পৌঁছান।'
         : '🚨 CRITICAL EMERGENCY ALERT: These symptoms indicate a potential life-threatening emergency requiring immediate veterinary attention. Do not delay or attempt home treatments. Below are the closest 24/7 emergency veterinary clinics. Please transport your pet to an emergency facility immediately.';
 
     return {
@@ -287,7 +287,7 @@ export function evaluateUserMessageGuardrails(
   if (isMedicineOrDiagnosis) {
     const safeResponse =
       locale === 'bn'
-        ? '🚫 নীতিগত সতর্কতা: প্রাণোরা এআই কোনো রোগ নির্ণয় করতে পারে না এবং প্রেসক্রিপশন ওষুধ বা তার ডোজ নির্ধারণ করে না। ভুল ওষুধ আপনার পোষা প্রাণীর জন্য মারাত্মক হতে পারে। দয়া করে একজন নিবন্ধিত পশু চিকিৎসকের পরামর্শ নিন।'
+        ? '🚫 নীতিগত সতর্কতা: প্রাণোরা এআই কোনো রোগ নির্ণয় করতে পারে না এবং কোনো প্রেসক্রিপশন ওষুধ বা তার ডোজ নির্ধারণ করে না। ভুল ওষুধ ও অনুপযুক্ত মাত্রা আপনার পোষা প্রাণীর জন্য প্রাণঘাতী হতে পারে। অনুগ্রহ করে একজন বাংলাদেশ ভেটেরিনারি কাউন্সিল (BVC) নিবন্ধিত পশু চিকিৎসকের পরামর্শ নিন।'
         : '🚫 Policy Restriction: Pranora AI cannot diagnose illnesses or recommend prescription medications or dosages. Improper medication can be life-threatening. Please consult a licensed veterinarian for clinical evaluation and prescription.';
 
     return {
@@ -618,7 +618,7 @@ export function generateAssistantReply(
 
     const reply =
       locale === 'bn'
-        ? 'অবশ্যই! আমাদের নিবন্ধিত ভেটেরিনারি ক্লিনিক এবং সেন্ট্রাল সাপোর্ট টিমের সাথে সরাসরি যোগাযোগের জন্য নিচে যোগাযোগের নম্বর ও তথ্য দেওয়া হলো। আপনি সরাসরি ক্লিনিকে কল করে বিশেষজ্ঞের সাথে পরামর্শ করতে পারেন অথবা আমাদের ডেডিকেটেড হেল্পলাইনে কথা বলতে পারেন।'
+        ? 'অবশ্যই! আমাদের নিবন্ধিত ভেটেরিনারি ক্লিনিক এবং সেন্ট্রাল সাপোর্ট টিমের সাথে সরাসরি যোগাযোগের তথ্য নিচে দেওয়া হলো। আপনি সরাসরি ক্লিনিকে কল করে বিশেষজ্ঞ চিকিৎসকের সাথে পরামর্শ করতে পারেন অথবা আমাদের ডেডিকেটেড হেল্পলাইনে কথা বলতে পারেন।'
         : 'Certainly! Here is the direct contact information for recommended licensed veterinary clinics and our support team. You can call a clinic directly for professional guidance or reach our dedicated helpline.';
 
     return {
@@ -632,8 +632,8 @@ export function generateAssistantReply(
   }
 
   // General safe answers
-  const disclaimerBn = '\n\n💡 তথ্যসূত্র: সাধারণ যত্ন ও পুষ্টি নির্দেশিকা। এটি কোনো ভেটেরিনারি চিকিৎসা পরামর্শ নয়।';
-  const disclaimerEn = '\n\n💡 Disclaimer: General care & nutritional guidance only. Not veterinary medical advice.';
+  const disclaimerBn = '\n\n💡 তথ্যসূত্র: সাধারণ যত্ন ও পুষ্টি সংক্রান্ত সচেতনতামূলক নির্দেশিকা। এটি কোনোভাবেই একজন নিবন্ধিত পশু চিকিৎসকের সরাসরি পরামর্শ বা প্রেসক্রিপশনের বিকল্প নয়।';
+  const disclaimerEn = '\n\n💡 Disclaimer: General care & nutritional guidance only. Not a substitute for licensed veterinary medical advice.';
 
   let petPrefix = '';
   let allergyNotice = '';
@@ -840,7 +840,7 @@ let mockMessages: AIMessageRow[] = [
     id: 'ai-msg-1',
     conversation_id: 'ai-conv-default',
     role: 'assistant',
-    content: 'স্বাগতম! আমি প্রাণোরা এআই সহকারী। আপনার পোষা প্রাণীর যত্ন, খাবার বা সাধারণ প্রশ্নের উত্তর দিতে আমি প্রস্তুত। মনে রাখবেন, আমি কোনো চিকিৎসকের বিকল্প নই।',
+    content: 'স্বাগতম! আমি প্রাণোরা এআই সহকারী। আপনার পোষা প্রাণীর খাবার, যত্ন, টিকা বা সাধারণ প্রশ্নের উত্তর দিতে আমি প্রস্তুত। মনে রাখবেন, আমি কোনো নিবন্ধিত পশু চিকিৎসকের বিকল্প নই।',
     is_voice: false,
     emergency_flag: false,
     handoff_flag: false,

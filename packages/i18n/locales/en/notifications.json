@@ -1,26 +1,59 @@
 {
   "pageTitle": "Notifications",
-  "empty": "No notifications",
+  "empty": "No new notifications",
   "markAllRead": "Mark all as read",
   "types": {
     "booking_confirmed": "Booking confirmed",
     "booking_cancelled": "Booking cancelled",
-    "booking_reminder": "Booking reminder",
+    "booking_reminder": "Appointment reminder",
     "vaccine_due": "Vaccine due",
-    "rescue_assigned": "Rescue assigned",
+    "rescue_assigned": "Rescue task assigned",
     "rescue_update": "Rescue update",
     "adoption_update": "Adoption update",
-    "urgent_rescue": "Urgent rescue report",
+    "urgent_rescue": "Urgent rescue alert",
+    "urgent_rescue_escalated": "Urgent rescue escalation (15 min pending)",
     "otp": "OTP Code",
+    "role_verified": "Role verification completed",
     "system": "System notification"
   },
   "otp": {
-    "message": "Your Pranora OTP: {{code}}. Use within 5 minutes. Never share it.",
-    "subject": "Pranora OTP Verification"
+    "message": "Your Pranora OTP: {{code}}. Valid for 5 minutes. For security, never share it with anyone.",
+    "sms": "Pranora: Your OTP is {{code}}. Valid for 5 minutes. Keep it confidential, never share it.",
+    "subject": "Pranora OTP Verification Code"
   },
   "urgentRescue": {
-    "title": "Urgent Rescue Report",
-    "body": "{{species}} in {{area}} — needs immediate attention",
-    "escalated": "Case escalated — no response in {{minutes}} minutes"
+    "title": "🚨 Urgent Rescue Alert",
+    "body": "Endangered {{species}} in {{area}} — immediate action required.",
+    "sms": "Pranora Urgent: Endangered {{species}} in {{area}}. Please open the app immediately to respond.",
+    "escalatedTitle": "🚨 Urgent Rescue Escalation (15 min pending)",
+    "escalated": "Case escalated to administrators — no response within {{minutes}} minutes.",
+    "escalatedSms": "Pranora Urgent: Rescue case #{{caseId}} unassigned for {{minutes}} min. Immediate review needed."
+  },
+  "bookingConfirmed": {
+    "title": "Booking Confirmed",
+    "body": "Your appointment at {{clinic}} is confirmed (Date: {{date}}, Time: {{time}}).",
+    "sms": "Pranora: Booking confirmed at {{clinic}} on {{date}} at {{time}}. Serial/Code: {{code}}."
+  },
+  "bookingCancelled": {
+    "title": "Booking Cancelled",
+    "body": "Your appointment at {{clinic}} has been cancelled. Check the app for details."
+  },
+  "bookingReminder": {
+    "title": "Appointment Reminder",
+    "body": "Your appointment at {{clinic}} is coming up soon at {{time}}. Please arrive on time.",
+    "sms": "Pranora Reminder: Your pet's appointment at {{clinic}} is today at {{time}}. Please be on time."
+  },
+  "vaccineDue": {
+    "title": "Vaccination Due",
+    "body": "{{pet}}'s {{vaccine}} vaccine is due (Target date: {{date}}). Please schedule a veterinary visit.",
+    "sms": "Pranora: {{pet}} is due for {{vaccine}} vaccination. Keep them protected by scheduling a visit."
+  },
+  "rescueAssigned": {
+    "title": "Rescue Task Assigned",
+    "body": "Rescue mission for {{species}} has been assigned to rescuer {{rescuer}}."
+  },
+  "roleVerified": {
+    "title": "Role Verification Complete",
+    "body": "Congratulations! Your profile as a {{role}} has been verified."
   }
 }

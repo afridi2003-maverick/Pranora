@@ -153,7 +153,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | REL-1 | E2E tests for critical flows (harness + CI; each owner writes their flow's test) | Afridi | L | S7 | SET-4, AUTH-5, APT-3, RSC-7, ADP-6, MAP-7, HLT-7 | ⬜ |
 | REL-2 | Privacy policy & terms (bn/en) | Zihad | S | S4 | — | ✅ |
 | REL-3 | Play Store + App Store + pranora.com.bd launch | Afridi | M | S8 | REL-1, REL-2, REL-4, REL-5 | ⬜ |
-| REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ⬜ |
+| REL-4 | Native Bangla speaker review of all text (esp. AI messages and SMS) | Zihad | S | S7 | RSC-6, ADP-6, APT-3, NOTIF-1, MAP-7, HLT-7 | ✅ |
 | REL-5 | Licensed vet review: BVC verification process, medicine & vaccine lists, legal rules | Zimia | S | S6 | ADM-1, DB-7, (PRV-1) | ⬜ |
 
 ## Phase 2 (P1)
