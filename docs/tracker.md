@@ -18,9 +18,9 @@ _Last updated: 2026-11-06_
 | Phase | Total | Done | Progress |
 |---|---|---|---|
 | Phase 0 — Planning & Setup | 13 | 13 | 100% |
-| Phase 1 — MVP | 64 | 0 | 0% |
-| Phase 2 | 34 | 0 | 0% |
-| Phase 3 | 7 | 0 | 0% |
+| Phase 1 — MVP | 64 | 63 | 98% |
+| Phase 2 | 34 | 14 | 41% |
+| Phase 3 | 7 | 1 | 14% |
 
 Per-member workload: [team.md §4](./team.md#4-workload-balance). Who works on what each week, milestones and the critical path: [schedule.md](./schedule.md).
 
