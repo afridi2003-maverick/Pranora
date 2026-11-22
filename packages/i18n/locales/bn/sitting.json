@@ -1,0 +1,83 @@
+{
+  "pageTitle": "পেট সিটিং ও ওয়াকিং",
+  "pageSubtitle": "বিশ্বস্ত ও যাচাইকৃত পেট সিটার এবং ডগ ওয়াকার",
+  "tabs": {
+    "sitters": "সিটার খুঁজুন",
+    "myBookings": "আমার বুকিং"
+  },
+  "searchPlaceholder": "সিটার খুঁজুন (এলাকা বা নাম)...",
+  "serviceTypes": {
+    "all": "সকল সেবা",
+    "sitting_hourly": "ঘণ্টাপ্রতি সিটিং",
+    "dog_walking": "কুকুর হাঁটানো",
+    "day_sitting": "সারাদিনের যত্ন",
+    "overnight": "রাত্রিকালীন সিটিং"
+  },
+  "speciesFilter": {
+    "all": "সকল প্রাণী",
+    "cat": "বিড়াল",
+    "dog": "কুকুর"
+  },
+  "areaFilter": {
+    "all": "সকল এলাকা",
+    "dhanmondi": "ধানমন্ডি",
+    "gulshan": "গুলশান",
+    "uttara": "উত্তরা",
+    "mirpur": "মিরপুর"
+  },
+  "sitterCard": {
+    "verified": "যাচাইকৃত সিটার",
+    "hourly": "ঘণ্টাপ্রতি",
+    "experience": "{{years}} বছরের অভিজ্ঞতা",
+    "rating": "{{rating}} ({{count}}টি রিভিউ)",
+    "servicesTitle": "প্রদত্ত সেবা:",
+    "areasTitle": "কভারেজ এলাকা:",
+    "bookBtn": "বুকিং করুন",
+    "callBtn": "কল করুন"
+  },
+  "emptySitters": "কোনো সিটার পাওয়া যায়নি। ফিল্টার পরিবর্তন করে দেখুন।",
+  "modal": {
+    "title": "সিটিং বুকিং অনুরোধ",
+    "sitterLabel": "নির্বাচিত সিটার:",
+    "serviceType": "সেবার ধরন",
+    "selectPet": "পোষা প্রাণী বেছে নিন",
+    "selectPetPlaceholder": "পোষা প্রাণী নির্বাচন করুন",
+    "date": "তারিখ",
+    "time": "শুরুর সময়",
+    "duration": "সময়কাল (ঘণ্টা)",
+    "address": "আপনার ঠিকানা",
+    "addressPlaceholder": "বাসা/ফ্ল্যাট নম্বর, রোড, এলাকা...",
+    "notes": "বিশেষ নির্দেশনা (খাবার, অভ্যাস ইত্যাদি)",
+    "notesPlaceholder": "যেমন: সময়মতো ওষুধ খাওয়াতে হবে...",
+    "paymentMethod": "পেমেন্ট মাধ্যম",
+    "cash": "ক্যাশ অন সার্ভিস",
+    "bkash": "বিকাশ",
+    "nagad": "নগদ",
+    "card": "কার্ড",
+    "estimatedPrice": "আনুমানিক মোট ফি",
+    "submitBtn": "বুকিং নিশ্চিত করুন",
+    "submitting": "বুকিং জমা হচ্ছে...",
+    "cancelBtn": "বাতিল",
+    "successToast": "সিটিং বুকিং অনুরোধ সফলভাবে জমা হয়েছে!"
+  },
+  "bookings": {
+    "title": "আমার সিটিং বুকিং",
+    "empty": "আপনার কোনো সিটিং বুকিং নেই",
+    "service": "সেবা",
+    "sitter": "সিটার",
+    "dateTime": "তারিখ ও সময়",
+    "duration": "সময়কাল",
+    "price": "মোট ফি",
+    "payment": "পেমেন্ট",
+    "address": "ঠিকানা",
+    "status": {
+      "pending": "অনুমোদনের অপেক্ষায়",
+      "confirmed": "নিশ্চিত হয়েছে",
+      "in_progress": "চলমান",
+      "completed": "সম্পন্ন",
+      "cancelled": "বাতিল"
+    },
+    "cancelBtn": "বুকিং বাতিল করুন",
+    "cancelledSuccess": "বুকিং সফলভাবে বাতিল করা হয়েছে"
+  }
+}

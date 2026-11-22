@@ -1,0 +1,83 @@
+{
+  "pageTitle": "Pet Sitting & Dog Walking",
+  "pageSubtitle": "Trusted & verified local pet sitters and dog walkers",
+  "tabs": {
+    "sitters": "Find Sitters",
+    "myBookings": "My Bookings"
+  },
+  "searchPlaceholder": "Search sitters by area or name...",
+  "serviceTypes": {
+    "all": "All Services",
+    "sitting_hourly": "Hourly Sitting",
+    "dog_walking": "Dog Walking",
+    "day_sitting": "Day Sitting",
+    "overnight": "Overnight Care"
+  },
+  "speciesFilter": {
+    "all": "All Pets",
+    "cat": "Cats",
+    "dog": "Dogs"
+  },
+  "areaFilter": {
+    "all": "All Areas",
+    "dhanmondi": "Dhanmondi",
+    "gulshan": "Gulshan",
+    "uttara": "Uttara",
+    "mirpur": "Mirpur"
+  },
+  "sitterCard": {
+    "verified": "Verified Sitter",
+    "hourly": "/ hour",
+    "experience": "{{years}} yrs experience",
+    "rating": "{{rating}} ({{count}} reviews)",
+    "servicesTitle": "Services:",
+    "areasTitle": "Service Areas:",
+    "bookBtn": "Book Now",
+    "callBtn": "Call"
+  },
+  "emptySitters": "No sitters found matching your filters.",
+  "modal": {
+    "title": "Request Pet Sitting",
+    "sitterLabel": "Selected Sitter:",
+    "serviceType": "Service Type",
+    "selectPet": "Select Pet",
+    "selectPetPlaceholder": "Select your pet",
+    "date": "Date",
+    "time": "Start Time",
+    "duration": "Duration (Hours)",
+    "address": "Your Address",
+    "addressPlaceholder": "House/Flat, Road, Area...",
+    "notes": "Special Instructions (diet, habits, etc.)",
+    "notesPlaceholder": "e.g. Needs medication at 2 PM...",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash on Service",
+    "bkash": "bKash",
+    "nagad": "Nagad",
+    "card": "Card",
+    "estimatedPrice": "Estimated Total Fee",
+    "submitBtn": "Confirm Booking",
+    "submitting": "Submitting booking...",
+    "cancelBtn": "Cancel",
+    "successToast": "Sitting booking requested successfully!"
+  },
+  "bookings": {
+    "title": "My Sitting Bookings",
+    "empty": "You have no sitting bookings yet",
+    "service": "Service",
+    "sitter": "Sitter",
+    "dateTime": "Date & Time",
+    "duration": "Duration",
+    "price": "Total Fee",
+    "payment": "Payment",
+    "address": "Address",
+    "status": {
+      "pending": "Pending Approval",
+      "confirmed": "Confirmed",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "cancelBtn": "Cancel Booking",
+    "cancelledSuccess": "Booking cancelled successfully"
+  }
+}
