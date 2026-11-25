@@ -11,7 +11,6 @@
 import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, EmptyState } from '@pranora/ui';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import type { ReminderItem, ReminderType, CreateReminderParams } from '@pranora/api';
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
@@ -94,14 +93,15 @@ function daysUntil(iso: string): number {
 // ── Add Reminder Modal ────────────────────────────────────────────────────────
 
 interface AddReminderModalProps {
+  pets: Array<{ id: string; name: string; species: string }>;
   onClose: () => void;
   onAdd: (params: CreateReminderParams) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   locale: string;
 }
 
-function AddReminderModal({ onClose, onAdd, t }: AddReminderModalProps) {
-  const [petId,       setPetId]       = useState(MOCK_PETS[0]?.id ?? 'pet-1');
+function AddReminderModal({ pets, onClose, onAdd, t }: AddReminderModalProps) {
+  const [petId,       setPetId]       = useState(pets[0]?.id ?? 'pet-1');
   const [type,        setType]        = useState<ReminderType>('vaccine');
   const [title,       setTitle]       = useState('');
   const [remindAt,    setRemindAt]    = useState('');
@@ -143,7 +143,7 @@ function AddReminderModal({ onClose, onAdd, t }: AddReminderModalProps) {
               onChange={e => setPetId(e.target.value)}
               className="w-full border border-stroke-subtle rounded-lg px-3 py-2 text-sm text-content-primary focus:outline-none focus:ring-2 focus:ring-primary-600"
             >
-              {MOCK_PETS.map(p => (
+              {pets.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
@@ -304,8 +304,13 @@ function ReminderCard({ reminder, petName, locale, t, onDone, onDelete }: Remind
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function RemindersPage() {
+export default function RemindersPage({
+  initialPets,
+}: {
+  initialPets?: Array<{ id: string; name: string; species: string }>;
+} = {}) {
   const { t, locale } = useLocale();
+  const [pets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
   const [showModal, setShowModal]   = useState(false);
   const [toast, setToast]           = useState('');
@@ -348,15 +353,13 @@ export default function RemindersPage() {
   }
 
   // Group by pet
-  const byPet = MOCK_PETS.map(pet => ({
+  const byPet = pets.map(pet => ({
     pet,
     items: reminders.filter(r => r.petId === pet.id),
   })).filter(g => g.items.length > 0);
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
-
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-primary-600 text-white text-sm px-4 py-2 rounded-lg shadow-lg">
@@ -366,6 +369,7 @@ export default function RemindersPage() {
 
       {showModal && (
         <AddReminderModal
+          pets={pets}
           onClose={() => setShowModal(false)}
           onAdd={handleAdd}
           t={t}

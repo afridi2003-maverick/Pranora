@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import { ReportStatusTracker } from '../../../../features/rescue';
 import type { MyReportStatusResponse } from '@pranora/api';
 
@@ -47,7 +46,7 @@ const MOCK_REPORTS: Record<string, MyReportStatusResponse> = {
 };
 
 export default function RescueStatusPage() {
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialId = searchParams.get('id');
@@ -91,8 +90,6 @@ export default function RescueStatusPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
@@ -108,7 +105,7 @@ export default function RescueStatusPage() {
         <ReportStatusTracker
           initialReport={initialReport}
           onSearch={fetchReport}
-          onNewReport={() => router.push('/rescue/report')}
+          onNewReport={() => router.push(`/${locale}/rescue/report`)}
         />
       </main>
     </div>

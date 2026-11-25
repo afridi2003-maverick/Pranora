@@ -9,7 +9,6 @@
 import React, { useState, useCallback } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Chip, EmptyState, LoadingState, Modal, Tabs, Textarea } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { VerifiableRole, PendingRoleRequest, ProviderPendingDoc } from '@pranora/api';
 
 // ─────────────────────────────────────────────
@@ -450,8 +449,6 @@ export default function AdminVerificationsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <LanguageHeader />
-
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-5">
         <div className="max-w-3xl mx-auto">

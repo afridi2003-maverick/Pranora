@@ -4,7 +4,6 @@ import React, { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import { LanguageHeader } from '@/components/LanguageHeader';
 import { BookingFlow } from '@/features/booking';
 
 function BookingPageContent() {
@@ -21,8 +20,6 @@ function BookingPageContent() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground pb-12">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         <div className="mb-4">
           <Button

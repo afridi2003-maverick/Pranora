@@ -10,7 +10,6 @@ import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Chip, EmptyState, Modal } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { ContentReportItem, ModerationAction } from '@pranora/api';
 import type { ModerationStatus, ReportTarget } from '@pranora/types';
 
@@ -200,8 +199,6 @@ export default function AdminModerationPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
-      <LanguageHeader />
-
       {/* Admin Subnav */}
       <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6">

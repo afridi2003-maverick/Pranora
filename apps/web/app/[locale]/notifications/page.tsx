@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, EmptyState, Chip } from '@pranora/ui';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import type { NotificationItem } from '@pranora/api';
 
 // Initial mock items for client view demonstration
@@ -110,8 +109,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="min-h-screen bg-green-50/30 dark:bg-gray-900 text-content-primary">
-      <LanguageHeader />
-
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">

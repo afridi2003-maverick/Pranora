@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Select } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 
 // 8 Divisions of Bangladesh
 const BANGLADESH_DIVISIONS = [
@@ -77,8 +76,6 @@ export default function LocationPermissionPage() {
 
   return (
     <div className="min-h-screen bg-green-50/40 dark:bg-gray-900 text-content-primary flex flex-col">
-      <LanguageHeader />
-
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Header */}

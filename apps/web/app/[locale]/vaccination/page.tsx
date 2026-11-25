@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import { VaccineList } from '../../../features/health';
 import type { PetRow, VaccinationRow, BreedRow } from '@pranora/api';
 
@@ -209,7 +208,6 @@ export default function VaccinationPage() {
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
       <main className="max-w-6xl mx-auto px-4 py-8">
         <VaccineList
           pets={pets}

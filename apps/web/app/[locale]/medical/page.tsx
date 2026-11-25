@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import { MedicalHistory } from '../../../features/health';
 import type { PetRow, MedicalRecordRow, PetDocumentRow, BreedRow, AddMedicalRecordPayload } from '@pranora/api';
 
@@ -218,7 +217,6 @@ export default function MedicalPage() {
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
       <main className="max-w-6xl mx-auto px-4 py-8">
         <MedicalHistory
           pets={pets}

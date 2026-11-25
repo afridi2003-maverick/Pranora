@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { LocaleProvider, useLocale } from '@pranora/i18n';
 import { EmergencyButton } from '@pranora/ui';
 import { LanguageHeader } from '../components/LanguageHeader';
 
 function HomeContent() {
-  const { isBangla } = useLocale();
+  const router = useRouter();
+  const { locale, isBangla } = useLocale();
 
   return (
     <div className="min-h-screen flex flex-col bg-green-50/40 text-content-primary">
@@ -22,13 +24,13 @@ function HomeContent() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <a
-            href="/pets"
+            href={`/${locale}/pets`}
             className="px-6 py-3 rounded-full bg-green-600 text-white font-medium hover:bg-green-700 transition shadow-1 min-h-[44px] flex items-center"
           >
             🐾 {isBangla ? 'আমার পোষা প্রাণী' : 'My Pets'}
           </a>
           <a
-            href="/services"
+            href={`/${locale}/services`}
             className="px-6 py-3 rounded-full bg-white border border-green-600 text-green-700 font-medium hover:bg-green-50 transition shadow-1 min-h-[44px] flex items-center"
           >
             {isBangla ? 'সেবাসমূহ দেখুন' : 'Explore Services'}
@@ -36,6 +38,7 @@ function HomeContent() {
           <EmergencyButton
             variant="pill"
             label={isBangla ? 'জরুরি সেবা' : 'Emergency Help'}
+            onClick={() => router.push(`/${locale}/emergency`)}
           />
         </div>
       </main>

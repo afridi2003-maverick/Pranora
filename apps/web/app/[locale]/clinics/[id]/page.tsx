@@ -19,7 +19,7 @@ const WEEKDAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গ�
 export default function ClinicDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
 
   const clinicId = (Array.isArray(params?.id) ? params.id[0] : (params?.id as string)) || '';
 
@@ -106,7 +106,7 @@ export default function ClinicDetailPage() {
       serviceId,
       vetId,
     });
-    router.push(bookingUrl);
+    router.push(`/${locale}${bookingUrl}`);
   };
 
   if (loading) {
@@ -137,7 +137,7 @@ export default function ClinicDetailPage() {
             }
           />
           <div className="mt-6 flex justify-center">
-            <Button variant="primary" onClick={() => router.push('/clinics')}>
+            <Button variant="primary" onClick={() => router.push(`/${locale}/clinics`)}>
               {isBangla ? 'ক্লিনিক তালিকায় ফিরুন' : 'Back to Clinics'}
             </Button>
           </div>
@@ -174,11 +174,11 @@ export default function ClinicDetailPage() {
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Breadcrumb Navigation */}
         <nav className="mb-4 text-xs font-bangla text-gray-500 dark:text-gray-400 flex items-center gap-2">
-          <button onClick={() => router.push('/')} className="hover:text-green-700">
+          <button onClick={() => router.push(`/${locale}`)} className="hover:text-green-700">
             {isBangla ? 'হোম' : 'Home'}
           </button>
           <span>/</span>
-          <button onClick={() => router.push('/clinics')} className="hover:text-green-700">
+          <button onClick={() => router.push(`/${locale}/clinics`)} className="hover:text-green-700">
             {isBangla ? 'ক্লিনিকসমূহ' : 'Clinics'}
           </button>
           <span>/</span>

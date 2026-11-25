@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import {
   AdoptionCard,
   AdoptionDetailModal,
@@ -14,7 +13,7 @@ import {
 import type { AdoptionListingRow } from '@pranora/api';
 
 export default function SavedAdoptionListingsPage() {
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const router = useRouter();
 
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set(MOCK_SAVED_LISTING_IDS));
@@ -42,13 +41,11 @@ export default function SavedAdoptionListingsPage() {
   };
 
   const handleApply = (listing: AdoptionListingRow) => {
-    router.push(`/adoption/apply/${listing.id}`);
+    router.push(`/${locale}/adoption/apply/${listing.id}`);
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -56,7 +53,7 @@ export default function SavedAdoptionListingsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push('/adoption')}
+                onClick={() => router.push(`/${locale}/adoption`)}
               >
                 ← {isBangla ? 'পাবলিক তালিকায় ফিরুন' : 'Back to Listings'}
               </Button>
@@ -74,7 +71,7 @@ export default function SavedAdoptionListingsPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => router.push('/adoption')}
+            onClick={() => router.push(`/${locale}/adoption`)}
           >
             {isBangla ? 'আরও প্রাণী দেখুন' : 'Browse More Pets'}
           </Button>
@@ -105,7 +102,7 @@ export default function SavedAdoptionListingsPage() {
             </p>
             <Button
               variant="primary"
-              onClick={() => router.push('/adoption')}
+              onClick={() => router.push(`/${locale}/adoption`)}
             >
               🐾 {isBangla ? 'দত্তক তালিকা দেখুন' : 'Browse Adoption Listings'}
             </Button>

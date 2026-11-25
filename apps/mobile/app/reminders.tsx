@@ -98,21 +98,18 @@ function daysUntil(iso: string): number {
   return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
-function petName(petId: string): string {
-  return MOCK_PETS.find(p => p.id === petId)?.name ?? petId;
-}
-
 // ── Add Reminder Bottom Sheet ─────────────────────────────────────────────────
 
 interface AddReminderSheetProps {
+  pets: Array<{ id: string; name: string; species: string }>;
   visible: boolean;
   onClose: () => void;
   onAdd: (params: CreateReminderParams) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-function AddReminderSheet({ visible, onClose, onAdd, t }: AddReminderSheetProps) {
-  const [petId,      setPetId]      = useState(MOCK_PETS[0]?.id ?? 'pet-1');
+function AddReminderSheet({ pets, visible, onClose, onAdd, t }: AddReminderSheetProps) {
+  const [petId,      setPetId]      = useState(pets[0]?.id ?? 'pet-1');
   const [type,       setType]       = useState<ReminderType>('vaccine');
   const [title,      setTitle]      = useState('');
   const [date,       setDate]       = useState('');
@@ -123,7 +120,7 @@ function AddReminderSheet({ visible, onClose, onAdd, t }: AddReminderSheetProps)
   function reset() {
     setTitle(''); setDate(''); setTime('');
     setRepeat(false); setRepeatDays('');
-    setType('vaccine'); setPetId(MOCK_PETS[0]?.id ?? 'pet-1');
+    setType('vaccine'); setPetId(pets[0]?.id ?? 'pet-1');
   }
 
   function handleAdd() {
@@ -154,7 +151,7 @@ function AddReminderSheet({ visible, onClose, onAdd, t }: AddReminderSheetProps)
             {/* Pet */}
             <Text style={styles.label}>Pet</Text>
             <View style={styles.chipRow}>
-              {MOCK_PETS.map(p => (
+              {pets.map(p => (
                 <TouchableOpacity
                   key={p.id}
                   style={[styles.chip, petId === p.id && styles.chipActive]}
@@ -259,12 +256,13 @@ function AddReminderSheet({ visible, onClose, onAdd, t }: AddReminderSheetProps)
 
 interface ReminderRowProps {
   item: ReminderItem;
+  petName: string;
   t: (key: string, params?: Record<string, string | number>) => string;
   onDone: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-function ReminderRow({ item, t, onDone, onDelete }: ReminderRowProps) {
+function ReminderRow({ item, petName: name, t, onDone, onDelete }: ReminderRowProps) {
   const days = daysUntil(item.remindAt);
   const urgent = days <= 1;
 
@@ -274,7 +272,7 @@ function ReminderRow({ item, t, onDone, onDelete }: ReminderRowProps) {
       <View style={styles.rowBody}>
         <View style={styles.rowMeta}>
           <Text style={styles.rowType}>{t(`health:reminders.types.${item.type}`)}</Text>
-          <Text style={styles.rowPet}>{petName(item.petId)}</Text>
+          <Text style={styles.rowPet}>{name}</Text>
           {(item.type === 'vaccine' || item.type === 'checkup') && (
             <Text style={styles.rowSms}>📱 {t('health:reminders.sms_badge')}</Text>
           )}
@@ -304,8 +302,13 @@ function ReminderRow({ item, t, onDone, onDelete }: ReminderRowProps) {
 
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
-export default function RemindersScreen() {
+export default function RemindersScreen({
+  initialPets,
+}: {
+  initialPets?: Array<{ id: string; name: string; species: string }>;
+} = {}) {
   const { t } = useLocale();
+  const [pets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
   const [showSheet, setShowSheet] = useState(false);
 
@@ -379,13 +382,20 @@ export default function RemindersScreen() {
           keyExtractor={item => item.id}
           contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
           renderItem={({ item }) => (
-            <ReminderRow item={item} t={t} onDone={handleDone} onDelete={handleDelete} />
+            <ReminderRow
+              item={item}
+              petName={pets.find(p => p.id === item.petId)?.name ?? item.petId}
+              t={t}
+              onDone={handleDone}
+              onDelete={handleDelete}
+            />
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         />
       )}
 
       <AddReminderSheet
+        pets={pets}
         visible={showSheet}
         onClose={() => setShowSheet(false)}
         onAdd={handleAdd}

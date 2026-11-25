@@ -9,7 +9,6 @@
 import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Card, Chip, EmptyState, Modal, Button } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { AuditLogEntry } from '@pranora/api';
 
 const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
@@ -104,8 +103,6 @@ export default function AdminAuditPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <LanguageHeader />
-
       {/* Header */}
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-5">
         <div className="max-w-4xl mx-auto">

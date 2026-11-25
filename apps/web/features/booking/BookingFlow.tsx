@@ -37,7 +37,7 @@ export function BookingFlow({
   onSuccess,
   onCancel,
 }: BookingFlowProps) {
-  const { t, isBangla } = useLocale();
+  const { t, isBangla, locale } = useLocale();
   const router = useRouter();
 
   // ── 1. Flow Step State ──────────────────────────────────────
@@ -824,7 +824,7 @@ export function BookingFlow({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => router.push(`/clinics/${clinic?.location.id}`)}
+                onClick={() => router.push(`/${locale}/clinics/${clinic?.location.id}`)}
               >
                 {t('booking:actions.backToClinic')}
               </Button>

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Chip, Input } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { UserRole, VerificationStatus } from '@pranora/types';
 
 interface RoleOption {
@@ -140,8 +139,6 @@ export default function RolesOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-green-50/40 dark:bg-gray-900 text-content-primary flex flex-col">
-      <LanguageHeader />
-
       <main className="max-w-3xl mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">

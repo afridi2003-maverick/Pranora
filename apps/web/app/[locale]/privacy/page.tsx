@@ -3,7 +3,6 @@
 import React from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 
 export default function PrivacyPage() {
   const { t } = useLocale();
@@ -19,7 +18,6 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
       <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
         <Card className="p-6 sm:p-10 bg-white shadow-sm">
           <div className="border-b border-stroke-subtle pb-6 mb-8">

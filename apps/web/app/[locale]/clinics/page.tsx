@@ -8,7 +8,7 @@ import { getAllMockClinics, type ClinicFullDetail } from '@pranora/api';
 
 export default function ClinicsDirectoryPage() {
   const router = useRouter();
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'govt' | 'private' | '24h' | 'emergency'>('all');
 
@@ -95,7 +95,7 @@ export default function ClinicsDirectoryPage() {
               <Card
                 key={clinic.location.id}
                 className="p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center hover:shadow-md transition cursor-pointer border border-gray-100 dark:border-gray-800"
-                onClick={() => router.push(`/clinics/${clinic.location.id}`)}
+                onClick={() => router.push(`/${locale}/clinics/${clinic.location.id}`)}
               >
                 {/* Thumbnail */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -156,7 +156,7 @@ export default function ClinicsDirectoryPage() {
                     className="w-full sm:w-auto font-bangla"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/clinics/${clinic.location.id}`);
+                      router.push(`/${locale}/clinics/${clinic.location.id}`);
                     }}
                   >
                     {isBangla ? 'বিস্তারিত দেখুন →' : 'View Detail →'}

@@ -4,11 +4,10 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import { AdoptionApplicationStatusTracker } from '../../../../features/adoption';
 
 export default function MyAdoptionApplicationsPage() {
-  const { isBangla } = useLocale();
+  const { locale, isBangla } = useLocale();
   const router = useRouter();
 
   const handleWithdraw = async (_applicationId: string) => {
@@ -17,17 +16,15 @@ export default function MyAdoptionApplicationsPage() {
   };
 
   const handleViewListing = (listingId: string) => {
-    router.push(`/adoption?listingId=${listingId}`);
+    router.push(`/${locale}/adoption?listingId=${listingId}`);
   };
 
   const handleGoToHandover = (listingId: string) => {
-    router.push(`/adoption/handover/${listingId}`);
+    router.push(`/${locale}/adoption/handover/${listingId}`);
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div>
@@ -35,7 +32,7 @@ export default function MyAdoptionApplicationsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push('/adoption')}
+                onClick={() => router.push(`/${locale}/adoption`)}
               >
                 ← {isBangla ? 'পাবলিক তালিকায় ফিরুন' : 'Back to Listings'}
               </Button>

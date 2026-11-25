@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import {
   RescuerCasesList,
   AssignRescuerModal,
@@ -12,7 +11,7 @@ import {
 } from '../../../../features/rescue';
 
 export default function RescuerAssignmentsPage() {
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const router = useRouter();
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -38,8 +37,6 @@ export default function RescuerAssignmentsPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         {/* Header & Coordinator Action */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -70,7 +67,7 @@ export default function RescuerAssignmentsPage() {
         <RescuerCasesList
           initialAssignments={MOCK_ASSIGNMENTS}
           onRespond={handleRespond}
-          onViewCase={(caseId) => router.push(`/rescue/cases/${caseId}`)}
+          onViewCase={(caseId) => router.push(`/${locale}/rescue/cases/${caseId}`)}
         />
 
         {/* Assign Rescuer Modal (for Shelter/Admin dispatchers) */}

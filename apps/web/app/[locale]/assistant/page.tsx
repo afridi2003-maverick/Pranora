@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import { AIChat } from '../../../features/ai';
 import type { PetRow, BreedRow } from '@pranora/api';
 
@@ -71,7 +70,6 @@ export default function AssistantPage() {
 
   return (
     <div className="min-h-screen bg-app-bg text-content-primary">
-      <LanguageHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <AIChat
           pets={pets}

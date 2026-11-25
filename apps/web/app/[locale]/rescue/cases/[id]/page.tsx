@@ -4,7 +4,6 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import { LanguageHeader } from '../../../../../components/LanguageHeader';
 import {
   RescueCaseDetails,
   MOCK_CASE_DETAILS,
@@ -13,7 +12,7 @@ import {
 import type { RescueStatus, RescueOutcome } from '@pranora/types';
 
 export default function RescueCasePage() {
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const caseId = params?.id || 'case-201';
@@ -83,15 +82,13 @@ export default function RescueCasePage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground pb-12">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {/* Navigation Breadcrumb */}
         <div className="mb-4">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/rescue/assignments')}
+            onClick={() => router.push(`/${locale}/rescue/assignments`)}
           >
             ← {isBangla ? 'উদ্ধারকারী ড্যাশবোর্ডে ফিরুন' : 'Back to Assignments'}
           </Button>

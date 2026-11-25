@@ -108,7 +108,7 @@ export default function ServiceProvidersPage() {
       serviceId: p.serviceId,
       bookingType: 'slot',
     });
-    router.push(url);
+    router.push(`/${locale}${url}`);
   };
 
   return (
