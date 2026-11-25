@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { Locale } from '@pranora/types';
 
 export default function LanguageOnboardingPage() {
@@ -23,8 +22,6 @@ export default function LanguageOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-green-50/40 dark:bg-gray-900 text-content-primary flex flex-col">
-      <LanguageHeader />
-
       <main className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
           {/* Header */}

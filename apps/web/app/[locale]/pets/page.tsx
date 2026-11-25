@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import { PetList, PetForm } from '../../../features/pets';
 import type { PetRow, BreedRow, AddPetPayload, PetOwnershipHistoryRow, OwnershipReason } from '@pranora/api';
 
@@ -197,7 +196,6 @@ export default function PetsPage() {
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
       <main className="max-w-6xl mx-auto px-4 py-8">
         {view === 'list' ? (
           <PetList

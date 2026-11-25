@@ -4,12 +4,11 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import { CreateAdoptionListingForm } from '../../../../features/adoption';
 import type { CreateListingPayload } from '@pranora/api';
 
 export default function CreateAdoptionListingPage() {
-  const { isBangla } = useLocale();
+  const { locale, isBangla } = useLocale();
   const router = useRouter();
 
   const handleListingSubmit = async (_payload: CreateListingPayload) => {
@@ -19,8 +18,6 @@ export default function CreateAdoptionListingPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div>
@@ -28,7 +25,7 @@ export default function CreateAdoptionListingPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push('/adoption')}
+                onClick={() => router.push(`/${locale}/adoption`)}
               >
                 ← {isBangla ? 'তালিকায় ফিরুন' : 'Back to Listings'}
               </Button>
@@ -50,7 +47,7 @@ export default function CreateAdoptionListingPage() {
           isApprovedLister={true}
           userRole="shelter"
           onSubmitListing={handleListingSubmit}
-          onCancel={() => router.push('/adoption')}
+          onCancel={() => router.push(`/${locale}/adoption`)}
         />
       </main>
     </div>

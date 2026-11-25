@@ -13,7 +13,6 @@ import React, { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import type { ReportTarget } from '@pranora/types';
 
 type ReviewReportReason =
@@ -109,7 +108,6 @@ function ReportPageContent() {
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <LanguageHeader />
       <div className="max-w-lg mx-auto px-4 py-8">
         {/* Back button */}
         <button

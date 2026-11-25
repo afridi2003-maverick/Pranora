@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 
 export default function EmergencyPage() {
   const params = useParams();
@@ -13,8 +12,6 @@ export default function EmergencyPage() {
 
   return (
     <div className="min-h-screen bg-red-50 dark:bg-zinc-950 text-content-primary">
-      <LanguageHeader />
-
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Hero Banner */}
         <div className="bg-red-600 dark:bg-red-700 rounded-3xl p-6 sm:p-8 shadow-lg text-white">

@@ -55,9 +55,6 @@
   "roleVerified": {
     "title": "Role Verification Complete",
     "body": "Congratulations! Your profile as a {{role}} has been verified."
-    "title": "Urgent Rescue Report",
-    "body": "{{species}} in {{area}} — needs immediate attention",
-    "escalated": "Case escalated — no response in {{minutes}} minutes"
   },
   "smsReminders": {
     "title": "SMS Reminders",

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import { ArticleDetail } from '../../../../features/tips';
 import type { Article } from '@pranora/api';
 import { getArticleBySlug, getRelatedArticles, MOCK_ARTICLES } from '@pranora/api';
@@ -45,7 +44,6 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen bg-app-bg">
-      <LanguageHeader />
       <main className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
         <ArticleDetail article={article} relatedArticles={related} />
       </main>

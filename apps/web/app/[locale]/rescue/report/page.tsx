@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../../components/LanguageHeader';
 import { AnimalReportForm } from '../../../../features/rescue';
 import type { PetRow, CreateReportPayload } from '@pranora/api';
 
@@ -61,7 +60,7 @@ const MOCK_USER_PETS: PetRow[] = [
 
 export default function RescueReportPage() {
   const router = useRouter();
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const [submittedReportId, setSubmittedReportId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -88,8 +87,6 @@ export default function RescueReportPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Emergency Notice Banner */}
         <div className="mb-6 p-4 rounded-xl border border-red-200 dark:border-red-900/60 bg-red-50/70 dark:bg-red-950/30 flex items-start gap-3">
@@ -128,7 +125,7 @@ export default function RescueReportPage() {
             <div className="flex flex-wrap justify-center gap-3">
               <Button
                 variant="primary"
-                onClick={() => router.push(`/rescue/status?id=${submittedReportId}`)}
+                onClick={() => router.push(`/${locale}/rescue/status?id=${submittedReportId}`)}
               >
                 🔍 {isBangla ? 'অগ্রগতি ট্র্যাক করুন' : 'Track Status'}
               </Button>

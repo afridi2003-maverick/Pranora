@@ -3,24 +3,21 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { LanguageHeader } from '../../../components/LanguageHeader';
 import { AdoptionList } from '../../../features/adoption';
 import { Button } from '@pranora/ui';
 import type { AdoptionListingRow } from '@pranora/api';
 
 export default function AdoptionPublicPage() {
-  const { isBangla } = useLocale();
+  const { locale, isBangla } = useLocale();
   const router = useRouter();
 
   const handleApply = (listing: AdoptionListingRow) => {
     // Navigate directly to the one-page application form (ADP-3)
-    router.push(`/adoption/apply/${listing.id}`);
+    router.push(`/${locale}/adoption/apply/${listing.id}`);
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Hero Banner */}
         <div className="text-center mb-8">
@@ -40,7 +37,7 @@ export default function AdoptionPublicPage() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => router.push('/adoption/create')}
+              onClick={() => router.push(`/${locale}/adoption/create`)}
             >
               ➕ {isBangla ? 'পোষা প্রাণী তালিকাভুক্ত করুন (ADP-2)' : 'List Pet for Adoption (ADP-2)'}
             </Button>
@@ -48,7 +45,7 @@ export default function AdoptionPublicPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => router.push('/adoption/applications')}
+              onClick={() => router.push(`/${locale}/adoption/applications`)}
             >
               📋 {isBangla ? 'আমার আবেদন ট্র্যাকার (ADP-4)' : 'My Applications (ADP-4)'}
             </Button>
@@ -56,7 +53,7 @@ export default function AdoptionPublicPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => router.push('/adoption/saved')}
+              onClick={() => router.push(`/${locale}/adoption/saved`)}
             >
               ♥ {isBangla ? 'সংরক্ষিত তালিকা (ADP-7)' : 'Saved Pets (ADP-7)'}
             </Button>

@@ -22,7 +22,7 @@ const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function WebMapPage() {
   const router = useRouter();
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
 
   // Location state
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number }>(DEFAULT_DHAKA_COORDS);
@@ -241,7 +241,7 @@ export default function WebMapPage() {
   };
 
   const handleBook = (locationId: string) => {
-    router.push(buildBookingUrl({ locationId }));
+    router.push(`/${locale}${buildBookingUrl({ locationId })}`);
   };
 
   return (
@@ -632,7 +632,7 @@ export default function WebMapPage() {
                         variant="secondary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          router.push(`/clinics/${clinic.locationId}`);
+                          router.push(`/${locale}/clinics/${clinic.locationId}`);
                         }}
                         className="py-1 px-2 text-xs font-bangla flex items-center justify-center gap-1"
                       >
@@ -774,7 +774,7 @@ export default function WebMapPage() {
                   <Button
                     size="sm"
                     variant="primary"
-                    onClick={() => router.push(`/clinics/${selectedClinic.locationId}`)}
+                    onClick={() => router.push(`/${locale}/clinics/${selectedClinic.locationId}`)}
                     className="py-1 text-xs font-bangla bg-green-700 hover:bg-green-800 text-white"
                   >
                     🔍 {isBangla ? 'বিস্তারিত' : 'Detail'}

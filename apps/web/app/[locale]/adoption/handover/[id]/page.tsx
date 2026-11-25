@@ -4,7 +4,6 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
-import { LanguageHeader } from '../../../../../components/LanguageHeader';
 import {
   AdoptionHandoverCard,
   findHandoverByIdOrListing,
@@ -12,7 +11,7 @@ import {
 } from '../../../../../features/adoption';
 
 export default function AdoptionHandoverPage() {
-  const { isBangla } = useLocale();
+  const { isBangla, locale } = useLocale();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const idOrListingId = params?.id || 'hnd-001';
@@ -28,14 +27,12 @@ export default function AdoptionHandoverPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-foreground">
-      <LanguageHeader />
-
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between gap-4 mb-6">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/adoption/applications')}
+            onClick={() => router.push(`/${locale}/adoption/applications`)}
           >
             ← {isBangla ? 'আমার আবেদনে ফিরুন' : 'Back to Applications'}
           </Button>
@@ -43,7 +40,7 @@ export default function AdoptionHandoverPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push('/adoption')}
+            onClick={() => router.push(`/${locale}/adoption`)}
           >
             {isBangla ? 'পাবলিক তালিকা' : 'Browse Listings'}
           </Button>
@@ -54,7 +51,7 @@ export default function AdoptionHandoverPage() {
             initialDetails={handoverDetails}
             currentUserId="user-current"
             onConfirmHandover={handleConfirmHandover}
-            onBack={() => router.push('/adoption/applications')}
+            onBack={() => router.push(`/${locale}/adoption/applications`)}
           />
         ) : (
           <Card className="p-8 text-center space-y-4">
@@ -63,7 +60,7 @@ export default function AdoptionHandoverPage() {
             </p>
             <Button
               variant="primary"
-              onClick={() => router.push('/adoption/applications')}
+              onClick={() => router.push(`/${locale}/adoption/applications`)}
             >
               {isBangla ? 'আবেদন তালিকায় ফিরুন' : 'Back to Applications'}
             </Button>

@@ -73,6 +73,7 @@ export default function HomeScreen() {
       </View>
 
       <TouchableOpacity
+        onPress={() => router.push('/emergency')}
         className="w-full py-4 rounded-xl bg-emergency items-center mb-4"
         activeOpacity={0.8}
       >
