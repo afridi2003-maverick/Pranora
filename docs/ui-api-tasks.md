@@ -1,0 +1,258 @@
+# Pranora — UI & API Implementation Task Tracker
+
+**Owner:** Zihad (Product, Design, Pet Health, AI, Care Services)
+**Branch:** `zihad`
+**Created:** 25 November 2026
+**Goal:** UI 100% complete + all pages wired to real Supabase API (zero mock data in production paths)
+
+> **Priority Order:** P1 → P2 → P3. Complete each priority group before moving to next.
+> **Rule:** Every page must have Loading state, Empty state, and Error state before marking done.
+
+---
+
+## Status Legend
+| Icon | Meaning |
+|------|---------|
+| 🔴 | Not started — UI is placeholder/empty |
+| 🟡 | UI exists but wired to MOCK data only |
+| 🔵 | UI complete, API exists but not connected |
+| ✅ | Done — real API connected, loading/empty/error states present |
+
+---
+
+## P1 — Critical User Flows (Must work for demo)
+
+### 1.1 Home & Navigation
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Home page hero — proper nav links | `apps/web/app/page.tsx` | 🟡 | Static links only, no auth-aware nav |
+| `[locale]/page.tsx` — real dashboard (not re-export of root) | `app/[locale]/page.tsx` | 🔴 | Currently re-exports root HomePage; needs role-based dashboard |
+| Bottom navigation bar (web) | `packages/ui/src/components/BottomNav.tsx` | 🔴 | Component exists, not mounted anywhere in web layout |
+| Auth guard — redirect unauthenticated users to login | `app/[locale]/layout.tsx` | 🔴 | No session check; all pages open without login |
+
+### 1.2 Authentication
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Login page — phone OTP input + send OTP | `app/[locale]/(auth)/login/page.tsx` | 🟡 | UI done, `signInWithOtp()` from API NOT called |
+| OTP verify step | `app/[locale]/(auth)/login/page.tsx` | 🔴 | No verify step UI — missing second screen |
+| Session persistence & `useSession` hook | global | 🔴 | No Supabase client context provided to app |
+| Supabase client provider (`createSupabaseClient`) | `app/[locale]/layout.tsx` | 🔴 | Client never instantiated; env vars not read |
+
+### 1.3 Pets Management
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| List my pets — call `listMyPets()` | `app/[locale]/pets/page.tsx` | 🟡 | Shows INITIAL_MOCK_PETS (Milo & Luna hardcoded) |
+| Load real breeds — call `listBreeds()` | `app/[locale]/pets/page.tsx` | 🟡 | MOCK_BREEDS hardcoded (4 entries) |
+| Add pet — call `addPet()` | `app/[locale]/pets/page.tsx` | 🟡 | Simulates with setTimeout(300ms), no real insert |
+| Edit pet — call `editPet()` | `app/[locale]/pets/page.tsx` | 🟡 | Local state mutation only |
+| Delete pet — call `deletePet()` | `app/[locale]/pets/page.tsx` | 🟡 | Local filter only, no soft-delete to DB |
+| Transfer pet — call `transferPetOwnership()` | `app/[locale]/pets/page.tsx` | 🟡 | Local history append only |
+| Fetch ownership history — call `getPetOwnershipHistory()` | `app/[locale]/pets/page.tsx` | 🟡 | Returns from local historyStore state |
+| Pet photo upload (Supabase Storage) | `features/pets/PetForm.tsx` | 🔴 | photo_url field present but no upload UI |
+
+### 1.4 Clinics Directory
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| List clinics — call real API (not `getAllMockClinics()`) | `app/[locale]/clinics/page.tsx` | 🟡 | Calls getAllMockClinics() from clinics/mock.ts |
+| Clinic detail page — real data | `app/[locale]/clinics/[id]/page.tsx` | 🟡 | Pulls from mock data by ID |
+| Search & filter (real data) | `app/[locale]/clinics/page.tsx` | 🟡 | Filter works but on mock array |
+| Book appointment from clinic detail | `app/[locale]/clinics/[id]/page.tsx` | 🔵 | Routes to /book, BookingFlow exists |
+
+### 1.5 Booking Flow
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| BookingFlow — load vet slots | `features/booking/BookingFlow.tsx` | 🟡 | Slots hardcoded as mock array |
+| BookingFlow — submit `createBooking()` | `features/booking/BookingFlow.tsx` | 🟡 | Mock submit with setTimeout |
+| BookingFlow — pet picker from real pets | `features/booking/BookingFlow.tsx` | 🟡 | Uses MOCK_PETS dropdown |
+| My Bookings — `listMyBookings()` | `features/booking/MyBookings.tsx` | 🟡 | Mock bookings array |
+| Cancel booking — `cancelBooking()` | `features/booking/MyBookings.tsx` | 🟡 | Local state only |
+
+### 1.6 Reminders
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Load user pets for reminder pet-picker | `app/[locale]/reminders/page.tsx` | 🟡 | MOCK_PETS (Milo & Luna) hardcoded |
+| List reminders — `listReminders()` from API | `app/[locale]/reminders/page.tsx` | 🔴 | No API call, static mock list |
+| Create reminder — `createReminder()` | `app/[locale]/reminders/page.tsx` | 🟡 | Local state append only |
+| Delete reminder — `deleteReminder()` | `app/[locale]/reminders/page.tsx` | 🟡 | Local filter only |
+
+---
+
+## P2 — Core Feature Pages
+
+### 2.1 Adoption
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Adoption listing — `listAdoptionListings()` | `features/adoption/AdoptionList.tsx` | 🟡 | MOCK_ADOPTION_LISTINGS imported from mockData.ts |
+| Save/unsave listing — `saveAdoptionListing()` | `features/adoption/AdoptionList.tsx` | 🟡 | MOCK_SAVED_LISTING_IDS local state only |
+| Apply for adoption — `createAdoptionApplication()` | `app/[locale]/adoption/apply/[id]/page.tsx` | 🟡 | Form exists, no API submit |
+| My applications — `listMyAdoptionApplications()` | `app/[locale]/adoption/applications/page.tsx` | 🟡 | Mock applications list |
+| Saved listings page — `listSavedAdoptionListings()` | `app/[locale]/adoption/saved/page.tsx` | 🟡 | Mock saved IDs |
+| Create adoption listing form + `createAdoptionListing()` | `app/[locale]/adoption/create/page.tsx` | 🟡 | Form exists, mock submit |
+| Application status tracker | `features/adoption/AdoptionApplicationStatusTracker.tsx` | 🟡 | Mock status steps |
+| Handover confirmation — `confirmAdoptionHandover()` | `app/[locale]/adoption/handover/[id]/page.tsx` | 🟡 | Mock |
+| Follow-up checklist — `submitAdoptionFollowup()` | `app/[locale]/adoption/followup/[id]/page.tsx` | 🟡 | Mock |
+| Review queue (admin/shelter) — `listPendingApplications()` | `app/[locale]/adoption/review/page.tsx` | 🟡 | Mock queue |
+
+### 2.2 Rescue
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Report form — `createRescueCase()` | `app/[locale]/rescue/report/page.tsx` | 🟡 | AnimalReportForm exists, mock submit |
+| Report status tracker — `getRescueCaseStatus()` | `app/[locale]/rescue/status/page.tsx` | 🟡 | Mock status timeline |
+| Case detail — `getRescueCase()` | `app/[locale]/rescue/cases/[id]/page.tsx` | 🟡 | Mock case data |
+| Rescuer assignments — `listMyAssignments()` | `app/[locale]/rescue/assignments/page.tsx` | 🟡 | Mock assignments |
+| Add case update — `addCaseUpdate()` | `features/rescue/AddCaseUpdateForm.tsx` | 🟡 | Mock |
+| Assign rescuer (admin/shelter) — `assignRescuer()` | `features/rescue/AssignRescuerModal.tsx` | 🟡 | Mock |
+| Close case — `closeRescueCase()` | `features/rescue/CloseCaseOutcomeModal.tsx` | 🟡 | Mock |
+
+### 2.3 Health & Medical Records
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Medical history — `getMedicalHistory()` | `features/health/MedicalHistory.tsx` | 🟡 | Mock records |
+| Add medical record — `addMedicalRecord()` | `features/health/AddMedicalRecordModal.tsx` | 🟡 | Mock |
+| Vaccine list — `listVaccinations()` | `features/health/VaccineList.tsx` | 🟡 | Mock vaccine entries |
+| Record vaccine — `recordVaccination()` | `features/health/RecordVaccineModal.tsx` | 🟡 | Mock |
+| Vet visit note form — `createVisitNote()` | `features/health/VisitNoteForm.tsx` | 🟡 | Mock |
+| Digital prescription — `createPrescription()` | `features/health/DigitalPrescriptionForm.tsx` | 🟡 | Mock |
+| Upload document (Supabase Storage) | `features/health/UploadDocumentModal.tsx` | 🟡 | No actual upload |
+| Medical page wires all health features | `app/[locale]/medical/page.tsx` | 🔴 | Page exists but renders nothing meaningful |
+| Vaccination page wires VaccineList + RecordModal | `app/[locale]/vaccination/page.tsx` | 🔴 | Minimal stub |
+
+### 2.4 AI Assistant
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| AI Chat UI — message send + stream response | `features/ai/AIChat.tsx` | 🟡 | UI exists, askAI() mock, no real Gemini API call |
+| AI Chat — Bangla language support | `features/ai/AIChat.tsx` | 🟡 | Static response mock in both langs |
+| Voice input (AI-5) | `packages/api/src/ai/voice.ts` | 🔴 | Stub only, no actual voice capture |
+| Assistant page renders AIChat with real API | `app/[locale]/assistant/page.tsx` | 🟡 | Renders AIChat but no real API |
+
+### 2.5 Map & Nearby Services
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Map page — load clinic locations | `app/[locale]/map/page.tsx` | 🟡 | Mock clinic pins |
+| Leaflet/Google Maps integration | `app/[locale]/map/page.tsx` | 🔴 | No actual map library rendered |
+| Nearby search — `getNearbyProviders()` | `packages/api/src/map/index.ts` | 🔵 | API function exists, not used in page |
+| District/upazila areas — `listAreas()` | `packages/api/src/map/areas.ts` | 🔵 | API ready, not used |
+
+---
+
+## P3 — Provider, Admin & Supporting Pages
+
+### 3.1 Provider (Vet) Portal
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Provider onboarding wizard + `createProvider()` | `features/provider/ProviderOnboarding.tsx` | 🟡 | 16 mock entries |
+| Provider dashboard stats | `features/provider/ProviderDashboard.tsx` | 🟡 | 13 hardcoded mock stats |
+| Provider bookings list | `features/provider/ProviderBookings.tsx` | 🟡 | Mock bookings |
+| Vet schedule manager | `features/provider/VetScheduleManager.tsx` | 🟡 | Mock slot grid |
+| Provider prescription history | `app/[locale]/provider/prescription/page.tsx` | 🟡 | Mock prescriptions |
+
+### 3.2 Shelter Portal
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Shelter onboarding + `registerShelter()` | `features/shelter/ShelterOnboarding.tsx` | 🟡 | 8 mock entries |
+| Shelter dashboard | `features/shelter/ShelterDashboard.tsx` | 🟡 | 14 mock stats |
+| Rescue review queue | `features/shelter/RescueReviewQueue.tsx` | 🟡 | Mock cases |
+
+### 3.3 Admin Panel
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Admin audit log | `app/[locale]/admin/audit/page.tsx` | 🔴 | Stub page |
+| Admin moderation queue | `app/[locale]/admin/moderation/page.tsx` | 🟡 | Mock queue |
+| Admin rescue queue | `app/[locale]/admin/rescue-queue/page.tsx` | 🟡 | Mock |
+| Admin verifications | `app/[locale]/admin/verifications/page.tsx` | 🟡 | Mock |
+
+### 3.4 Services & Sitting
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Services grid — `listServices()` | `features/services/ServiceGrid.tsx` | 🟡 | Static grid |
+| Service providers list — `listProvidersByService()` | `app/[locale]/services/[slug]/providers/page.tsx` | 🟡 | Mock |
+| Sitting listings — `listSittingProviders()` | `features/sitting/SittingList.tsx` | 🟡 | Mock |
+| Book sitting — `createSittingBooking()` | `features/sitting/BookSittingModal.tsx` | 🟡 | Mock |
+| My sitting bookings | `features/sitting/SittingBookings.tsx` | 🟡 | Mock |
+
+### 3.5 Tips / Articles
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Tips list — `listTips()` | `features/tips/TipsList.tsx` | 🟡 | 5 mock entries |
+| Tip detail — `getTip()` | `features/tips/ArticleDetail.tsx` | 🟡 | Mock content |
+
+### 3.6 Notifications
+| Task | File | Status | Notes |
+|------|------|--------|-------|
+| Notification list — `listNotifications()` | `app/[locale]/notifications/page.tsx` | 🟡 | Mock notification array |
+| Mark read — `markNotificationRead()` | `app/[locale]/notifications/page.tsx` | 🟡 | Local state only |
+
+---
+
+## UI Component Gaps
+
+| Component | Issue | Priority |
+|-----------|-------|---------|
+| `BottomNav` — not mounted in web layout | Add to `app/[locale]/layout.tsx` | P1 |
+| `TopAppBar` — not mounted in most pages | Pages need consistent top bar | P1 |
+| Map component — no Leaflet/Mapbox added | Install & wire map lib | P2 |
+| `Skeleton` loading — not used in most pages | Replace animate-pulse divs with `<Skeleton>` | P2 |
+| `Toast` — no global toast provider | Add `<ToastProvider>` to layout | P2 |
+| Dark mode — `ThemeToggle` mounted but no `dark:` provider | Add ThemeProvider to root layout | P3 |
+
+---
+
+## Infrastructure Tasks (Do FIRST — everything depends on these)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| `.env.local` — `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 🔴 | Needed for ALL API calls |
+| Supabase browser client singleton (`lib/supabase.ts`) | 🔴 | Must wrap app in provider |
+| Auth session context (`hooks/useSession.ts`) | 🔴 | Needed by every protected page |
+| RLS policies verified with real user tokens | 🔴 | Must test |
+| Supabase Storage bucket for pet photos | 🔴 | Needed for photo_url uploads |
+| Supabase Storage bucket for rescue photos | 🔴 | AnimalReportForm photo upload |
+| `NEXT_PUBLIC_GEMINI_API_KEY` env var | 🔴 | Needed for AI Assistant |
+
+---
+
+## Progress Summary
+
+| Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
+|----------|-------|---------|---------|----------------|
+| P1 (Critical) | 24 | 0 | 18 | 6 |
+| P2 (Core Features) | 34 | 0 | 28 | 6 |
+| P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
+| UI Components | 6 | 0 | 0 | 6 |
+| Infrastructure | 7 | 0 | 0 | 7 |
+| **TOTAL** | **91** | **0** | **64** | **27** |
+
+---
+
+## Implementation Session Plan
+
+### Session 1 — Foundation (Everything depends on this)
+- [ ] Create `.env.local` (Supabase URL + anon key)
+- [ ] Create `apps/web/lib/supabase.ts` — browser client singleton
+- [ ] Create `apps/web/hooks/useSession.ts` — auth session hook
+- [ ] Add Supabase Provider to `app/[locale]/layout.tsx`
+- [ ] Auth guard middleware for protected pages
+- [ ] Wire Login page → phone OTP → verify → redirect
+
+### Session 2 — P1 Real API Wiring
+- [ ] Pets page — `listMyPets()`, `listBreeds()`, `addPet()`, `editPet()`, `deletePet()`
+- [ ] Reminders — `listReminders()`, `createReminder()`, `deleteReminder()`
+- [ ] Clinics — replace `getAllMockClinics()` with real `listClinics()` DB query
+- [ ] Booking flow — real slot loading + `createBooking()`
+
+### Session 3 — P2 Features
+- [ ] Adoption full flow (list → apply → track → handover)
+- [ ] Rescue full flow (report → track → update → close)
+- [ ] Health & medical records all wired
+- [ ] AI Assistant → real Gemini API call
+
+### Session 4 — P3 + UI Polish
+- [ ] Provider & Shelter portals
+- [ ] Admin panel
+- [ ] Toast provider + Skeleton states on all pages
+- [ ] Map with Leaflet + real clinic pins
+- [ ] BottomNav mounted in layout
+
+---
+
+*Last updated: 25 November 2026 — Zihad*
