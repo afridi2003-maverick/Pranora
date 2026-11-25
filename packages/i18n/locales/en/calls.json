@@ -69,5 +69,18 @@
     "ended": "Ended",
     "missed": "Missed",
     "declined": "Declined"
+  },
+  "recording": {
+    "title": "Call Recording",
+    "mutualConsentRequired": "Recording starts only when both you and the vet consent.",
+    "ownerConsent": "Owner Consent",
+    "vetConsent": "Vet Consent",
+    "consented": "Consented",
+    "waiting": "Waiting",
+    "giveConsent": "Allow Recording",
+    "revokeConsent": "Stop / Revoke Consent",
+    "recordingActive": "Recording Active",
+    "pendingConsent": "Waiting for both parties",
+    "recordingOff": "Not Recording"
   }
 }

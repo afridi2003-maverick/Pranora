@@ -42,8 +42,17 @@ export type CallHistoryFilter = z.infer<typeof callHistoryFilterSchema>;
 
 // ─── Call Recording Consent ───────────────────────────────────────────────────
 
+export const RecordingStatusSchema = z.enum([
+  'off',
+  'pending_consent',
+  'recording',
+  'stopped',
+]);
+export type RecordingStatus = z.infer<typeof RecordingStatusSchema>;
+
 export const recordingConsentSchema = z.object({
   call_session_id: z.string().uuid(),
   consented: z.boolean(),
+  role: z.enum(['owner', 'vet']).optional(),
 });
 export type RecordingConsentInput = z.infer<typeof recordingConsentSchema>;

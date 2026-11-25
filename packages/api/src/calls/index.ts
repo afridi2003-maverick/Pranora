@@ -5,8 +5,9 @@ export type {
   EndCallInput,
   CallHistoryFilter,
   RecordingConsentInput,
+  RecordingStatus,
 } from '@pranora/validation';
-export { CallTypeSchema, CallStatusSchema } from '@pranora/validation';
+export { CallTypeSchema, CallStatusSchema, RecordingStatusSchema } from '@pranora/validation';
 
 import type {
   CallType,
@@ -14,6 +15,8 @@ import type {
   InitiateCallInput,
   EndCallInput,
   CallHistoryFilter,
+  RecordingConsentInput,
+  RecordingStatus,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -167,4 +170,52 @@ export async function getCallHistory(
     if (filter.status && item.status !== filter.status) return false;
     return true;
   });
+}
+
+// ─── Call Recording Mutual Consent (CALL-4) ───────────────────────────────────
+
+export interface RecordingConsentState {
+  callSessionId: string;
+  ownerConsented: boolean;
+  vetConsented: boolean;
+  recordingStatus: RecordingStatus;
+  recordingUrl?: string;
+}
+
+export async function getRecordingConsentState(
+  _client: TypedSupabaseClient,
+  callSessionId: string
+): Promise<RecordingConsentState> {
+  return {
+    callSessionId,
+    ownerConsented: false,
+    vetConsented: true,
+    recordingStatus: 'pending_consent',
+  };
+}
+
+export async function setRecordingConsent(
+  _client: TypedSupabaseClient,
+  input: RecordingConsentInput,
+  currentState?: { ownerConsented: boolean; vetConsented: boolean }
+): Promise<RecordingConsentState> {
+  const role = input.role ?? 'owner';
+  const ownerConsented =
+    role === 'owner' ? input.consented : (currentState?.ownerConsented ?? false);
+  const vetConsented =
+    role === 'vet' ? input.consented : (currentState?.vetConsented ?? true);
+
+  let recordingStatus: RecordingStatus = 'off';
+  if (ownerConsented && vetConsented) {
+    recordingStatus = 'recording';
+  } else if (ownerConsented || vetConsented) {
+    recordingStatus = 'pending_consent';
+  }
+
+  return {
+    callSessionId: input.call_session_id,
+    ownerConsented,
+    vetConsented,
+    recordingStatus,
+  };
 }
