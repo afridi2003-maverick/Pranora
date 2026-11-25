@@ -1,18 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
-import { Button, Card, Chip, SearchBar } from '@pranora/ui';
+import { Button, Card, Chip, SearchBar, Skeleton } from '@pranora/ui';
 import { getAllMockClinics, type ClinicFullDetail } from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
 
 export default function ClinicsDirectoryPage() {
   const router = useRouter();
   const { isBangla, locale } = useLocale();
+  const { supabase, isConfigured } = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'govt' | 'private' | '24h' | 'emergency'>('all');
+  const [allClinics, setAllClinics] = useState<ClinicFullDetail[]>(() => getAllMockClinics());
+  const [loading, setLoading] = useState(false);
 
-  const allClinics = getAllMockClinics();
+  useEffect(() => {
+    if (!isConfigured) return;
+    let active = true;
+
+    async function loadClinics() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('provider_locations')
+          .select('*, providers(*)')
+          .eq('is_active', true)
+          .limit(50);
+
+        if (!active || error || !data || data.length === 0) return;
+
+        const mapped: ClinicFullDetail[] = (data as Array<Record<string, unknown>>).map((raw) => {
+          const providerRaw = (raw.providers as Record<string, unknown>) || {};
+          return {
+            location: {
+              id: raw.id as string,
+              providerId: raw.provider_id as string,
+              nameBn: (raw.name_bn as string) ?? null,
+              nameEn: (raw.name_en as string) ?? null,
+              addressBn: (raw.address_bn as string) ?? null,
+              addressEn: (raw.address_en as string) ?? null,
+              upazilaId: (raw.upazila_id as number) ?? null,
+              lat: Number(raw.lat ?? 0),
+              lng: Number(raw.lng ?? 0),
+              phone: (raw.phone as string) ?? null,
+              is24h: Boolean(raw.is_24h),
+              hasEmergency: Boolean(raw.has_emergency),
+              offersHomeVisit: Boolean(raw.offers_home_visit),
+              homeVisitRadiusKm: raw.home_visit_radius_km ? Number(raw.home_visit_radius_km) : null,
+              speciesTreated: (raw.species_treated as ('dog' | 'cat')[]) ?? ['dog', 'cat'],
+              photos: (raw.photos as string[]) ?? [],
+              cancelCutoffHours: Number(raw.cancel_cutoff_hours ?? 2),
+              isActive: Boolean(raw.is_active),
+            },
+            provider: {
+              id: (providerRaw.id as string) ?? (raw.provider_id as string),
+              ownerUserId: (providerRaw.owner_user_id as string) ?? '',
+              type: (providerRaw.type as 'vet_clinic') ?? 'vet_clinic',
+              nameBn: (providerRaw.name_bn as string) ?? null,
+              nameEn: (providerRaw.name_en as string) ?? null,
+              descriptionBn: (providerRaw.description_bn as string) ?? null,
+              descriptionEn: (providerRaw.description_en as string) ?? null,
+              logoUrl: (providerRaw.logo_url as string) ?? null,
+              phone: (providerRaw.phone as string) ?? '',
+              whatsapp: (providerRaw.whatsapp as string) ?? null,
+              email: (providerRaw.email as string) ?? null,
+              website: (providerRaw.website as string) ?? null,
+              tradeLicenseNo: (providerRaw.trade_license_no as string) ?? null,
+              isGovernment: Boolean(providerRaw.is_government),
+              verification: (providerRaw.verification as 'verified') ?? 'verified',
+              verifiedAt: (providerRaw.verified_at as string) ?? null,
+              ratingAvg: Number(providerRaw.rating_avg ?? 4.8),
+              ratingCount: Number(providerRaw.rating_count ?? 0),
+            },
+            hours: [],
+            vets: [],
+            services: [],
+          };
+        });
+
+        setAllClinics(mapped);
+      } catch {
+        // Keep mock fallback
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadClinics();
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, supabase]);
 
   const filteredClinics = allClinics.filter((item: ClinicFullDetail) => {
     const name = (isBangla ? item.provider.nameBn : item.provider.nameEn) || item.provider.nameEn || '';
@@ -85,6 +165,13 @@ export default function ClinicsDirectoryPage() {
         </div>
 
         {/* Clinic Cards List */}
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : (
         <div className="space-y-4">
           {filteredClinics.map((clinic) => {
             const name = (isBangla ? clinic.provider.nameBn : clinic.provider.nameEn) || clinic.provider.nameEn;
@@ -166,6 +253,7 @@ export default function ClinicsDirectoryPage() {
             );
           })}
         </div>
+        )}
       </main>
     </div>
   );

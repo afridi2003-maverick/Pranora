@@ -41,39 +41,39 @@
 ### 1.3 Pets Management
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| List my pets — call `listMyPets()` | `app/[locale]/pets/page.tsx` | 🟡 | Shows INITIAL_MOCK_PETS (Milo & Luna hardcoded) |
-| Load real breeds — call `listBreeds()` | `app/[locale]/pets/page.tsx` | 🟡 | MOCK_BREEDS hardcoded (4 entries) |
-| Add pet — call `addPet()` | `app/[locale]/pets/page.tsx` | 🟡 | Simulates with setTimeout(300ms), no real insert |
-| Edit pet — call `editPet()` | `app/[locale]/pets/page.tsx` | 🟡 | Local state mutation only |
-| Delete pet — call `deletePet()` | `app/[locale]/pets/page.tsx` | 🟡 | Local filter only, no soft-delete to DB |
-| Transfer pet — call `transferPetOwnership()` | `app/[locale]/pets/page.tsx` | 🟡 | Local history append only |
-| Fetch ownership history — call `getPetOwnershipHistory()` | `app/[locale]/pets/page.tsx` | 🟡 | Returns from local historyStore state |
+| List my pets — call `listMyPets()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `listMyPets(supabase)` with Skeleton & demo fallback |
+| Load real breeds — call `listBreeds()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `listBreeds(supabase)` |
+| Add pet — call `addPet()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `addPet(supabase, payload)` + Toast |
+| Edit pet — call `editPet()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `editPet(supabase, ...)` + Toast |
+| Delete pet — call `deletePet()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `deletePet(supabase, id)` + Toast |
+| Transfer pet — call `transferPetOwnership()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `transferPetOwnership(supabase, ...)` |
+| Fetch ownership history — call `getPetOwnershipHistory()` | `app/[locale]/pets/page.tsx` | ✅ | Wired to `getPetOwnershipHistory(supabase, petId)` |
 | Pet photo upload (Supabase Storage) | `features/pets/PetForm.tsx` | 🔴 | photo_url field present but no upload UI |
 
 ### 1.4 Clinics Directory
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| List clinics — call real API (not `getAllMockClinics()`) | `app/[locale]/clinics/page.tsx` | 🟡 | Calls getAllMockClinics() from clinics/mock.ts |
-| Clinic detail page — real data | `app/[locale]/clinics/[id]/page.tsx` | 🟡 | Pulls from mock data by ID |
-| Search & filter (real data) | `app/[locale]/clinics/page.tsx` | 🟡 | Filter works but on mock array |
-| Book appointment from clinic detail | `app/[locale]/clinics/[id]/page.tsx` | 🔵 | Routes to /book, BookingFlow exists |
+| List clinics — call real API (not `getAllMockClinics()`) | `app/[locale]/clinics/page.tsx` | ✅ | Queries `provider_locations` + `providers` with mock fallback |
+| Clinic detail page — real data | `app/[locale]/clinics/[id]/page.tsx` | ✅ | Passes `supabase` to `getClinicFullDetail(clinicId, supabase)` |
+| Search & filter (real data) | `app/[locale]/clinics/page.tsx` | ✅ | Filters live or fallback clinics |
+| Book appointment from clinic detail | `app/[locale]/clinics/[id]/page.tsx` | ✅ | Routes to `/${locale}/book` with clinic params |
 
 ### 1.5 Booking Flow
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| BookingFlow — load vet slots | `features/booking/BookingFlow.tsx` | 🟡 | Slots hardcoded as mock array |
-| BookingFlow — submit `createBooking()` | `features/booking/BookingFlow.tsx` | 🟡 | Mock submit with setTimeout |
-| BookingFlow — pet picker from real pets | `features/booking/BookingFlow.tsx` | 🟡 | Uses MOCK_PETS dropdown |
-| My Bookings — `listMyBookings()` | `features/booking/MyBookings.tsx` | 🟡 | Mock bookings array |
-| Cancel booking — `cancelBooking()` | `features/booking/MyBookings.tsx` | 🟡 | Local state only |
+| BookingFlow — load vet slots | `features/booking/BookingFlow.tsx` | ✅ | Wired `getAvailableSlots(supabase, ...)` with fallback |
+| BookingFlow — submit `createBooking()` | `features/booking/BookingFlow.tsx` | ✅ | Wired `createBooking(supabase, payload)` |
+| BookingFlow — pet picker from real pets | `features/booking/BookingFlow.tsx` | ✅ | Wired `listMyPets(supabase)` |
+| My Bookings — `listMyBookings()` | `features/booking/MyBookings.tsx` | ✅ | Wired `listUserBookings(supabase)` |
+| Cancel booking — `cancelBooking()` | `features/booking/MyBookings.tsx` | ✅ | Wired `cancelBooking(supabase, ...)` & `rescheduleBooking` |
 
 ### 1.6 Reminders
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Load user pets for reminder pet-picker | `app/[locale]/reminders/page.tsx` | 🟡 | MOCK_PETS (Milo & Luna) hardcoded |
-| List reminders — `listReminders()` from API | `app/[locale]/reminders/page.tsx` | 🔴 | No API call, static mock list |
-| Create reminder — `createReminder()` | `app/[locale]/reminders/page.tsx` | 🟡 | Local state append only |
-| Delete reminder — `deleteReminder()` | `app/[locale]/reminders/page.tsx` | 🟡 | Local filter only |
+| Load user pets for reminder pet-picker | `app/[locale]/reminders/page.tsx` | ✅ | Wired `listMyPets(supabase)` |
+| List reminders — `listReminders()` from API | `app/[locale]/reminders/page.tsx` | ✅ | Wired `listReminders(supabase)` with Skeleton |
+| Create reminder — `createReminder()` | `app/[locale]/reminders/page.tsx` | ✅ | Wired `createReminder(supabase, params)` |
+| Delete reminder — `deleteReminder()` | `app/[locale]/reminders/page.tsx` | ✅ | Wired `deleteReminder` & `markReminderDone` |
 
 ---
 
@@ -215,12 +215,12 @@
 
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
-| P1 (Critical) | 24 | 8 | 16 | 0 |
+| P1 (Critical) | 24 | 23 | 0 | 1 |
 | P2 (Core Features) | 34 | 0 | 28 | 6 |
 | P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **15** | **62** | **14** |
+| **TOTAL** | **91** | **30** | **46** | **15** |
 
 ---
 
@@ -235,10 +235,10 @@
 - [x] Wire Login page → phone/email OTP → verify → redirect
 
 ### Session 2 — P1 Real API Wiring
-- [ ] Pets page — `listMyPets()`, `listBreeds()`, `addPet()`, `editPet()`, `deletePet()`
-- [ ] Reminders — `listReminders()`, `createReminder()`, `deleteReminder()`
-- [ ] Clinics — replace `getAllMockClinics()` with real `listClinics()` DB query
-- [ ] Booking flow — real slot loading + `createBooking()`
+- [x] Pets page — `listMyPets()`, `listBreeds()`, `addPet()`, `editPet()`, `deletePet()`, `transferPetOwnership()`, `getPetOwnershipHistory()`
+- [x] Reminders — `listMyPets()`, `listReminders()`, `createReminder()`, `markReminderDone()`, `deleteReminder()`
+- [x] Clinics — query `provider_locations` + `providers` and pass `supabase` to `getClinicFullDetail()`
+- [x] Booking flow — real slot loading, `listMyPets()`, `createBooking()`, `listUserBookings()`, `cancelBooking()`, `rescheduleBooking()`
 
 ### Session 3 — P2 Features
 - [ ] Adoption full flow (list → apply → track → handover)

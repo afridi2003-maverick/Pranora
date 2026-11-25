@@ -8,10 +8,20 @@
  * Supports: add reminder modal, mark-done, delete, repeat toggle.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocale } from '@pranora/i18n';
-import { Button, Card, EmptyState } from '@pranora/ui';
-import type { ReminderItem, ReminderType, CreateReminderParams } from '@pranora/api';
+import { Button, Card, EmptyState, Skeleton } from '@pranora/ui';
+import {
+  createReminder,
+  deleteReminder,
+  listMyPets,
+  listReminders,
+  markReminderDone,
+  type CreateReminderParams,
+  type ReminderItem,
+  type ReminderType,
+} from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 
@@ -310,17 +320,76 @@ export default function RemindersPage({
   initialPets?: Array<{ id: string; name: string; species: string }>;
 } = {}) {
   const { t, locale } = useLocale();
-  const [pets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+  const { supabase, isAuthenticated, isConfigured, isLoading: sessionLoading } = useSession();
+  const useLiveApi = isConfigured && isAuthenticated;
+
+  const [pets, setPets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
-  const [showModal, setShowModal]   = useState(false);
-  const [toast, setToast]           = useState('');
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [toast, setToast] = useState('');
 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
   }
 
-  function handleAdd(params: CreateReminderParams) {
+  useEffect(() => {
+    if (sessionLoading) return;
+    let active = true;
+
+    async function loadData() {
+      if (!useLiveApi) {
+        setPets(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+        setReminders(INITIAL_REMINDERS);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const [petsRes, remindersList] = await Promise.all([
+          listMyPets(supabase),
+          listReminders(supabase),
+        ]);
+        if (!active) return;
+
+        if (!petsRes.error && petsRes.data.length > 0) {
+          setPets(petsRes.data.map((p) => ({ id: p.id, name: p.name, species: p.species })));
+        }
+        setReminders(remindersList);
+      } catch (err) {
+        if (active) {
+          showToast(err instanceof Error ? err.message : 'Failed to load reminders');
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadData();
+    return () => {
+      active = false;
+    };
+  }, [sessionLoading, useLiveApi, supabase, initialPets]);
+
+  async function handleAdd(params: CreateReminderParams) {
+    if (useLiveApi) {
+      try {
+        const created = await createReminder(supabase, params);
+        setReminders((prev) =>
+          [...prev, created].sort(
+            (a, b) => new Date(a.remindAt).getTime() - new Date(b.remindAt).getTime()
+          )
+        );
+        setShowModal(false);
+        showToast(t('health:reminders.success.created'));
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Failed to create reminder');
+      }
+      return;
+    }
+
     const newReminder: ReminderItem = {
       id:            `rem-${Date.now()}`,
       petId:         params.petId,
@@ -341,13 +410,29 @@ export default function RemindersPage({
     showToast(t('health:reminders.success.created'));
   }
 
-  function handleDone(id: string) {
+  async function handleDone(id: string) {
+    if (useLiveApi) {
+      try {
+        await markReminderDone(supabase, id);
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Failed to mark done');
+        return;
+      }
+    }
     setReminders(prev => prev.filter(r => r.id !== id));
     showToast(t('health:reminders.success.done'));
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
     if (!window.confirm(t('health:reminders.delete_confirm'))) return;
+    if (useLiveApi) {
+      try {
+        await deleteReminder(supabase, id);
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Failed to delete reminder');
+        return;
+      }
+    }
     setReminders(prev => prev.filter(r => r.id !== id));
     showToast(t('health:reminders.success.deleted'));
   }
@@ -407,7 +492,13 @@ export default function RemindersPage({
         </div>
 
         {/* Content */}
-        {reminders.length === 0 ? (
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : reminders.length === 0 ? (
           <EmptyState
             icon={<span className="text-2xl">🔔</span>}
             title={t('health:reminders.empty')}
