@@ -128,8 +128,7 @@ export async function getCallHistory(
   _client: TypedSupabaseClient,
   filter: CallHistoryFilter
 ): Promise<CallHistoryItem[]> {
-  void filter;
-  return [
+  const items: CallHistoryItem[] = [
     {
       id: 'ch-001',
       bookingId: 'booking-001',
@@ -162,4 +161,10 @@ export async function getCallHistory(
       createdAt: new Date(Date.now() - 259200000).toISOString(),
     },
   ];
+
+  return items.filter((item) => {
+    if (filter.call_type && item.callType !== filter.call_type) return false;
+    if (filter.status && item.status !== filter.status) return false;
+    return true;
+  });
 }
