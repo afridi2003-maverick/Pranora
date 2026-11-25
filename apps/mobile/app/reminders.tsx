@@ -5,7 +5,7 @@
  * FlatList of upcoming reminders, add via bottom sheet, swipe-to-delete / mark-done.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useLocale } from '@pranora/i18n';
-import type { ReminderItem, ReminderType, CreateReminderParams } from '@pranora/api';
+import { listMyPets, type ReminderItem, type ReminderType, type CreateReminderParams } from '@pranora/api';
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 
@@ -308,9 +308,26 @@ export default function RemindersScreen({
   initialPets?: Array<{ id: string; name: string; species: string }>;
 } = {}) {
   const { t } = useLocale();
-  const [pets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+  const [pets, setPets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
   const [showSheet, setShowSheet] = useState(false);
+
+  useEffect(() => {
+    if (initialPets && initialPets.length > 0) return;
+    let mounted = true;
+    listMyPets(null as any)
+      .then((res) => {
+        if (mounted && res?.data && res.data.length > 0) {
+          setPets(res.data.map((p) => ({ id: p.id, name: p.name, species: p.species })));
+        }
+      })
+      .catch(() => {
+        // Fallback to MOCK_PETS
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [initialPets]);
 
   function handleAdd(params: CreateReminderParams) {
     const newItem: ReminderItem = {

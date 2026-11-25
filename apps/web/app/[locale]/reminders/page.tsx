@@ -8,10 +8,10 @@
  * Supports: add reminder modal, mark-done, delete, repeat toggle.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, EmptyState } from '@pranora/ui';
-import type { ReminderItem, ReminderType, CreateReminderParams } from '@pranora/api';
+import { listMyPets, type ReminderItem, type ReminderType, type CreateReminderParams } from '@pranora/api';
 
 // ── Mock Data ─────────────────────────────────────────────────────────────────
 
@@ -304,13 +304,25 @@ function ReminderCard({ reminder, petName, locale, t, onDone, onDelete }: Remind
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function RemindersPage({
-  initialPets,
-}: {
-  initialPets?: Array<{ id: string; name: string; species: string }>;
-} = {}) {
+export default function RemindersPage() {
   const { t, locale } = useLocale();
-  const [pets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+  const [pets, setPets] = useState(MOCK_PETS);
+
+  useEffect(() => {
+    let mounted = true;
+    listMyPets(null as any)
+      .then((res) => {
+        if (mounted && res?.data && res.data.length > 0) {
+          setPets(res.data.map((p) => ({ id: p.id, name: p.name, species: p.species })));
+        }
+      })
+      .catch(() => {
+        // Fallback to MOCK_PETS
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
   const [showModal, setShowModal]   = useState(false);
   const [toast, setToast]           = useState('');

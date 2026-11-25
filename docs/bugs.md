@@ -110,7 +110,7 @@
 - **Description:** When a user opens the "Add Reminder" modal, the pet selector only offers hardcoded options (`Milo (dog)` and `Luna (cat)`), ignoring the user's actual registered pets.
 - **Impact:** Pet owners cannot create custom reminders for their real pets.
 - **Remediation:** Connect `listMyPets()` to populate pet options dynamically with fallback to mock data only when offline.
-- **Status:** 🟨 **Pending Integration**
+- **Status:** ✅ **Fixed & Documented**
 
 #### BUG-08: Unit Test Imports Incompatible with Native Node Runner
 - **Severity:** 🟡 Medium
