@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
@@ -9,16 +9,26 @@ import {
   MOCK_CASE_DETAILS,
   type RescueCaseFullDetails,
 } from '../../../../../features/rescue';
+import {
+  addRescueCaseUpdate,
+  closeRescueCase,
+  getRescueCaseById,
+  getRescueCaseUpdates,
+} from '@pranora/api';
 import type { RescueStatus, RescueOutcome } from '@pranora/types';
+import { useSession } from '../../../../../hooks/useSession';
+import { useToast } from '../../../../../components/ToastProvider';
 
 export default function RescueCasePage() {
   const { isBangla, locale } = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const caseId = params?.id || 'case-201';
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
 
   // Load from mock data or generate fallback
-  const caseData: RescueCaseFullDetails = MOCK_CASE_DETAILS[caseId] || {
+  const fallbackCaseData: RescueCaseFullDetails = MOCK_CASE_DETAILS[caseId] || {
     rescueCase: {
       id: caseId,
       report_id: `rep-${caseId}`,
@@ -58,14 +68,49 @@ export default function RescueCasePage() {
     updates: [],
   };
 
+  const [caseData, setCaseData] = useState<RescueCaseFullDetails>(fallbackCaseData);
+
+  useEffect(() => {
+    if (!isConfigured || !caseId) return;
+    let active = true;
+    async function loadCase() {
+      try {
+        const [rc, updates] = await Promise.all([
+          getRescueCaseById(supabase, caseId),
+          getRescueCaseUpdates(supabase, caseId),
+        ]);
+        if (!active || !rc) return;
+        setCaseData((prev) => ({
+          ...prev,
+          rescueCase: rc,
+          updates,
+        }));
+      } catch {
+        // Fallback to mock
+      }
+    }
+    void loadCase();
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, caseId, supabase]);
+
   const handleAddUpdate = async (payload: {
     case_id: string;
     note?: string | null;
     status?: RescueStatus | null;
     photos?: string[];
   }): Promise<{ error?: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Case update submitted:', payload);
+    if (isConfigured && isAuthenticated && user) {
+      try {
+        await addRescueCaseUpdate(supabase, user.id, payload);
+        showToast({ type: 'success', message: isBangla ? 'আপডেট যোগ হয়েছে' : 'Update added' });
+        return {};
+      } catch (err) {
+        return { error: err instanceof Error ? err.message : 'Failed to add update' };
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return {};
   };
 
@@ -75,8 +120,22 @@ export default function RescueCasePage() {
     note?: string | null;
     pet_id?: string | null;
   }): Promise<{ error?: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Case closed with outcome:', payload);
+    if (isConfigured && isAuthenticated) {
+      try {
+        await closeRescueCase(
+          supabase,
+          payload.case_id,
+          payload.outcome,
+          payload.note,
+          payload.pet_id
+        );
+        showToast({ type: 'success', message: isBangla ? 'কেস সম্পন্ন হয়েছে' : 'Case closed' });
+        return {};
+      } catch (err) {
+        return { error: err instanceof Error ? err.message : 'Failed to close case' };
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return {};
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
@@ -10,25 +10,52 @@ import {
   MOCK_ADOPTION_LISTINGS,
   MOCK_SAVED_LISTING_IDS,
 } from '../../../../features/adoption';
-import type { AdoptionListingRow } from '@pranora/api';
+import {
+  getMySavedListings,
+  toggleAdoptionFavorite,
+  type AdoptionListingRow,
+} from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
 
 export default function SavedAdoptionListingsPage() {
   const { isBangla, locale } = useLocale();
   const router = useRouter();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
 
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set(MOCK_SAVED_LISTING_IDS));
+  const [liveListings, setLiveListings] = useState<AdoptionListingRow[] | null>(null);
   const [selectedListing, setSelectedListing] = useState<AdoptionListingRow | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
-  const savedListings = MOCK_ADOPTION_LISTINGS.filter((item) => savedIds.has(item.id));
+  useEffect(() => {
+    if (!isConfigured || !isAuthenticated || !user) return;
+    let active = true;
+    getMySavedListings(supabase, user.id)
+      .then((rows) => {
+        if (!active) return;
+        setLiveListings(rows);
+        setSavedIds(new Set(rows.map((r) => r.id)));
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, isAuthenticated, user, supabase]);
 
-  const handleToggleSave = (id: string) => {
+  const savedListings = (liveListings ?? MOCK_ADOPTION_LISTINGS).filter((item) =>
+    savedIds.has(item.id)
+  );
+
+  const handleToggleSave = async (id: string) => {
     setSavedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+    if (isConfigured && isAuthenticated) {
+      await toggleAdoptionFavorite(supabase, id).catch(() => {});
+    }
   };
 
   const handleOpenDetail = (listing: AdoptionListingRow) => {

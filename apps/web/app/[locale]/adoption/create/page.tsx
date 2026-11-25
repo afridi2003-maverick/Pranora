@@ -5,14 +5,32 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
 import { CreateAdoptionListingForm } from '../../../../features/adoption';
-import type { CreateListingPayload } from '@pranora/api';
+import { createAdoptionListing, type CreateListingPayload } from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
+import { useToast } from '../../../../components/ToastProvider';
 
 export default function CreateAdoptionListingPage() {
   const { locale, isBangla } = useLocale();
   const router = useRouter();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
 
-  const handleListingSubmit = async (_payload: CreateListingPayload) => {
-    // In production, calls Supabase createAdoptionListing client RPC
+  const handleListingSubmit = async (payload: CreateListingPayload) => {
+    if (isConfigured && isAuthenticated && user) {
+      try {
+        await createAdoptionListing(supabase, user.id, payload);
+        showToast({
+          type: 'success',
+          message: isBangla ? 'দত্তক তালিকা তৈরি হয়েছে!' : 'Adoption listing created!',
+        });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : 'Failed to create listing',
+        };
+      }
+    }
     return { success: true };
   };
 

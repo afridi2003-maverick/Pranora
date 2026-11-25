@@ -84,11 +84,11 @@
 |------|------|--------|-------|
 | Adoption listing — `listAdoptionListings()` | `features/adoption/AdoptionList.tsx` | ✅ | Wired `getPublicAdoptionListings(supabase)` with fallback |
 | Save/unsave listing — `saveAdoptionListing()` | `features/adoption/AdoptionList.tsx` | ✅ | Wired `getMyFavoriteListingIds` + `toggleAdoptionFavorite` |
-| Apply for adoption — `createAdoptionApplication()` | `app/[locale]/adoption/apply/[id]/page.tsx` | 🟡 | Form exists, no API submit |
-| My applications — `listMyAdoptionApplications()` | `app/[locale]/adoption/applications/page.tsx` | 🟡 | Mock applications list |
-| Saved listings page — `listSavedAdoptionListings()` | `app/[locale]/adoption/saved/page.tsx` | 🟡 | Mock saved IDs |
-| Create adoption listing form + `createAdoptionListing()` | `app/[locale]/adoption/create/page.tsx` | 🟡 | Form exists, mock submit |
-| Application status tracker | `features/adoption/AdoptionApplicationStatusTracker.tsx` | 🟡 | Mock status steps |
+| Apply for adoption — `createAdoptionApplication()` | `app/[locale]/adoption/apply/[id]/page.tsx` | ✅ | Wired `getAdoptionListingById` + `submitAdoptionApplication` |
+| My applications — `listMyAdoptionApplications()` | `app/[locale]/adoption/applications/page.tsx` | ✅ | Wired `getMyApplicationsWithListings` + `withdrawAdoptionApplication` |
+| Saved listings page — `listSavedAdoptionListings()` | `app/[locale]/adoption/saved/page.tsx` | ✅ | Wired `getMySavedListings` + `toggleAdoptionFavorite` |
+| Create adoption listing form + `createAdoptionListing()` | `app/[locale]/adoption/create/page.tsx` | ✅ | Wired `createAdoptionListing(supabase, user.id, payload)` |
+| Application status tracker | `features/adoption/AdoptionApplicationStatusTracker.tsx` | ✅ | Receives live `initialApplications` from `applications/page.tsx` |
 | Handover confirmation — `confirmAdoptionHandover()` | `app/[locale]/adoption/handover/[id]/page.tsx` | 🟡 | Mock |
 | Follow-up checklist — `submitAdoptionFollowup()` | `app/[locale]/adoption/followup/[id]/page.tsx` | 🟡 | Mock |
 | Review queue (admin/shelter) — `listPendingApplications()` | `app/[locale]/adoption/review/page.tsx` | 🟡 | Mock queue |
@@ -97,12 +97,12 @@
 | Task | File | Status | Notes |
 |------|------|--------|-------|
 | Report form — `createRescueCase()` | `app/[locale]/rescue/report/page.tsx` | ✅ | Wired `listMyPets` + `createAnimalReport(supabase, user.id, payload)` |
-| Report status tracker — `getRescueCaseStatus()` | `app/[locale]/rescue/status/page.tsx` | 🟡 | Mock status timeline |
-| Case detail — `getRescueCase()` | `app/[locale]/rescue/cases/[id]/page.tsx` | 🟡 | Mock case data |
-| Rescuer assignments — `listMyAssignments()` | `app/[locale]/rescue/assignments/page.tsx` | 🟡 | Mock assignments |
-| Add case update — `addCaseUpdate()` | `features/rescue/AddCaseUpdateForm.tsx` | 🟡 | Mock |
-| Assign rescuer (admin/shelter) — `assignRescuer()` | `features/rescue/AssignRescuerModal.tsx` | 🟡 | Mock |
-| Close case — `closeRescueCase()` | `features/rescue/CloseCaseOutcomeModal.tsx` | 🟡 | Mock |
+| Report status tracker — `getRescueCaseStatus()` | `app/[locale]/rescue/status/page.tsx` | ✅ | Wired `getMyReportStatus(supabase, reportId)` |
+| Case detail — `getRescueCase()` | `app/[locale]/rescue/cases/[id]/page.tsx` | ✅ | Wired `getRescueCaseById` + `getRescueCaseUpdates` |
+| Rescuer assignments — `listMyAssignments()` | `app/[locale]/rescue/assignments/page.tsx` | ✅ | Wired `respondToAssignment` + `assignRescuer` |
+| Add case update — `addCaseUpdate()` | `features/rescue/AddCaseUpdateForm.tsx` | ✅ | Wired `addRescueCaseUpdate(supabase, user.id, payload)` |
+| Assign rescuer (admin/shelter) — `assignRescuer()` | `features/rescue/AssignRescuerModal.tsx` | ✅ | Wired `assignRescuer(supabase, caseId, rescuerId)` |
+| Close case — `closeRescueCase()` | `features/rescue/CloseCaseOutcomeModal.tsx` | ✅ | Wired `closeRescueCase(supabase, ...)` |
 
 ### 2.3 Health & Medical Records
 | Task | File | Status | Notes |
@@ -216,11 +216,11 @@
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
 | P1 (Critical) | 24 | 23 | 0 | 1 |
-| P2 (Core Features) | 34 | 10 | 20 | 4 |
+| P2 (Core Features) | 34 | 21 | 9 | 4 |
 | P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **40** | **38** | **13** |
+| **TOTAL** | **91** | **51** | **27** | **13** |
 
 ---
 
@@ -241,9 +241,9 @@
 - [x] Booking flow — real slot loading, `listMyPets()`, `createBooking()`, `listUserBookings()`, `cancelBooking()`, `rescheduleBooking()`
 
 ### Session 3 — P2 Features
-- [ ] Adoption full flow (list → apply → track → handover)
-- [ ] Rescue full flow (report → track → update → close)
-- [ ] Health & medical records all wired
+- [x] Adoption core flow (list, favorite, apply, applications, saved, create)
+- [x] Rescue full flow (report, status, case detail, updates, assignments, close)
+- [x] Health & medical records all wired (`medical`, `vaccination`)
 - [ ] AI Assistant → real Gemini API call
 
 ### Session 4 — P3 + UI Polish
