@@ -170,7 +170,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
 | CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ✅ |
-| CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ⬜ |
+| CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ✅ |
 | CALL-3 | Call history | Tain | S | S8 | CALL-1 | ⬜ |
 | AI-1 | AI chat (bn/en) with guardrails | Zihad | L | S6 | AUTH-1, I18N-1, UI-1 | ✅ |
 | AI-2 | Emergency-sign detection → go to vet | Zihad | M | S7 | AI-1, MAP-7 | ✅ |
