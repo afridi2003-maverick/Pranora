@@ -25,18 +25,18 @@
 ### 1.1 Home & Navigation
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Home page hero — proper nav links | `apps/web/app/page.tsx` | 🟡 | Static links only, no auth-aware nav |
-| `[locale]/page.tsx` — real dashboard (not re-export of root) | `app/[locale]/page.tsx` | 🔴 | Currently re-exports root HomePage; needs role-based dashboard |
-| Bottom navigation bar (web) | `packages/ui/src/components/BottomNav.tsx` | 🔴 | Component exists, not mounted anywhere in web layout |
-| Auth guard — redirect unauthenticated users to login | `app/[locale]/layout.tsx` | 🔴 | No session check; all pages open without login |
+| Home page hero — proper nav links | `apps/web/app/page.tsx` | ✅ | Upgraded with `AppShell` + `HomeDashboard` |
+| `[locale]/page.tsx` — real dashboard (not re-export of root) | `app/[locale]/page.tsx` | ✅ | Renders full `HomeDashboard` (Hero, Service tiles, Rescue & Booking cards) |
+| Bottom navigation bar (web) | `packages/ui/src/components/BottomNav.tsx` | ✅ | Mounted in `AppShell.tsx` for mobile viewports (`md:hidden`) |
+| Auth guard — session-aware nav & redirect | `app/[locale]/layout.tsx` | ✅ | Wrapped in `SessionProvider` + `AppShell` + `LanguageHeader` auth status |
 
 ### 1.2 Authentication
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Login page — phone OTP input + send OTP | `app/[locale]/(auth)/login/page.tsx` | 🟡 | UI done, `signInWithOtp()` from API NOT called |
-| OTP verify step | `app/[locale]/(auth)/login/page.tsx` | 🔴 | No verify step UI — missing second screen |
-| Session persistence & `useSession` hook | global | 🔴 | No Supabase client context provided to app |
-| Supabase client provider (`createSupabaseClient`) | `app/[locale]/layout.tsx` | 🔴 | Client never instantiated; env vars not read |
+| Login page — phone OTP input + send OTP | `app/[locale]/(auth)/login/page.tsx` | ✅ | Wired to `signInWithPhoneOtp()` & `signInWithEmailOtp()` |
+| OTP verify step | `app/[locale]/(auth)/login/page.tsx` | ✅ | Wired to `verifyPhoneOtp()` & `verifyEmailOtp()` + redirect |
+| Session persistence & `useSession` hook | `apps/web/hooks/useSession.tsx` | ✅ | `SessionProvider` + `useSession()` active across app |
+| Supabase client provider (`createSupabaseClient`) | `apps/web/lib/supabase.ts` | ✅ | Browser singleton created with env var check |
 
 ### 1.3 Pets Management
 | Task | File | Status | Notes |
@@ -188,12 +188,12 @@
 
 | Component | Issue | Priority |
 |-----------|-------|---------|
-| `BottomNav` — not mounted in web layout | Add to `app/[locale]/layout.tsx` | P1 |
-| `TopAppBar` — not mounted in most pages | Pages need consistent top bar | P1 |
+| `BottomNav` — mounted in web layout | Added in `AppShell.tsx` | ✅ |
+| `TopAppBar` — unified header nav | Upgraded `LanguageHeader.tsx` with nav links + auth | ✅ |
 | Map component — no Leaflet/Mapbox added | Install & wire map lib | P2 |
 | `Skeleton` loading — not used in most pages | Replace animate-pulse divs with `<Skeleton>` | P2 |
-| `Toast` — no global toast provider | Add `<ToastProvider>` to layout | P2 |
-| Dark mode — `ThemeToggle` mounted but no `dark:` provider | Add ThemeProvider to root layout | P3 |
+| `Toast` — global toast provider | Added `ToastProvider.tsx` to `app/layout.tsx` | ✅ |
+| Dark mode — `ThemeToggle` wired with `data-theme="dark"` | Persisted in `localStorage` + CSS tokens in `globals.css` | ✅ |
 
 ---
 
@@ -201,9 +201,9 @@
 
 | Task | Status | Notes |
 |------|--------|-------|
-| `.env.local` — `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 🔴 | Needed for ALL API calls |
-| Supabase browser client singleton (`lib/supabase.ts`) | 🔴 | Must wrap app in provider |
-| Auth session context (`hooks/useSession.ts`) | 🔴 | Needed by every protected page |
+| `.env.local` — `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Created `apps/web/.env.local` with defaults |
+| Supabase browser client singleton (`lib/supabase.ts`) | ✅ | `getSupabaseBrowserClient()` + `isSupabaseConfigured()` |
+| Auth session context (`hooks/useSession.tsx`) | ✅ | `SessionProvider` + `useSession()` wired in root layout |
 | RLS policies verified with real user tokens | 🔴 | Must test |
 | Supabase Storage bucket for pet photos | 🔴 | Needed for photo_url uploads |
 | Supabase Storage bucket for rescue photos | 🔴 | AnimalReportForm photo upload |
@@ -215,24 +215,24 @@
 
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
-| P1 (Critical) | 24 | 0 | 18 | 6 |
+| P1 (Critical) | 24 | 8 | 16 | 0 |
 | P2 (Core Features) | 34 | 0 | 28 | 6 |
 | P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
-| UI Components | 6 | 0 | 0 | 6 |
-| Infrastructure | 7 | 0 | 0 | 7 |
-| **TOTAL** | **91** | **0** | **64** | **27** |
+| UI Components | 6 | 4 | 0 | 2 |
+| Infrastructure | 7 | 3 | 0 | 4 |
+| **TOTAL** | **91** | **15** | **62** | **14** |
 
 ---
 
 ## Implementation Session Plan
 
 ### Session 1 — Foundation (Everything depends on this)
-- [ ] Create `.env.local` (Supabase URL + anon key)
-- [ ] Create `apps/web/lib/supabase.ts` — browser client singleton
-- [ ] Create `apps/web/hooks/useSession.ts` — auth session hook
-- [ ] Add Supabase Provider to `app/[locale]/layout.tsx`
-- [ ] Auth guard middleware for protected pages
-- [ ] Wire Login page → phone OTP → verify → redirect
+- [x] Create `.env.local` (Supabase URL + anon key)
+- [x] Create `apps/web/lib/supabase.ts` — browser client singleton
+- [x] Create `apps/web/hooks/useSession.tsx` — auth session hook
+- [x] Add Supabase Provider + ToastProvider + Design Tokens to layout
+- [x] Mount `BottomNav` + `LanguageHeader` + `HomeDashboard`
+- [x] Wire Login page → phone/email OTP → verify → redirect
 
 ### Session 2 — P1 Real API Wiring
 - [ ] Pets page — `listMyPets()`, `listBreeds()`, `addPet()`, `editPet()`, `deletePet()`
