@@ -6,6 +6,7 @@ import { useLocale } from '@pranora/i18n';
 import { Button, Card, Input, Textarea, ProgressBar } from '@pranora/ui';
 import { registerShelter } from '@pranora/api';
 import type { ShelterOnboardingInput } from '@pranora/validation';
+import { useSession } from '../../hooks/useSession';
 
 const ALL_SPECIES = [
   { id: 'dog', labelEn: 'Dogs', labelBn: 'কুকুর' },
@@ -22,6 +23,7 @@ export function ShelterOnboarding() {
   const router = useRouter();
   const { locale } = useLocale();
   const isBn = locale === 'bn';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [submitting, setSubmitting] = useState(false);
@@ -79,7 +81,7 @@ export function ShelterOnboarding() {
         documents,
       };
 
-      await registerShelter(null as any, payload);
+      await registerShelter(isConfigured && isAuthenticated ? supabase : (null as any), payload);
       setSubmitted(true);
     } catch (err: any) {
       console.warn('Shelter onboarding API warning (using mock success):', err);

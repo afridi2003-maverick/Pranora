@@ -9,6 +9,7 @@ import {
   SittingPaymentMethod,
   createSittingBooking,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 interface BookSittingModalProps {
   sitter: SitterProfile;
@@ -19,6 +20,7 @@ interface BookSittingModalProps {
 
 export function BookSittingModal({ sitter, isOpen, onClose, onSuccess }: BookSittingModalProps) {
   const { t, isBangla } = useLocale();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [serviceType, setServiceType] = useState<SittingServiceType>(
     sitter.service_types[0] ?? 'sitting_hourly'
@@ -50,7 +52,7 @@ export function BookSittingModal({ sitter, isOpen, onClose, onSuccess }: BookSit
     setErrorMessage(null);
 
     try {
-      const res = await createSittingBooking(null, {
+      const res = await createSittingBooking(isConfigured && isAuthenticated ? supabase : null, {
         sitter_id: sitter.id,
         service_type: serviceType,
         start_date: startDate,

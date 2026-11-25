@@ -10,6 +10,7 @@ import {
   type AnimalReportRow,
   type ShelterProviderRow,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 const MOCK_REVIEW_REPORTS: AnimalReportRow[] = [
   {
@@ -105,6 +106,7 @@ const MOCK_REVIEW_REPORTS: AnimalReportRow[] = [
 export function RescueReviewQueue() {
   const { locale } = useLocale();
   const isBn = locale === 'bn';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [reports, setReports] = useState<AnimalReportRow[]>(MOCK_REVIEW_REPORTS);
   const [shelter, setShelter] = useState<ShelterProviderRow | null>(null);
@@ -116,12 +118,13 @@ export function RescueReviewQueue() {
   const [speciesFilter, setSpeciesFilter] = useState<string>('all');
 
   useEffect(() => {
+    if (!isConfigured || !isAuthenticated) return;
     async function loadQueue() {
       try {
-        const profile = await getMyShelterProfile(null as any);
+        const profile = await getMyShelterProfile(supabase);
         if (profile) setShelter(profile);
 
-        const data = await getRescueReviewQueue(null as any);
+        const data = await getRescueReviewQueue(supabase);
         if (data && data.length > 0) {
           setReports(data);
         }
@@ -153,7 +156,7 @@ export function RescueReviewQueue() {
   const handleAcceptReport = async (reportId: string) => {
     setActionInProgress(reportId);
     try {
-      await reviewAnimalReport(null as any, reportId, true, shelter?.id);
+      await reviewAnimalReport(isConfigured && isAuthenticated ? supabase : (null as any), reportId, true, shelter?.id);
     } catch {
       // optimistic fallback
     }
@@ -164,7 +167,7 @@ export function RescueReviewQueue() {
   const handleDeclineReport = async (reportId: string) => {
     setActionInProgress(reportId);
     try {
-      await reviewAnimalReport(null as any, reportId, false);
+      await reviewAnimalReport(isConfigured && isAuthenticated ? supabase : (null as any), reportId, false);
     } catch {
       // optimistic fallback
     }

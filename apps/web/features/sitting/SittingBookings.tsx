@@ -8,6 +8,7 @@ import {
   listMySittingBookings,
   cancelSittingBooking,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 interface SittingBookingsProps {
   onRefreshTrigger?: number;
@@ -15,6 +16,7 @@ interface SittingBookingsProps {
 
 export function SittingBookings({ onRefreshTrigger = 0 }: SittingBookingsProps) {
   const { t, isBangla } = useLocale();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
   const [bookings, setBookings] = useState<SittingBooking[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
@@ -22,7 +24,7 @@ export function SittingBookings({ onRefreshTrigger = 0 }: SittingBookingsProps) 
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      const data = await listMySittingBookings(null);
+      const data = await listMySittingBookings(isConfigured && isAuthenticated ? supabase : null);
       setBookings(data);
     } finally {
       setIsLoading(false);
@@ -41,7 +43,7 @@ export function SittingBookings({ onRefreshTrigger = 0 }: SittingBookingsProps) 
     );
     if (!confirmed) return;
 
-    const res = await cancelSittingBooking(null, id);
+    const res = await cancelSittingBooking(isConfigured && isAuthenticated ? supabase : null, id);
     if (res.success) {
       setActionSuccess(t('sitting:bookings.cancelledSuccess'));
       fetchBookings();

@@ -6,6 +6,7 @@ import { useLocale } from '@pranora/i18n';
 import { Button, Card, Input, Textarea, ProgressBar } from '@pranora/ui';
 import { registerProvider } from '@pranora/api';
 import type { ProviderOnboardingInput, ProviderType } from '@pranora/validation';
+import { useSession } from '../../hooks/useSession';
 
 const PROVIDER_TYPES: { id: ProviderType; labelEn: string; labelBn: string }[] = [
   { id: 'vet_clinic', labelEn: 'Veterinary Clinic', labelBn: 'ভেটেরিনারি ক্লিনিক' },
@@ -40,6 +41,7 @@ const WEEKDAYS = [
 export function ProviderOnboarding() {
   const router = useRouter();
   const { locale, isBangla } = useLocale();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [submitting, setSubmitting] = useState(false);
@@ -151,7 +153,9 @@ export function ProviderOnboarding() {
     };
 
     try {
-      await registerProvider(null as any, payload);
+      if (isConfigured && isAuthenticated) {
+        await registerProvider(supabase, payload);
+      }
       setSubmitted(true);
     } catch {
       // optimistic fallback for demo / test

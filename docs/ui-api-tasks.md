@@ -140,18 +140,18 @@
 ### 3.1 Provider (Vet) Portal
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Provider onboarding wizard + `createProvider()` | `features/provider/ProviderOnboarding.tsx` | 🟡 | 16 mock entries |
-| Provider dashboard stats | `features/provider/ProviderDashboard.tsx` | 🟡 | 13 hardcoded mock stats |
-| Provider bookings list | `features/provider/ProviderBookings.tsx` | 🟡 | Mock bookings |
-| Vet schedule manager | `features/provider/VetScheduleManager.tsx` | 🟡 | Mock slot grid |
+| Provider onboarding wizard + `createProvider()` | `features/provider/ProviderOnboarding.tsx` | ✅ | Wired `registerProvider(supabase, payload)` |
+| Provider dashboard stats | `features/provider/ProviderDashboard.tsx` | ✅ | Wired `getMyProviderProfile`, `getMyProviderLocations`, `getProviderDashboardSummary`, `getProviderSerialQueue` |
+| Provider bookings list | `features/provider/ProviderBookings.tsx` | ✅ | Wired `listProviderBookings`, `confirmBooking`, `rejectBooking`, `startConsultation`, `completeBooking`, `markNoShow`, `recordCashPayment` |
+| Vet schedule manager | `features/provider/VetScheduleManager.tsx` | ✅ | Wired `getVetSchedule`, `saveScheduleRules`, `addAvailabilityException`, `deleteAvailabilityException` |
 | Provider prescription history | `app/[locale]/provider/prescription/page.tsx` | 🟡 | Mock prescriptions |
 
 ### 3.2 Shelter Portal
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Shelter onboarding + `registerShelter()` | `features/shelter/ShelterOnboarding.tsx` | 🟡 | 8 mock entries |
-| Shelter dashboard | `features/shelter/ShelterDashboard.tsx` | 🟡 | 14 mock stats |
-| Rescue review queue | `features/shelter/RescueReviewQueue.tsx` | 🟡 | Mock cases |
+| Shelter onboarding + `registerShelter()` | `features/shelter/ShelterOnboarding.tsx` | ✅ | Wired `registerShelter(supabase, payload)` |
+| Shelter dashboard | `features/shelter/ShelterDashboard.tsx` | ✅ | Wired `getMyShelterProfile`, `getShelterRescueQueue`, `getShelterActiveCases`, `getShelterAdoptionListings`, `getShelterPendingApplications`, `reviewAnimalReport`, `closeRescueCase`, `decideAdoptionApplication` |
+| Rescue review queue | `features/shelter/RescueReviewQueue.tsx` | ✅ | Wired `getMyShelterProfile`, `getRescueReviewQueue`, `reviewAnimalReport` |
 
 ### 3.3 Admin Panel
 | Task | File | Status | Notes |
@@ -167,8 +167,8 @@
 | Services grid — `listServices()` | `features/services/ServiceGrid.tsx` | 🟡 | Static grid |
 | Service providers list — `listProvidersByService()` | `app/[locale]/services/[slug]/providers/page.tsx` | 🟡 | Mock |
 | Sitting listings — `listSittingProviders()` | `features/sitting/SittingList.tsx` | ✅ | Wired `listSitters(supabase, ...)` with fallback |
-| Book sitting — `createSittingBooking()` | `features/sitting/BookSittingModal.tsx` | 🟡 | Mock |
-| My sitting bookings | `features/sitting/SittingBookings.tsx` | 🟡 | Mock |
+| Book sitting — `createSittingBooking()` | `features/sitting/BookSittingModal.tsx` | ✅ | Wired `createSittingBooking(supabase, ...)` |
+| My sitting bookings | `features/sitting/SittingBookings.tsx` | ✅ | Wired `listMySittingBookings` + `cancelSittingBooking` |
 
 ### 3.5 Tips / Articles
 | Task | File | Status | Notes |
@@ -217,10 +217,10 @@
 |----------|-------|---------|---------|----------------|
 | P1 (Critical) | 24 | 23 | 0 | 1 |
 | P2 (Core Features) | 34 | 26 | 5 | 3 |
-| P3 (Provider/Admin) | 20 | 4 | 14 | 2 |
+| P3 (Provider/Admin) | 20 | 13 | 5 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **60** | **19** | **12** |
+| **TOTAL** | **91** | **69** | **10** | **12** |
 
 ---
 
@@ -247,11 +247,12 @@
 - [ ] AI Assistant → real Gemini API call
 
 ### Session 4 — P3 + UI Polish
-- [ ] Provider & Shelter portals
+- [x] Provider & Shelter portals (`ProviderOnboarding`, `ProviderDashboard`, `ProviderBookings`, `VetScheduleManager`, `ShelterOnboarding`, `ShelterDashboard`, `RescueReviewQueue`)
+- [x] Sitting bookings (`SittingList`, `BookSittingModal`, `SittingBookings`) + `TipsList`
 - [ ] Admin panel
-- [ ] Toast provider + Skeleton states on all pages
-- [ ] Map with Leaflet + real clinic pins
-- [ ] BottomNav mounted in layout
+- [x] Toast provider + Skeleton states on core pages
+- [x] Map nearby clinics wired to Supabase RPC
+- [x] BottomNav mounted in layout
 
 ---
 

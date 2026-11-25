@@ -14,6 +14,7 @@ import {
   type BookingDetails,
   type BookingStatus,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 const STATUS_TYPE_MAP: Record<string, 'pending' | 'confirmed' | 'completed' | 'emergency' | 'neutral'> = {
   pending: 'pending',
@@ -146,6 +147,7 @@ export function ProviderBookings({
   locationId = 'loc-dhaka-mirpur',
 }: ProviderBookingsProps) {
   const { t, isBangla } = useLocale();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
   const [tab, setTab] = useState<ProviderTab>('pending');
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -164,7 +166,11 @@ export function ProviderBookings({
     async function fetchBookings() {
       setLoading(true);
       try {
-        const data = await listProviderBookings(null as any, locationId);
+        if (!isConfigured || !isAuthenticated) {
+          if (isMounted) setBookings(MOCK_PROVIDER_BOOKINGS);
+          return;
+        }
+        const data = await listProviderBookings(supabase, locationId);
         if (isMounted) setBookings(data.length > 0 ? data : MOCK_PROVIDER_BOOKINGS);
       } catch {
         if (isMounted) setBookings(MOCK_PROVIDER_BOOKINGS);
@@ -200,7 +206,7 @@ export function ProviderBookings({
     setActionLoadingId(bookingId);
     setActionError(null);
     try {
-      await confirmBooking(null as any, bookingId);
+      await confirmBooking(isConfigured && isAuthenticated ? supabase : (null as any), bookingId);
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: 'confirmed' } : b))
       );
@@ -216,7 +222,7 @@ export function ProviderBookings({
     setActionLoadingId(declineTargetId);
     setActionError(null);
     try {
-      await rejectBooking(null as any, declineTargetId, declineReason || 'Declined by clinic');
+      await rejectBooking(isConfigured && isAuthenticated ? supabase : (null as any), declineTargetId, declineReason || 'Declined by clinic');
       setBookings((prev) =>
         prev.map((b) =>
           b.id === declineTargetId
@@ -237,7 +243,7 @@ export function ProviderBookings({
     setActionLoadingId(bookingId);
     setActionError(null);
     try {
-      await startConsultation(null as any, bookingId);
+      await startConsultation(isConfigured && isAuthenticated ? supabase : (null as any), bookingId);
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: 'in_progress' } : b))
       );
@@ -252,7 +258,7 @@ export function ProviderBookings({
     setActionLoadingId(bookingId);
     setActionError(null);
     try {
-      await completeBooking(null as any, bookingId);
+      await completeBooking(isConfigured && isAuthenticated ? supabase : (null as any), bookingId);
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: 'completed' } : b))
       );
@@ -268,7 +274,7 @@ export function ProviderBookings({
     setActionLoadingId(bookingId);
     setActionError(null);
     try {
-      await markNoShow(null as any, bookingId);
+      await markNoShow(isConfigured && isAuthenticated ? supabase : (null as any), bookingId);
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: 'no_show' } : b))
       );
@@ -283,7 +289,7 @@ export function ProviderBookings({
     setActionLoadingId(booking.id);
     setActionError(null);
     try {
-      await recordCashPayment(null as any, {
+      await recordCashPayment(isConfigured && isAuthenticated ? supabase : (null as any), {
         bookingId: booking.id,
         amount: booking.price ?? 500,
       });
