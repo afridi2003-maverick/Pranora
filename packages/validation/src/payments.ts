@@ -1,5 +1,5 @@
 // packages/validation/src/payments.ts
-// Owner: Afridi | Task: PAY-2 (Online payments: SSLCommerz with bKash, Nagad, Rocket, Cards)
+// Owner: Afridi | Task: PAY-2 & PAY-3 (Payments, Invoices & Refunds)
 
 import { z } from 'zod';
 import { paymentMethodSchema } from './booking';
@@ -8,6 +8,14 @@ export const paymentGatewayEnum = z.enum([
   'sslcommerz',
   'bkash',
   'cash',
+]);
+
+export const refundStatusEnum = z.enum([
+  'none',
+  'requested',
+  'approved',
+  'rejected',
+  'processed',
 ]);
 
 export const initPaymentSessionSchema = z.object({
@@ -30,6 +38,21 @@ export const verifyPaymentSchema = z.object({
   cardBrand: z.string().optional(),
 });
 
+export const requestRefundSchema = z.object({
+  paymentId: z.string().uuid({ message: 'Payment ID must be a valid UUID' }),
+  reason: z.string().min(5, { message: 'Reason must be at least 5 characters' }).max(500),
+  amount: z.number().positive().optional(),
+});
+
+export const processRefundSchema = z.object({
+  paymentId: z.string().uuid({ message: 'Payment ID must be a valid UUID' }),
+  action: z.enum(['approved', 'rejected', 'processed']),
+  adminNote: z.string().max(500).optional(),
+});
+
 export type PaymentGateway = z.infer<typeof paymentGatewayEnum>;
+export type RefundStatus = z.infer<typeof refundStatusEnum>;
 export type InitPaymentSessionInput = z.infer<typeof initPaymentSessionSchema>;
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;
+export type RequestRefundInput = z.infer<typeof requestRefundSchema>;
+export type ProcessRefundInput = z.infer<typeof processRefundSchema>;
