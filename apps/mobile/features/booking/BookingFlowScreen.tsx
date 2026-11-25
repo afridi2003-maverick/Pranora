@@ -144,6 +144,7 @@ export function BookingFlowScreen({
   const [loadingSlots, setLoadingSlots] = useState<boolean>(false);
 
   const [problemNote, setProblemNote] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'bkash' | 'nagad' | 'card'>('cash');
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -305,7 +306,7 @@ export function BookingFlowScreen({
         serialNo: scheduleMode === 'serial' ? selectedSerialNo || 1 : undefined,
         problemNote: problemNote.trim() || undefined,
         attachments: [],
-        paymentMethod: 'cash' as const,
+        paymentMethod: paymentMethod,
       };
 
       let result: CreateBookingResult;
@@ -697,16 +698,103 @@ export function BookingFlowScreen({
               </View>
             </Card>
 
-            {/* Payment Method */}
-            <View className="p-3.5 rounded-xl border border-primary bg-green-50/50 mt-2 flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <Text className="text-lg mr-2.5">💵</Text>
-                <View>
-                  <Text className="text-xs font-bold text-gray-900">{t('booking:payment.cash')}</Text>
-                  <Text className="text-[10px] text-gray-500">{t('booking:payment.cashDesc')}</Text>
+            {/* Payment Method Selector (PAY-1 & PAY-2) */}
+            <View className="mt-3 space-y-2">
+              <Text className="text-xs font-bold text-gray-800 mb-1">
+                💳 {t('booking:payment.method')}
+              </Text>
+
+              {/* Cash */}
+              <TouchableOpacity
+                onPress={() => setPaymentMethod('cash')}
+                activeOpacity={0.7}
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
+                  paymentMethod === 'cash'
+                    ? 'border-primary bg-green-50/50'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <View className="flex-row items-center">
+                  <Text className="text-lg mr-2.5">💵</Text>
+                  <View>
+                    <Text className="text-xs font-bold text-gray-900">{t('booking:payment.cash')}</Text>
+                    <Text className="text-[10px] text-gray-500">{t('booking:payment.cashDesc')}</Text>
+                  </View>
                 </View>
-              </View>
-              <Text className="text-primary font-bold text-xs">✓</Text>
+                {paymentMethod === 'cash' && <Text className="text-primary font-bold text-xs">✓</Text>}
+              </TouchableOpacity>
+
+              {/* bKash */}
+              <TouchableOpacity
+                onPress={() => setPaymentMethod('bkash')}
+                activeOpacity={0.7}
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
+                  paymentMethod === 'bkash'
+                    ? 'border-primary bg-pink-50/50'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <View className="flex-row items-center">
+                  <Text className="text-lg mr-2.5">📱</Text>
+                  <View>
+                    <Text className="text-xs font-bold text-gray-900">
+                      {isBangla ? 'বিকাশ (bKash)' : 'bKash Mobile Payment'}
+                    </Text>
+                    <Text className="text-[10px] text-gray-500">
+                      {isBangla ? 'তাৎক্ষণিক অনলাইন পেমেন্ট' : 'Instant mobile banking payment'}
+                    </Text>
+                  </View>
+                </View>
+                {paymentMethod === 'bkash' && <Text className="text-primary font-bold text-xs">✓</Text>}
+              </TouchableOpacity>
+
+              {/* Nagad */}
+              <TouchableOpacity
+                onPress={() => setPaymentMethod('nagad')}
+                activeOpacity={0.7}
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
+                  paymentMethod === 'nagad'
+                    ? 'border-primary bg-orange-50/50'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <View className="flex-row items-center">
+                  <Text className="text-lg mr-2.5">⚡</Text>
+                  <View>
+                    <Text className="text-xs font-bold text-gray-900">
+                      {isBangla ? 'নগদ (Nagad)' : 'Nagad Direct Payment'}
+                    </Text>
+                    <Text className="text-[10px] text-gray-500">
+                      {isBangla ? 'ডাক বিভাগের ডিজিটাল লেনদেন' : 'Post office digital wallet'}
+                    </Text>
+                  </View>
+                </View>
+                {paymentMethod === 'nagad' && <Text className="text-primary font-bold text-xs">✓</Text>}
+              </TouchableOpacity>
+
+              {/* Cards / SSLCommerz */}
+              <TouchableOpacity
+                onPress={() => setPaymentMethod('card')}
+                activeOpacity={0.7}
+                className={`p-3 rounded-xl border flex-row items-center justify-between ${
+                  paymentMethod === 'card'
+                    ? 'border-primary bg-blue-50/50'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <View className="flex-row items-center">
+                  <Text className="text-lg mr-2.5">💳</Text>
+                  <View>
+                    <Text className="text-xs font-bold text-gray-900">
+                      {isBangla ? 'ভিসা / মাস্টারকার্ড' : 'Cards & Net Banking'}
+                    </Text>
+                    <Text className="text-[10px] text-gray-500">
+                      {isBangla ? 'SSLCommerz সুরক্ষিত গেটওয়ে' : 'SSLCommerz secured portal'}
+                    </Text>
+                  </View>
+                </View>
+                {paymentMethod === 'card' && <Text className="text-primary font-bold text-xs">✓</Text>}
+              </TouchableOpacity>
             </View>
 
             <View className="flex-row justify-between pt-4 border-t border-gray-100 mt-4">

@@ -163,7 +163,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | HLT-2 | Reminders (push + in-app) with pg_cron | Afridi | M | S5 | HLT-1, NOTIF-1 | ✅ |
 | APT-4 | Booking reminders 24h / 1h | Tain | S | S8 | APT-2, HLT-2 | ⬜ |
 | HLT-6 | SMS reminders (vaccine + appointment) | Afridi | M | S6 | HLT-2 | ✅ |
-| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ⬜ |
+| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ✅ |
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ⬜ |
 | PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
