@@ -89,8 +89,8 @@
 | Saved listings page — `listSavedAdoptionListings()` | `app/[locale]/adoption/saved/page.tsx` | ✅ | Wired `getMySavedListings` + `toggleAdoptionFavorite` |
 | Create adoption listing form + `createAdoptionListing()` | `app/[locale]/adoption/create/page.tsx` | ✅ | Wired `createAdoptionListing(supabase, user.id, payload)` |
 | Application status tracker | `features/adoption/AdoptionApplicationStatusTracker.tsx` | ✅ | Receives live `initialApplications` from `applications/page.tsx` |
-| Handover confirmation — `confirmAdoptionHandover()` | `app/[locale]/adoption/handover/[id]/page.tsx` | 🟡 | Mock |
-| Follow-up checklist — `submitAdoptionFollowup()` | `app/[locale]/adoption/followup/[id]/page.tsx` | 🟡 | Mock |
+| Handover confirmation — `confirmAdoptionHandover()` | `app/[locale]/adoption/handover/[id]/page.tsx` | ✅ | Wired `confirmHandover(supabase, handoverId)` |
+| Follow-up checklist — `submitAdoptionFollowup()` | `app/[locale]/adoption/followup/[id]/page.tsx` | ✅ | Wired `submitAdoptionFollowup(supabase, ...)` |
 | Review queue (admin/shelter) — `listPendingApplications()` | `app/[locale]/adoption/review/page.tsx` | 🟡 | Mock queue |
 
 ### 2.2 Rescue
@@ -166,14 +166,14 @@
 |------|------|--------|-------|
 | Services grid — `listServices()` | `features/services/ServiceGrid.tsx` | 🟡 | Static grid |
 | Service providers list — `listProvidersByService()` | `app/[locale]/services/[slug]/providers/page.tsx` | 🟡 | Mock |
-| Sitting listings — `listSittingProviders()` | `features/sitting/SittingList.tsx` | 🟡 | Mock |
+| Sitting listings — `listSittingProviders()` | `features/sitting/SittingList.tsx` | ✅ | Wired `listSitters(supabase, ...)` with fallback |
 | Book sitting — `createSittingBooking()` | `features/sitting/BookSittingModal.tsx` | 🟡 | Mock |
 | My sitting bookings | `features/sitting/SittingBookings.tsx` | 🟡 | Mock |
 
 ### 3.5 Tips / Articles
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Tips list — `listTips()` | `features/tips/TipsList.tsx` | 🟡 | 5 mock entries |
+| Tips list — `listTips()` | `features/tips/TipsList.tsx` | ✅ | Wired `listArticles(supabase)` with `MOCK_ARTICLES` fallback |
 | Tip detail — `getTip()` | `features/tips/ArticleDetail.tsx` | 🟡 | Mock content |
 
 ### 3.6 Notifications
@@ -216,11 +216,11 @@
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
 | P1 (Critical) | 24 | 23 | 0 | 1 |
-| P2 (Core Features) | 34 | 24 | 7 | 3 |
-| P3 (Provider/Admin) | 20 | 2 | 16 | 2 |
+| P2 (Core Features) | 34 | 26 | 5 | 3 |
+| P3 (Provider/Admin) | 20 | 4 | 14 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **56** | **23** | **12** |
+| **TOTAL** | **91** | **60** | **19** | **12** |
 
 ---
 

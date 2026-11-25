@@ -10,12 +10,17 @@ import {
   getFollowupsForHandover,
   MOCK_ADOPTION_FOLLOWUPS,
 } from '../../../../../features/adoption';
+import { submitAdoptionFollowup } from '@pranora/api';
+import { useSession } from '../../../../../hooks/useSession';
+import { useToast } from '../../../../../components/ToastProvider';
 
 export default function AdoptionFollowupPage() {
   const { isBangla, locale } = useLocale();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params?.id || 'flw-001';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
 
   // Check if id is a followupId or a handoverId
   let followupsList = getFollowupsForHandover(id);
@@ -33,14 +38,34 @@ export default function AdoptionFollowupPage() {
   }
 
   const handleSubmitFollowup = async (
-    _followupId: string,
-    _payload: {
+    followupId: string,
+    payload: {
       wellbeing: 'good' | 'okay' | 'needs_help';
       note?: string | null;
       photos: string[];
     }
   ) => {
-    // In production, calls submitAdoptionFollowup RPC
+    if (isConfigured && isAuthenticated) {
+      try {
+        await submitAdoptionFollowup(
+          supabase,
+          followupId,
+          payload.wellbeing,
+          payload.note,
+          payload.photos
+        );
+        showToast({
+          type: 'success',
+          message: isBangla ? 'ফলো-আপ জমা হয়েছে!' : 'Follow-up submitted!',
+        });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : 'Follow-up submission failed',
+        };
+      }
+    }
     return { success: true };
   };
 

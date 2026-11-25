@@ -10,9 +10,11 @@ import {
 } from '@pranora/api';
 import { BookSittingModal } from './BookSittingModal';
 import { SittingBookings } from './SittingBookings';
+import { useSession } from '../../hooks/useSession';
 
 export function SittingList() {
   const { t, isBangla } = useLocale();
+  const { supabase, isConfigured } = useSession();
 
   const [activeTab, setActiveTab] = useState<'sitters' | 'myBookings'>('sitters');
   const [sitters, setSitters] = useState<SitterProfile[]>([]);
@@ -29,7 +31,7 @@ export function SittingList() {
   const fetchSitters = async () => {
     setIsLoading(true);
     try {
-      const data = await listSitters(null, {
+      const data = await listSitters(isConfigured ? supabase : null, {
         service_type: selectedService === 'all' ? undefined : selectedService,
         area: selectedArea === 'all' ? undefined : selectedArea,
         search: searchQuery.trim() || undefined,
