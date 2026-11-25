@@ -1,8 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MedicalHistory } from '../../../features/health';
-import type { PetRow, MedicalRecordRow, PetDocumentRow, BreedRow, AddMedicalRecordPayload } from '@pranora/api';
+import {
+  addMedicalRecord,
+  addPetDocument,
+  deletePetDocument,
+  listMedicalRecords,
+  listMyPets,
+  listPetDocuments,
+  type AddMedicalRecordPayload,
+  type BreedRow,
+  type MedicalRecordRow,
+  type PetDocumentRow,
+  type PetRow,
+} from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
+import { useToast } from '../../../components/ToastProvider';
 
 const MOCK_BREEDS: BreedRow[] = [
   { id: 1, species: 'dog', name_en: 'Mixed/Deshi', name_bn: 'মিশ্র/দেশি' },
@@ -139,10 +153,51 @@ const INITIAL_MOCK_DOCS: Record<string, PetDocumentRow[]> = {
 };
 
 export default function MedicalPage() {
-  const [pets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
+  const { supabase, isConfigured, isAuthenticated, isLoading: sessionLoading } = useSession();
+  const { showToast } = useToast();
+  const useLiveApi = isConfigured && isAuthenticated;
+
+  const [pets, setPets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
   const [selectedPet, setSelectedPet] = useState<PetRow | null>(INITIAL_MOCK_PETS[0] ?? null);
   const [recordsStore, setRecordsStore] = useState<Record<string, MedicalRecordRow[]>>(INITIAL_MOCK_RECORDS);
   const [docsStore, setDocsStore] = useState<Record<string, PetDocumentRow[]>>(INITIAL_MOCK_DOCS);
+
+  useEffect(() => {
+    if (sessionLoading || !useLiveApi) return;
+    let active = true;
+    async function loadPets() {
+      const res = await listMyPets(supabase);
+      if (!active || res.error || res.data.length === 0) return;
+      setPets(res.data);
+      setSelectedPet(res.data[0] ?? null);
+    }
+    void loadPets();
+    return () => {
+      active = false;
+    };
+  }, [sessionLoading, useLiveApi, supabase]);
+
+  useEffect(() => {
+    if (!useLiveApi || !selectedPet) return;
+    let active = true;
+    async function loadPetHealth(petId: string) {
+      const [recRes, docRes] = await Promise.all([
+        listMedicalRecords(supabase, petId),
+        listPetDocuments(supabase, petId),
+      ]);
+      if (!active) return;
+      if (!recRes.error) {
+        setRecordsStore((prev) => ({ ...prev, [petId]: recRes.data }));
+      }
+      if (!docRes.error) {
+        setDocsStore((prev) => ({ ...prev, [petId]: docRes.data }));
+      }
+    }
+    void loadPetHealth(selectedPet.id);
+    return () => {
+      active = false;
+    };
+  }, [useLiveApi, selectedPet, supabase]);
 
   const currentRecords = selectedPet ? recordsStore[selectedPet.id] || [] : [];
   const currentDocs = selectedPet ? docsStore[selectedPet.id] || [] : [];
@@ -158,6 +213,17 @@ export default function MedicalPage() {
     file_path: string;
     document_date?: string;
   }) => {
+    if (useLiveApi) {
+      const res = await addPetDocument(supabase, { pet_id, title, file_path, document_date });
+      if (res.error || !res.data) {
+        showToast({ type: 'emergency', message: res.error || 'Failed to upload document' });
+        return { error: res.error || 'Failed to upload document' };
+      }
+      setDocsStore((prev) => ({ ...prev, [pet_id]: [res.data!, ...(prev[pet_id] || [])] }));
+      showToast({ type: 'success', message: 'Document saved' });
+      return {};
+    }
+
     const newDoc: PetDocumentRow = {
       id: `doc-${Date.now()}`,
       pet_id,
@@ -178,6 +244,13 @@ export default function MedicalPage() {
 
   const handleDeleteDocument = async (id: string) => {
     if (!selectedPet) return {};
+    if (useLiveApi) {
+      const res = await deletePetDocument(supabase, id);
+      if (!res.success) {
+        showToast({ type: 'emergency', message: res.error || 'Failed to delete document' });
+        return { error: res.error };
+      }
+    }
     setDocsStore((prev) => ({
       ...prev,
       [selectedPet.id]: (prev[selectedPet.id] || []).filter((d) => d.id !== id),
@@ -186,6 +259,20 @@ export default function MedicalPage() {
   };
 
   const handleAddMedicalRecord = async (payload: AddMedicalRecordPayload) => {
+    if (useLiveApi) {
+      const res = await addMedicalRecord(supabase, payload);
+      if (res.error || !res.data) {
+        showToast({ type: 'emergency', message: res.error || 'Failed to save medical record' });
+        return { error: res.error || 'Failed to save medical record' };
+      }
+      setRecordsStore((prev) => ({
+        ...prev,
+        [payload.pet_id]: [res.data!, ...(prev[payload.pet_id] || [])],
+      }));
+      showToast({ type: 'success', message: 'Medical record saved' });
+      return {};
+    }
+
     const newRecord: MedicalRecordRow = {
       id: `med-${Date.now()}`,
       pet_id: payload.pet_id,

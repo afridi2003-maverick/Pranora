@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card } from '@pranora/ui';
 import { AnimalReportForm } from '../../../../features/rescue';
-import type { PetRow, CreateReportPayload } from '@pranora/api';
+import { createAnimalReport, listMyPets, type CreateReportPayload, type PetRow } from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
 
 const MOCK_USER_PETS: PetRow[] = [
   {
@@ -61,15 +62,36 @@ const MOCK_USER_PETS: PetRow[] = [
 export default function RescueReportPage() {
   const router = useRouter();
   const { isBangla, locale } = useLocale();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
+  const [pets, setPets] = useState<PetRow[]>(MOCK_USER_PETS);
   const [submittedReportId, setSubmittedReportId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (_payload: CreateReportPayload): Promise<{ error?: string; reportId?: string }> => {
+  useEffect(() => {
+    if (!isConfigured || !isAuthenticated) return;
+    let active = true;
+    async function loadPets() {
+      const res = await listMyPets(supabase);
+      if (!active || res.error || res.data.length === 0) return;
+      setPets(res.data);
+    }
+    void loadPets();
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, isAuthenticated, supabase]);
+
+  const handleSubmit = async (payload: CreateReportPayload): Promise<{ error?: string; reportId?: string }> => {
     setIsSubmitting(true);
     try {
-      // Simulate submission network call with 600ms latency
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      if (isConfigured && isAuthenticated && user) {
+        const created = await createAnimalReport(supabase, user.id, payload);
+        setSubmittedReportId(created.id);
+        return { reportId: created.id };
+      }
 
+      // Demo fallback when offline/unauthenticated
+      await new Promise((resolve) => setTimeout(resolve, 400));
       const generatedId = `rep-${Date.now().toString(36)}`;
       setSubmittedReportId(generatedId);
       return { reportId: generatedId };
@@ -148,7 +170,7 @@ export default function RescueReportPage() {
             </div>
 
             <AnimalReportForm
-              userPets={MOCK_USER_PETS}
+              userPets={pets}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
             />

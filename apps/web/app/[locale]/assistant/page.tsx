@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AIChat } from '../../../features/ai';
-import type { PetRow, BreedRow } from '@pranora/api';
+import { listMyPets, type BreedRow, type PetRow } from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
 
 const MOCK_BREEDS: BreedRow[] = [
   { id: 1, species: 'dog', name_en: 'Mixed/Deshi', name_bn: 'মিশ্র/দেশি' },
@@ -65,8 +66,24 @@ const INITIAL_MOCK_PETS: PetRow[] = [
 ];
 
 export default function AssistantPage() {
-  const [pets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
+  const { supabase, isConfigured, isAuthenticated, isLoading: sessionLoading } = useSession();
+  const [pets, setPets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
   const [selectedPet, setSelectedPet] = useState<PetRow | null>(INITIAL_MOCK_PETS[0] ?? null);
+
+  useEffect(() => {
+    if (sessionLoading || !isConfigured || !isAuthenticated) return;
+    let active = true;
+    async function loadPets() {
+      const res = await listMyPets(supabase);
+      if (!active || res.error || res.data.length === 0) return;
+      setPets(res.data);
+      setSelectedPet(res.data[0] ?? null);
+    }
+    void loadPets();
+    return () => {
+      active = false;
+    };
+  }, [sessionLoading, isConfigured, isAuthenticated, supabase]);
 
   return (
     <div className="min-h-screen bg-app-bg text-content-primary">

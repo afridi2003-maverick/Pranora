@@ -82,8 +82,8 @@
 ### 2.1 Adoption
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Adoption listing — `listAdoptionListings()` | `features/adoption/AdoptionList.tsx` | 🟡 | MOCK_ADOPTION_LISTINGS imported from mockData.ts |
-| Save/unsave listing — `saveAdoptionListing()` | `features/adoption/AdoptionList.tsx` | 🟡 | MOCK_SAVED_LISTING_IDS local state only |
+| Adoption listing — `listAdoptionListings()` | `features/adoption/AdoptionList.tsx` | ✅ | Wired `getPublicAdoptionListings(supabase)` with fallback |
+| Save/unsave listing — `saveAdoptionListing()` | `features/adoption/AdoptionList.tsx` | ✅ | Wired `getMyFavoriteListingIds` + `toggleAdoptionFavorite` |
 | Apply for adoption — `createAdoptionApplication()` | `app/[locale]/adoption/apply/[id]/page.tsx` | 🟡 | Form exists, no API submit |
 | My applications — `listMyAdoptionApplications()` | `app/[locale]/adoption/applications/page.tsx` | 🟡 | Mock applications list |
 | Saved listings page — `listSavedAdoptionListings()` | `app/[locale]/adoption/saved/page.tsx` | 🟡 | Mock saved IDs |
@@ -96,7 +96,7 @@
 ### 2.2 Rescue
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Report form — `createRescueCase()` | `app/[locale]/rescue/report/page.tsx` | 🟡 | AnimalReportForm exists, mock submit |
+| Report form — `createRescueCase()` | `app/[locale]/rescue/report/page.tsx` | ✅ | Wired `listMyPets` + `createAnimalReport(supabase, user.id, payload)` |
 | Report status tracker — `getRescueCaseStatus()` | `app/[locale]/rescue/status/page.tsx` | 🟡 | Mock status timeline |
 | Case detail — `getRescueCase()` | `app/[locale]/rescue/cases/[id]/page.tsx` | 🟡 | Mock case data |
 | Rescuer assignments — `listMyAssignments()` | `app/[locale]/rescue/assignments/page.tsx` | 🟡 | Mock assignments |
@@ -107,15 +107,15 @@
 ### 2.3 Health & Medical Records
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Medical history — `getMedicalHistory()` | `features/health/MedicalHistory.tsx` | 🟡 | Mock records |
-| Add medical record — `addMedicalRecord()` | `features/health/AddMedicalRecordModal.tsx` | 🟡 | Mock |
-| Vaccine list — `listVaccinations()` | `features/health/VaccineList.tsx` | 🟡 | Mock vaccine entries |
-| Record vaccine — `recordVaccination()` | `features/health/RecordVaccineModal.tsx` | 🟡 | Mock |
+| Medical history — `getMedicalHistory()` | `features/health/MedicalHistory.tsx` | ✅ | Wired via `medical/page.tsx` (`listMedicalRecords`) |
+| Add medical record — `addMedicalRecord()` | `features/health/AddMedicalRecordModal.tsx` | ✅ | Wired `addMedicalRecord(supabase, payload)` |
+| Vaccine list — `listVaccinations()` | `features/health/VaccineList.tsx` | ✅ | Wired via `vaccination/page.tsx` (`listPetVaccinations`) |
+| Record vaccine — `recordVaccination()` | `features/health/RecordVaccineModal.tsx` | ✅ | Wired `recordVaccination(supabase, ...)` & `autoGenerateSpeciesSchedule` |
 | Vet visit note form — `createVisitNote()` | `features/health/VisitNoteForm.tsx` | 🟡 | Mock |
 | Digital prescription — `createPrescription()` | `features/health/DigitalPrescriptionForm.tsx` | 🟡 | Mock |
-| Upload document (Supabase Storage) | `features/health/UploadDocumentModal.tsx` | 🟡 | No actual upload |
-| Medical page wires all health features | `app/[locale]/medical/page.tsx` | 🔴 | Page exists but renders nothing meaningful |
-| Vaccination page wires VaccineList + RecordModal | `app/[locale]/vaccination/page.tsx` | 🔴 | Minimal stub |
+| Upload document (Supabase Storage) | `features/health/UploadDocumentModal.tsx` | 🟡 | Metadata wired via `addPetDocument`/`deletePetDocument`, Storage bucket pending |
+| Medical page wires all health features | `app/[locale]/medical/page.tsx` | ✅ | Wired `listMyPets`, `listMedicalRecords`, `listPetDocuments`, `addMedicalRecord` |
+| Vaccination page wires VaccineList + RecordModal | `app/[locale]/vaccination/page.tsx` | ✅ | Wired `listMyPets`, `listPetVaccinations`, `autoGenerateSpeciesSchedule`, `recordVaccination` |
 
 ### 2.4 AI Assistant
 | Task | File | Status | Notes |
@@ -123,7 +123,7 @@
 | AI Chat UI — message send + stream response | `features/ai/AIChat.tsx` | 🟡 | UI exists, askAI() mock, no real Gemini API call |
 | AI Chat — Bangla language support | `features/ai/AIChat.tsx` | 🟡 | Static response mock in both langs |
 | Voice input (AI-5) | `packages/api/src/ai/voice.ts` | 🔴 | Stub only, no actual voice capture |
-| Assistant page renders AIChat with real API | `app/[locale]/assistant/page.tsx` | 🟡 | Renders AIChat but no real API |
+| Assistant page renders AIChat with real API | `app/[locale]/assistant/page.tsx` | ✅ | Wired `listMyPets(supabase)` to pass real pet context to `AIChat` |
 
 ### 2.5 Map & Nearby Services
 | Task | File | Status | Notes |
@@ -216,11 +216,11 @@
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
 | P1 (Critical) | 24 | 23 | 0 | 1 |
-| P2 (Core Features) | 34 | 0 | 28 | 6 |
+| P2 (Core Features) | 34 | 10 | 20 | 4 |
 | P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **30** | **46** | **15** |
+| **TOTAL** | **91** | **40** | **38** | **13** |
 
 ---
 

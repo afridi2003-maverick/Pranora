@@ -1,8 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { VaccineList } from '../../../features/health';
-import type { PetRow, VaccinationRow, BreedRow } from '@pranora/api';
+import {
+  autoGenerateSpeciesSchedule,
+  listMyPets,
+  listPetVaccinations,
+  recordVaccination,
+  type BreedRow,
+  type PetRow,
+  type VaccinationRow,
+} from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
+import { useToast } from '../../../components/ToastProvider';
 
 const MOCK_BREEDS: BreedRow[] = [
   { id: 1, species: 'dog', name_en: 'Mixed/Deshi', name_bn: 'মিশ্র/দেশি' },
@@ -124,13 +134,59 @@ const INITIAL_MOCK_VACCINES: Record<string, VaccinationRow[]> = {
 };
 
 export default function VaccinationPage() {
-  const [pets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
+  const { supabase, isConfigured, isAuthenticated, isLoading: sessionLoading } = useSession();
+  const { showToast } = useToast();
+  const useLiveApi = isConfigured && isAuthenticated;
+
+  const [pets, setPets] = useState<PetRow[]>(INITIAL_MOCK_PETS);
   const [selectedPet, setSelectedPet] = useState<PetRow | null>(INITIAL_MOCK_PETS[0] ?? null);
   const [vaccinesStore, setVaccinesStore] = useState<Record<string, VaccinationRow[]>>(INITIAL_MOCK_VACCINES);
+
+  useEffect(() => {
+    if (sessionLoading || !useLiveApi) return;
+    let active = true;
+    async function loadPets() {
+      const res = await listMyPets(supabase);
+      if (!active || res.error || res.data.length === 0) return;
+      setPets(res.data);
+      setSelectedPet(res.data[0] ?? null);
+    }
+    void loadPets();
+    return () => {
+      active = false;
+    };
+  }, [sessionLoading, useLiveApi, supabase]);
+
+  useEffect(() => {
+    if (!useLiveApi || !selectedPet) return;
+    let active = true;
+    async function loadVaccines(petId: string) {
+      const res = await listPetVaccinations(supabase, petId);
+      if (!active || res.error) return;
+      setVaccinesStore((prev) => ({ ...prev, [petId]: res.data }));
+    }
+    void loadVaccines(selectedPet.id);
+    return () => {
+      active = false;
+    };
+  }, [useLiveApi, selectedPet, supabase]);
 
   const currentVaccines = selectedPet ? vaccinesStore[selectedPet.id] || [] : [];
 
   const handleAutoGenerate = async (petId: string, species: string) => {
+    if (useLiveApi) {
+      const res = await autoGenerateSpeciesSchedule(supabase, petId, species as PetRow['species']);
+      if (!res.success) {
+        showToast({ type: 'emergency', message: res.error || 'Schedule generation failed' });
+        return { count: 0 };
+      }
+      const updated = await listPetVaccinations(supabase, petId);
+      if (!updated.error) {
+        setVaccinesStore((prev) => ({ ...prev, [petId]: updated.data }));
+      }
+      return { count: res.count };
+    }
+
     const isDog = species === 'dog';
     const newItems: VaccinationRow[] = isDog
       ? [
@@ -195,6 +251,20 @@ export default function VaccinationPage() {
     batch_no?: string;
   }) => {
     if (!selectedPet) return { error: 'No pet selected' };
+
+    if (useLiveApi) {
+      const res = await recordVaccination(supabase, { id, given_date, batch_no });
+      if (res.error || !res.data) {
+        return { error: res.error || 'Failed to record dose' };
+      }
+      setVaccinesStore((prev) => ({
+        ...prev,
+        [selectedPet.id]: (prev[selectedPet.id] || []).map((v) =>
+          v.id === id ? res.data! : v
+        ),
+      }));
+      return {};
+    }
 
     setVaccinesStore((prev) => ({
       ...prev,
