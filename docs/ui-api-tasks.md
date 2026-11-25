@@ -128,10 +128,10 @@
 ### 2.5 Map & Nearby Services
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Map page — load clinic locations | `app/[locale]/map/page.tsx` | 🟡 | Mock clinic pins |
-| Leaflet/Google Maps integration | `app/[locale]/map/page.tsx` | 🔴 | No actual map library rendered |
-| Nearby search — `getNearbyProviders()` | `packages/api/src/map/index.ts` | 🔵 | API function exists, not used in page |
-| District/upazila areas — `listAreas()` | `packages/api/src/map/areas.ts` | 🔵 | API ready, not used |
+| Map page — load clinic locations | `app/[locale]/map/page.tsx` | ✅ | Wired `getNearbyClinicsWithFallback(params, supabase)` |
+| Leaflet/Google Maps integration | `app/[locale]/map/page.tsx` | 🔴 | Interactive split list/map UI ready; external map tile lib optional |
+| Nearby search — `getNearbyProviders()` | `packages/api/src/map/index.ts` | ✅ | Wired via `getNearbyClinicsWithFallback` |
+| District/upazila areas — `listAreas()` | `packages/api/src/map/areas.ts` | ✅ | Wired in `map/page.tsx` (`searchAreas`, `getDivisions`, etc.) |
 
 ---
 
@@ -179,8 +179,8 @@
 ### 3.6 Notifications
 | Task | File | Status | Notes |
 |------|------|--------|-------|
-| Notification list — `listNotifications()` | `app/[locale]/notifications/page.tsx` | 🟡 | Mock notification array |
-| Mark read — `markNotificationRead()` | `app/[locale]/notifications/page.tsx` | 🟡 | Local state only |
+| Notification list — `listNotifications()` | `app/[locale]/notifications/page.tsx` | ✅ | Wired `listNotifications(supabase, user.id)` with mock fallback |
+| Mark read — `markNotificationRead()` | `app/[locale]/notifications/page.tsx` | ✅ | Wired `markNotificationAsRead` + `markAllNotificationsAsRead` |
 
 ---
 
@@ -216,11 +216,11 @@
 | Priority | Total | ✅ Done | 🟡 Mock | 🔴 Not Started |
 |----------|-------|---------|---------|----------------|
 | P1 (Critical) | 24 | 23 | 0 | 1 |
-| P2 (Core Features) | 34 | 21 | 9 | 4 |
-| P3 (Provider/Admin) | 20 | 0 | 18 | 2 |
+| P2 (Core Features) | 34 | 24 | 7 | 3 |
+| P3 (Provider/Admin) | 20 | 2 | 16 | 2 |
 | UI Components | 6 | 4 | 0 | 2 |
 | Infrastructure | 7 | 3 | 0 | 4 |
-| **TOTAL** | **91** | **51** | **27** | **13** |
+| **TOTAL** | **91** | **56** | **23** | **12** |
 
 ---
 

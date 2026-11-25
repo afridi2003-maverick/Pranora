@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, EmptyState, Chip } from '@pranora/ui';
-import type { NotificationItem } from '@pranora/api';
+import {
+  listNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+  type NotificationItem,
+} from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
 
 // Initial mock items for client view demonstration
 const MOCK_NOTIFICATIONS: NotificationItem[] = [
@@ -50,8 +56,22 @@ const MOCK_NOTIFICATIONS: NotificationItem[] = [
 
 export default function NotificationsPage() {
   const { isBangla } = useLocale();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
   const [items, setItems] = useState<NotificationItem[]>(MOCK_NOTIFICATIONS);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
+
+  useEffect(() => {
+    if (!isConfigured || !isAuthenticated || !user) return;
+    let active = true;
+    listNotifications(supabase, user.id, { limit: 50 })
+      .then((rows) => {
+        if (active && rows.length > 0) setItems(rows);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, isAuthenticated, user, supabase]);
 
   const filteredItems = items.filter((item) =>
     filter === 'unread' ? !item.isRead : true
@@ -59,18 +79,24 @@ export default function NotificationsPage() {
 
   const unreadCount = items.filter((item) => !item.isRead).length;
 
-  const handleMarkAsRead = (id: string) => {
+  const handleMarkAsRead = async (id: string) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isRead: true, readAt: new Date().toISOString() } : item
       )
     );
+    if (isConfigured && isAuthenticated) {
+      await markNotificationAsRead(supabase, id).catch(() => {});
+    }
   };
 
-  const handleMarkAllRead = () => {
+  const handleMarkAllRead = async () => {
     setItems((prev) =>
       prev.map((item) => ({ ...item, isRead: true, readAt: new Date().toISOString() }))
     );
+    if (isConfigured && isAuthenticated && user) {
+      await markAllNotificationsAsRead(supabase, user.id).catch(() => {});
+    }
   };
 
   const handleDelete = (id: string) => {
