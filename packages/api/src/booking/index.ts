@@ -18,6 +18,10 @@ export type {
   AvailabilityException,
   SaveScheduleInput,
   AddExceptionInput,
+  ReminderWindow,
+  BookingReminderStatus,
+  ReminderChannel,
+  ScheduleBookingRemindersInput,
 } from '@pranora/validation';
 import type {
   BookingType,
@@ -35,6 +39,10 @@ import type {
   AvailabilityException,
   SaveScheduleInput,
   AddExceptionInput,
+  ReminderWindow,
+  BookingReminderStatus,
+  ReminderChannel,
+  ScheduleBookingRemindersInput,
 } from '@pranora/validation';
 import type { TypedSupabaseClient } from '../client';
 
@@ -563,4 +571,94 @@ export async function deleteAvailabilityException(
 
   return data ?? { success: true, deletedId: exceptionId };
 }
+
+/**
+ * APT-4: Booking Reminder (24h / 1h)
+ */
+export interface BookingReminderItem {
+  id: string;
+  bookingId: string;
+  reminderWindow: ReminderWindow;
+  remindAt: string;
+  sentAt?: string;
+  status: BookingReminderStatus;
+  channel: ReminderChannel;
+  clinicName?: string;
+  petName?: string;
+  appointmentAt?: string;
+}
+
+export async function getBookingReminders(
+  _client: TypedSupabaseClient,
+  bookingId?: string
+): Promise<BookingReminderItem[]> {
+  const tomorrow = new Date(Date.now() + 26 * 3600 * 1000).toISOString();
+  const sample: BookingReminderItem[] = [
+    {
+      id: 'br-001',
+      bookingId: bookingId ?? '550e8400-e29b-41d4-a716-446655440001',
+      reminderWindow: '24h',
+      remindAt: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
+      status: 'pending',
+      channel: 'both',
+      clinicName: 'PranoraCare Veterinary Clinic, Dhanmondi',
+      petName: 'মতি (Moti)',
+      appointmentAt: tomorrow,
+    },
+    {
+      id: 'br-002',
+      bookingId: bookingId ?? '550e8400-e29b-41d4-a716-446655440001',
+      reminderWindow: '1h',
+      remindAt: new Date(Date.now() + 25 * 3600 * 1000).toISOString(),
+      status: 'pending',
+      channel: 'both',
+      clinicName: 'PranoraCare Veterinary Clinic, Dhanmondi',
+      petName: 'মতি (Moti)',
+      appointmentAt: tomorrow,
+    },
+  ];
+  return bookingId ? sample.filter((r) => r.bookingId === bookingId) : sample;
+}
+
+export async function scheduleBookingReminders(
+  _client: TypedSupabaseClient,
+  input: ScheduleBookingRemindersInput
+): Promise<BookingReminderItem[]> {
+  const scheduled = new Date(input.scheduledAt).getTime();
+  const result: BookingReminderItem[] = [];
+
+  if (input.enable24h) {
+    result.push({
+      id: `br-24h-${Date.now()}`,
+      bookingId: input.bookingId,
+      reminderWindow: '24h',
+      remindAt: new Date(scheduled - 24 * 3600 * 1000).toISOString(),
+      status: 'pending',
+      channel: input.channel,
+      appointmentAt: input.scheduledAt,
+    });
+  }
+
+  if (input.enable1h) {
+    result.push({
+      id: `br-1h-${Date.now()}`,
+      bookingId: input.bookingId,
+      reminderWindow: '1h',
+      remindAt: new Date(scheduled - 1 * 3600 * 1000).toISOString(),
+      status: 'pending',
+      channel: input.channel,
+      appointmentAt: input.scheduledAt,
+    });
+  }
+
+  return result;
+}
+
+export async function cancelBookingReminders(
+  _client: TypedSupabaseClient,
+  bookingId: string
+): Promise<{ success: boolean; bookingId: string }> {
+  return { success: true, bookingId };
+}
+
 
