@@ -163,9 +163,9 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | HLT-2 | Reminders (push + in-app) with pg_cron | Afridi | M | S5 | HLT-1, NOTIF-1 | ✅ |
 | APT-4 | Booking reminders 24h / 1h | Tain | S | S8 | APT-2, HLT-2 | ⬜ |
 | HLT-6 | SMS reminders (vaccine + appointment) | Afridi | M | S6 | HLT-2 | ✅ |
-| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ⬜ |
-| PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ⬜ |
-| PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
+| PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ✅ |
+| PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ✅ |
+| PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ✅ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
 | APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
@@ -202,7 +202,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ADP-10 | Smart adoption matching | Brehat | L | S9 | ADP-9 | ⬜ |
 | CALL-4 | Call recording (both must consent) | Tain | M | S9 | CALL-2 | ⬜ |
 | SVC-SIT | Pet sitting & walking | Zihad | M | S9 | APT-1, PAY-2 | ✅ |
-| SVC-TRN | Training | Afridi | M | S9 | APT-1, PAY-2 | ⬜ |
+| SVC-TRN | Training | Afridi | M | S9 | APT-1, PAY-2 | ✅ |
 | SVC-TAXI | Pet taxi | Tain | M | S9 | APT-1, PAY-2, (MAP-1) | ⬜ |
 | LIV-1 | Livestock vets | Zimia | M | S9 | MAP-3 | ⬜ |
 | MAP-12 | Offline nearby cache | Zimia | M | S9 | MAP-2 | ⬜ |

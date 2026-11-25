@@ -13,6 +13,7 @@ export * from './ai';
 export * from './moderation';
 export * from './tips';
 export * from './sitting';
+export * from './training';
 
 export * from './reminders';
 export * from './sms';

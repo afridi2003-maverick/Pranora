@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/services',
     '/tips',
     '/sitting',
+    '/training',
     '/terms',
     '/privacy',
   ];

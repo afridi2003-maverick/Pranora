@@ -1,0 +1,86 @@
+{
+  "pageTitle": "Pet Training & Behavior",
+  "pageSubtitle": "Certified positive-reinforcement trainers for obedience, puppy socialization & behavior care",
+  "badge": "Certified Pet Trainers",
+  "tabs": {
+    "trainers": "Trainers & Programs",
+    "myBookings": "My Training"
+  },
+  "packagesTitle": "Training Programs",
+  "sessionsLabel": "sessions",
+  "minutesLabel": "min",
+  "searchPlaceholder": "Search trainers by area or name...",
+  "specialties": {
+    "all": "All Programs",
+    "obedience": "Basic Obedience",
+    "puppy_socialization": "Puppy Socialization",
+    "behavior_correction": "Behavior Correction",
+    "agility": "Agility & Advanced"
+  },
+  "areaFilter": {
+    "all": "All Areas",
+    "dhanmondi": "Dhanmondi",
+    "gulshan": "Gulshan",
+    "uttara": "Uttara",
+    "chattogram": "Chattogram"
+  },
+  "trainerCard": {
+    "verified": "Certified Trainer",
+    "session": "/ session",
+    "package": "package",
+    "experience": "{{years}} yrs experience",
+    "specialtiesTitle": "Programs:",
+    "areasTitle": "Service Areas:",
+    "bookBtn": "Book Training",
+    "callBtn": "Call"
+  },
+  "emptyTrainers": "No trainers found matching your filters.",
+  "modal": {
+    "title": "Book Pet Training",
+    "trainerLabel": "Selected Trainer:",
+    "packageType": "Training Program",
+    "bookingMode": "Booking Mode",
+    "modePackage": "Full Package",
+    "modeSingle": "Single Assessment Session",
+    "trainingFormat": "Training Location",
+    "formatHome": "Home Visit",
+    "formatCenter": "Training Center",
+    "date": "Preferred Start Date",
+    "time": "Preferred Time",
+    "address": "Address",
+    "addressPlaceholder": "House/Flat, Road, Area...",
+    "notes": "Pet Behavior & Goals",
+    "notesPlaceholder": "e.g. Pulls on leash, barks at strangers, 6-month puppy...",
+    "paymentMethod": "Payment Method (SSLCommerz / Cash)",
+    "cash": "Cash on Session",
+    "bkash": "bKash",
+    "nagad": "Nagad",
+    "rocket": "Rocket",
+    "card": "Card",
+    "estimatedPrice": "Total Fee",
+    "submitBtn": "Confirm Training Booking",
+    "submitting": "Submitting booking...",
+    "cancelBtn": "Cancel",
+    "successToast": "Training booking confirmed successfully!"
+  },
+  "bookings": {
+    "title": "My Training Bookings",
+    "empty": "You have no training bookings yet",
+    "program": "Program",
+    "trainer": "Trainer",
+    "dateTime": "Start Date & Time",
+    "sessionsProgress": "Sessions",
+    "format": "Format",
+    "price": "Total Fee",
+    "payment": "Payment",
+    "status": {
+      "pending": "Pending Confirmation",
+      "confirmed": "Confirmed",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "cancelBtn": "Cancel Booking",
+    "cancelledSuccess": "Training booking cancelled"
+  }
+}
