@@ -1,5 +1,5 @@
 // packages/validation/src/payments.ts
-// Owner: Afridi | Task: PAY-2 & PAY-3 (Payments, Invoices & Refunds)
+// Owner: Afridi | Tasks: PAY-2, PAY-3 & PAY-4 (Payments, Invoices, Refunds & Provider Payouts)
 
 import { z } from 'zod';
 import { paymentMethodSchema } from './booking';
@@ -16,6 +16,21 @@ export const refundStatusEnum = z.enum([
   'approved',
   'rejected',
   'processed',
+]);
+
+export const payoutMethodEnum = z.enum([
+  'bkash',
+  'nagad',
+  'rocket',
+  'bank_transfer',
+]);
+
+export const payoutStatusEnum = z.enum([
+  'pending',
+  'processing',
+  'completed',
+  'failed',
+  'rejected',
 ]);
 
 export const initPaymentSessionSchema = z.object({
@@ -50,9 +65,34 @@ export const processRefundSchema = z.object({
   adminNote: z.string().max(500).optional(),
 });
 
+export const requestPayoutSchema = z.object({
+  providerId: z.string().uuid({ message: 'Provider ID must be a valid UUID' }),
+  amount: z.number().min(500, { message: 'Minimum withdrawal is 500 BDT' }),
+  method: payoutMethodEnum,
+  accountDetails: z.object({
+    accountNumber: z.string().min(11, { message: 'Account number is required' }),
+    accountHolderName: z.string().optional(),
+    bankName: z.string().optional(),
+    branchName: z.string().optional(),
+    routingNumber: z.string().optional(),
+  }),
+  notes: z.string().max(500).optional(),
+});
+
+export const processPayoutSchema = z.object({
+  payoutId: z.string().uuid({ message: 'Payout ID must be a valid UUID' }),
+  action: z.enum(['completed', 'rejected', 'processing']),
+  reference: z.string().max(100).optional(),
+  notes: z.string().max(500).optional(),
+});
+
 export type PaymentGateway = z.infer<typeof paymentGatewayEnum>;
 export type RefundStatus = z.infer<typeof refundStatusEnum>;
+export type PayoutMethod = z.infer<typeof payoutMethodEnum>;
+export type PayoutStatus = z.infer<typeof payoutStatusEnum>;
 export type InitPaymentSessionInput = z.infer<typeof initPaymentSessionSchema>;
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;
 export type RequestRefundInput = z.infer<typeof requestRefundSchema>;
 export type ProcessRefundInput = z.infer<typeof processRefundSchema>;
+export type RequestPayoutInput = z.infer<typeof requestPayoutSchema>;
+export type ProcessPayoutInput = z.infer<typeof processPayoutSchema>;

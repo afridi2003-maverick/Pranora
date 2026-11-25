@@ -9,6 +9,7 @@ import { buildGatewayUrl, type SSLCommerzSessionResponse } from './sslcommerz';
 export * from './sslcommerz';
 export * from './invoices';
 export * from './refunds';
+export * from './payouts';
 
 export interface CreatePaymentSessionParams {
   bookingId?: string;

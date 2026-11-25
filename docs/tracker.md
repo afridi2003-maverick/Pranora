@@ -165,7 +165,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | HLT-6 | SMS reminders (vaccine + appointment) | Afridi | M | S6 | HLT-2 | ✅ |
 | PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ✅ |
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ✅ |
-| PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ⬜ |
+| PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ✅ |
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
 | APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
