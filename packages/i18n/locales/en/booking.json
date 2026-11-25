@@ -143,5 +143,19 @@
       "inProgress": "No visits currently in progress",
       "completed": "No past visits recorded"
     }
+  },
+  "bookingReminders": {
+    "title": "Appointment Reminders",
+    "subtitle": "Get notified 24 hours and 1 hour before your vet visit",
+    "window24h": "24 hours before",
+    "window1h": "1 hour before",
+    "savePreferences": "Save Reminder Preferences",
+    "savedSuccess": "Booking reminders updated!",
+    "cancelAll": "Mute Reminders",
+    "status": {
+      "pending": "Scheduled",
+      "sent": "Sent",
+      "cancelled": "Muted"
+    }
   }
 }

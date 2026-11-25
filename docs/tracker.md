@@ -161,7 +161,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | HLT-2 | Reminders (push + in-app) with pg_cron | Afridi | M | S5 | HLT-1, NOTIF-1 | ✅ |
-| APT-4 | Booking reminders 24h / 1h | Tain | S | S8 | APT-2, HLT-2 | ⬜ |
+| APT-4 | Booking reminders 24h / 1h | Tain | S | S8 | APT-2, HLT-2 | ✅ |
 | HLT-6 | SMS reminders (vaccine + appointment) | Afridi | M | S6 | HLT-2 | ✅ |
 | PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ✅ |
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ✅ |
@@ -169,9 +169,9 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
 | APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ⬜ |
-| CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ⬜ |
-| CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ⬜ |
-| CALL-3 | Call history | Tain | S | S8 | CALL-1 | ⬜ |
+| CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ✅ |
+| CALL-2 | Owner–vet video call | Tain | L | S7 | CALL-1 | ✅ |
+| CALL-3 | Call history | Tain | S | S8 | CALL-1 | ✅ |
 | AI-1 | AI chat (bn/en) with guardrails | Zihad | L | S6 | AUTH-1, I18N-1, UI-1 | ✅ |
 | AI-2 | Emergency-sign detection → go to vet | Zihad | M | S7 | AI-1, MAP-7 | ✅ |
 | AI-3 | Pet context with consent | Zihad | S | S7 | AI-1, HLT-3 | ✅ |
@@ -200,7 +200,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ID | Task | Owner | Size | Sprint | Depends on | Status |
 |---|---|---|---|---|---|---|
 | ADP-10 | Smart adoption matching | Brehat | L | S9 | ADP-9 | ⬜ |
-| CALL-4 | Call recording (both must consent) | Tain | M | S9 | CALL-2 | ⬜ |
+| CALL-4 | Call recording (both must consent) | Tain | M | S9 | CALL-2 | ✅ |
 | SVC-SIT | Pet sitting & walking | Zihad | M | S9 | APT-1, PAY-2 | ✅ |
 | SVC-TRN | Training | Afridi | M | S9 | APT-1, PAY-2 | ✅ |
 | SVC-TAXI | Pet taxi | Tain | M | S9 | APT-1, PAY-2, (MAP-1) | ⬜ |
