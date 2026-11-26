@@ -62,5 +62,17 @@
     "payAndBook": "Pay & Confirm Consultation",
     "joinCall": "Join Call Room",
     "myConsultations": "My Online Consultations"
+  },
+  "petTaxi": {
+    "title": "Pet Taxi",
+    "subtitle": "Safe, pet-friendly transport to clinics, groomers, or home",
+    "pickup": "Pickup Address",
+    "dropoff": "Dropoff Address / Clinic",
+    "vehicleType": "Vehicle Type",
+    "needsCrate": "Include sanitized pet carrier/crate (+৳80)",
+    "roundTrip": "Round trip (wait & return)",
+    "estimatedFare": "Estimated Fare",
+    "bookTaxi": "Book Pet Taxi",
+    "myRides": "My Pet Taxi Rides"
   }
 }

@@ -203,7 +203,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | CALL-4 | Call recording (both must consent) | Tain | M | S9 | CALL-2 | ✅ |
 | SVC-SIT | Pet sitting & walking | Zihad | M | S9 | APT-1, PAY-2 | ✅ |
 | SVC-TRN | Training | Afridi | M | S9 | APT-1, PAY-2 | ✅ |
-| SVC-TAXI | Pet taxi | Tain | M | S9 | APT-1, PAY-2, (MAP-1) | ⬜ |
+| SVC-TAXI | Pet taxi | Tain | M | S9 | APT-1, PAY-2, (MAP-1) | ✅ |
 | LIV-1 | Livestock vets | Zimia | M | S9 | MAP-3 | ⬜ |
 | MAP-12 | Offline nearby cache | Zimia | M | S9 | MAP-2 | ⬜ |
 

@@ -64,3 +64,30 @@ export const createOnlineConsultSchema = z.object({
   feeBdt: z.number().int().min(0),
 });
 export type CreateOnlineConsultInput = z.infer<typeof createOnlineConsultSchema>;
+
+// ─── SVC-TAXI: Pet Taxi ───────────────────────────────────────────────────────
+
+export const PetTaxiVehicleSchema = z.enum(['bike_carrier', 'ac_car', 'van']);
+export type PetTaxiVehicle = z.infer<typeof PetTaxiVehicleSchema>;
+
+export const PetTaxiStatusSchema = z.enum([
+  'requested',
+  'driver_assigned',
+  'in_transit',
+  'completed',
+  'cancelled',
+]);
+export type PetTaxiStatus = z.infer<typeof PetTaxiStatusSchema>;
+
+export const requestPetTaxiSchema = z.object({
+  petId: z.string().uuid('Valid pet ID required'),
+  pickupAddress: z.string().min(4, 'Pickup address required').max(300),
+  dropoffAddress: z.string().min(4, 'Dropoff address required').max(300),
+  vehicleType: PetTaxiVehicleSchema.default('ac_car'),
+  needsCrate: z.boolean().default(true),
+  roundTrip: z.boolean().default(false),
+  scheduledAt: z.string().datetime(),
+  estimatedFareBdt: z.number().int().min(0),
+  paymentMethod: z.enum(['cash', 'sslcommerz']).default('sslcommerz'),
+});
+export type RequestPetTaxiInput = z.infer<typeof requestPetTaxiSchema>;
