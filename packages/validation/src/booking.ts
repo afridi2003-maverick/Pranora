@@ -295,5 +295,27 @@ export const addExceptionInputSchema = z.object({
 });
 export type AddExceptionInput = z.infer<typeof addExceptionInputSchema>;
 
+/**
+ * APT-4: Booking Reminders (24h / 1h)
+ */
+export const ReminderWindowSchema = z.enum(['24h', '1h']);
+export type ReminderWindow = z.infer<typeof ReminderWindowSchema>;
+
+export const BookingReminderStatusSchema = z.enum(['pending', 'sent', 'cancelled']);
+export type BookingReminderStatus = z.infer<typeof BookingReminderStatusSchema>;
+
+export const ReminderChannelSchema = z.enum(['push', 'in_app', 'both']);
+export type ReminderChannel = z.infer<typeof ReminderChannelSchema>;
+
+export const scheduleBookingRemindersSchema = z.object({
+  bookingId: z.string().uuid(),
+  scheduledAt: z.string().datetime(),
+  enable24h: z.boolean().default(true),
+  enable1h: z.boolean().default(true),
+  channel: ReminderChannelSchema.default('both'),
+});
+export type ScheduleBookingRemindersInput = z.infer<typeof scheduleBookingRemindersSchema>;
+
+
 
 

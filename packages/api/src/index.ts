@@ -15,7 +15,9 @@ export * from './health';
 export * from './ai';
 export * from './tips';
 export * from './sitting';
+export * from './training';
 export * from './shelter';
 export * from './provider';
 export * from './reviews';
+export * from './calls';
 

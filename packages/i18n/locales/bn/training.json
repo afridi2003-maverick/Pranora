@@ -1,0 +1,86 @@
+{
+  "pageTitle": "পেট ট্রেনিং ও আচরণ পরিচর্যা",
+  "pageSubtitle": "ওবিডিয়েন্স, পাপি সোশ্যালাইজেশন ও বিহেভিয়ার কারেকশনের জন্য সার্টিফায়েড ট্রেইনার",
+  "badge": "সার্টিফায়েড পেট ট্রেইনার",
+  "tabs": {
+    "trainers": "ট্রেইনার ও প্রোগ্রাম",
+    "myBookings": "আমার ট্রেনিং"
+  },
+  "packagesTitle": "ট্রেনিং প্রোগ্রামসমূহ",
+  "sessionsLabel": "সেশন",
+  "minutesLabel": "মিনিট",
+  "searchPlaceholder": "এলাকা বা ট্রেইনারের নাম দিয়ে খুঁজুন...",
+  "specialties": {
+    "all": "সব প্রোগ্রাম",
+    "obedience": "বেসিক ওবিডিয়েন্স",
+    "puppy_socialization": "পাপি সোশ্যালাইজেশন",
+    "behavior_correction": "বিহেভিয়ার কারেকশন",
+    "agility": "অ্যাজিলিটি ও অ্যাডভান্সড"
+  },
+  "areaFilter": {
+    "all": "সব এলাকা",
+    "dhanmondi": "ধানমন্ডি",
+    "gulshan": "গুলশান",
+    "uttara": "উত্তরা",
+    "chattogram": "চট্টগ্রাম"
+  },
+  "trainerCard": {
+    "verified": "সার্টিফায়েড ট্রেইনার",
+    "session": "/ সেশন",
+    "package": "প্যাকেজ",
+    "experience": "{{years}} বছরের অভিজ্ঞতা",
+    "specialtiesTitle": "প্রোগ্রামসমূহ:",
+    "areasTitle": "সেবার এলাকা:",
+    "bookBtn": "ট্রেনিং বুক করুন",
+    "callBtn": "কল করুন"
+  },
+  "emptyTrainers": "আপনার ফিল্টার অনুযায়ী কোনো ট্রেইনার পাওয়া যায়নি।",
+  "modal": {
+    "title": "পেট ট্রেনিং বুকিং",
+    "trainerLabel": "নির্বাচিত ট্রেইনার:",
+    "packageType": "ট্রেনিং প্রোগ্রাম",
+    "bookingMode": "বুকিংয়ের ধরন",
+    "modePackage": "সম্পূর্ণ প্যাকেজ",
+    "modeSingle": "একক অ্যাসেসমেন্ট সেশন",
+    "trainingFormat": "ট্রেনিংয়ের স্থান",
+    "formatHome": "হোম ভিজিট (বাসায়)",
+    "formatCenter": "ট্রেনিং সেন্টার",
+    "date": "শুরুর তারিখ",
+    "time": "পছন্দের সময়",
+    "address": "ঠিকানা",
+    "addressPlaceholder": "বাড়ি/ফ্ল্যাট, রোড, এলাকা...",
+    "notes": "পোষা প্রাণীর আচরণ ও লক্ষ্য",
+    "notesPlaceholder": "যেমন: লিশ ধরে টানে, অপরিচিত দেখলে ঘেউ ঘেউ করে...",
+    "paymentMethod": "পেমেন্ট পদ্ধতি (SSLCommerz / ক্যাশ)",
+    "cash": "সেশনে ক্যাশ",
+    "bkash": "বিকাশ",
+    "nagad": "নগদ",
+    "rocket": "রকেট",
+    "card": "কার্ড",
+    "estimatedPrice": "মোট ফি",
+    "submitBtn": "ট্রেনিং বুকিং নিশ্চিত করুন",
+    "submitting": "বুকিং সাবমিট হচ্ছে...",
+    "cancelBtn": "বাতিল",
+    "successToast": "ট্রেনিং বুকিং সফলভাবে নিশ্চিত হয়েছে!"
+  },
+  "bookings": {
+    "title": "আমার ট্রেনিং বুকিংসমূহ",
+    "empty": "আপনার এখনো কোনো ট্রেনিং বুকিং নেই",
+    "program": "প্রোগ্রাম",
+    "trainer": "ট্রেইনার",
+    "dateTime": "তারিখ ও সময়",
+    "sessionsProgress": "সেশন",
+    "format": "ধরন",
+    "price": "মোট ফি",
+    "payment": "পেমেন্ট",
+    "status": {
+      "pending": "নিশ্চিতকরণের অপেক্ষায়",
+      "confirmed": "নিশ্চিত হয়েছে",
+      "in_progress": "চলমান",
+      "completed": "সম্পন্ন",
+      "cancelled": "বাতিল"
+    },
+    "cancelBtn": "বুকিং বাতিল করুন",
+    "cancelledSuccess": "ট্রেনিং বুকিং বাতিল করা হয়েছে"
+  }
+}

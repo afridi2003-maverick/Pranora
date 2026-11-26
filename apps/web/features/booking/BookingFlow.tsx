@@ -15,6 +15,7 @@ import {
   type CreateBookingResult,
   type PetRow,
   listMyPets,
+  createPaymentSession,
 } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
 import { useSession } from '../../hooks/useSession';
@@ -80,7 +81,7 @@ export function BookingFlow({
   const [problemNote, setProblemNote] = useState<string>('');
   const [attachmentUrl, setAttachmentUrl] = useState<string>('');
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'bkash'>('cash');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'bkash' | 'nagad' | 'rocket' | 'card'>('cash');
 
   // Submission & Result
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -274,7 +275,7 @@ export function BookingFlow({
         serialNo: scheduleMode === 'serial' ? selectedSerialNo || 1 : undefined,
         problemNote: problemNote.trim() || undefined,
         attachments,
-        paymentMethod: 'cash' as const,
+        paymentMethod,
       };
 
       let result: CreateBookingResult;
@@ -290,6 +291,25 @@ export function BookingFlow({
           serialNo: scheduleMode === 'serial' ? selectedSerialNo : null,
           startsAt: payload.startsAt,
         };
+      }
+
+      // If user selected online payment (SSLCommerz: bKash, Nagad, Rocket, card)
+      if (paymentMethod !== 'cash') {
+        try {
+          const session = await createPaymentSession(null as any, {
+            bookingId: result.bookingId,
+            amount: selectedService?.price || 500,
+            method: paymentMethod,
+            customerName: selectedPet?.name || 'Pet Owner',
+            customerPhone: '01700000000',
+          });
+          if (session?.gatewayUrl && typeof window !== 'undefined') {
+            window.location.href = session.gatewayUrl;
+            return;
+          }
+        } catch {
+          // Fall through to show confirmation with pending payment
+        }
       }
 
       setBookingResult(result);
@@ -736,38 +756,128 @@ export function BookingFlow({
               </div>
             </Card>
 
-            {/* Payment Method Selector (PAY-1) */}
+            {/* Payment Method Selector (PAY-1 & PAY-2) */}
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-content-primary">
                 💳 {t('booking:payment.method')}
               </h3>
 
-              <div
-                onClick={() => setPaymentMethod('cash')}
-                className={`p-3.5 rounded-xl border cursor-pointer flex items-center justify-between ${
-                  paymentMethod === 'cash'
-                    ? 'border-primary bg-green-50/50 dark:bg-green-950/20 ring-2 ring-primary/40'
-                    : 'border-stroke-subtle'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">💵</span>
-                  <div>
-                    <div className="font-bold text-sm text-content-primary">
-                      {t('booking:payment.cash')}
-                    </div>
-                    <div className="text-xs text-content-secondary">
-                      {t('booking:payment.cashDesc')}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* Cash at clinic */}
+                <div
+                  onClick={() => setPaymentMethod('cash')}
+                  className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${
+                    paymentMethod === 'cash'
+                      ? 'border-primary bg-green-50/50 dark:bg-green-950/20 ring-2 ring-primary/40'
+                      : 'border-stroke-subtle hover:border-stroke-medium'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">💵</span>
+                    <div>
+                      <div className="font-bold text-xs text-content-primary">
+                        {t('booking:payment.cash')}
+                      </div>
+                      <div className="text-[10px] text-content-secondary">
+                        {t('booking:payment.cashDesc')}
+                      </div>
                     </div>
                   </div>
+                  <input
+                    type="radio"
+                    name="payment"
+                    checked={paymentMethod === 'cash'}
+                    readOnly
+                    className="text-primary w-3.5 h-3.5"
+                  />
                 </div>
-                <input
-                  type="radio"
-                  name="payment"
-                  checked={paymentMethod === 'cash'}
-                  readOnly
-                  className="text-primary w-4 h-4"
-                />
+
+                {/* bKash */}
+                <div
+                  onClick={() => setPaymentMethod('bkash')}
+                  className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${
+                    paymentMethod === 'bkash'
+                      ? 'border-primary bg-pink-50/50 dark:bg-pink-950/20 ring-2 ring-primary/40'
+                      : 'border-stroke-subtle hover:border-stroke-medium'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">📱</span>
+                    <div>
+                      <div className="font-bold text-xs text-content-primary">
+                        {isBangla ? 'বিকাশ (bKash)' : 'bKash Online'}
+                      </div>
+                      <div className="text-[10px] text-content-secondary">
+                        {isBangla ? 'তাৎক্ষণিক পেমেন্ট ও নিশ্চিতকরণ' : 'Instant digital payment'}
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="payment"
+                    checked={paymentMethod === 'bkash'}
+                    readOnly
+                    className="text-primary w-3.5 h-3.5"
+                  />
+                </div>
+
+                {/* Nagad */}
+                <div
+                  onClick={() => setPaymentMethod('nagad')}
+                  className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${
+                    paymentMethod === 'nagad'
+                      ? 'border-primary bg-orange-50/50 dark:bg-orange-950/20 ring-2 ring-primary/40'
+                      : 'border-stroke-subtle hover:border-stroke-medium'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">⚡</span>
+                    <div>
+                      <div className="font-bold text-xs text-content-primary">
+                        {isBangla ? 'নগদ (Nagad)' : 'Nagad Online'}
+                      </div>
+                      <div className="text-[10px] text-content-secondary">
+                        {isBangla ? 'সহজ ও নিরাপদ মোবাইল পেমেন্ট' : 'Direct mobile banking'}
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="payment"
+                    checked={paymentMethod === 'nagad'}
+                    readOnly
+                    className="text-primary w-3.5 h-3.5"
+                  />
+                </div>
+
+                {/* Card / SSLCommerz */}
+                <div
+                  onClick={() => setPaymentMethod('card')}
+                  className={`p-3 rounded-xl border cursor-pointer flex items-center justify-between transition-all ${
+                    paymentMethod === 'card'
+                      ? 'border-primary bg-blue-50/50 dark:bg-blue-950/20 ring-2 ring-primary/40'
+                      : 'border-stroke-subtle hover:border-stroke-medium'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">💳</span>
+                    <div>
+                      <div className="font-bold text-xs text-content-primary">
+                        {isBangla ? 'ভিসা / মাস্টারকার্ড / ইন্টারনেট ব্যাংকিং' : 'Debit/Credit Cards'}
+                      </div>
+                      <div className="text-[10px] text-content-secondary">
+                        {isBangla ? 'SSLCommerz সুরক্ষিত গেটওয়ে' : 'Secure SSLCommerz gateway'}
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="payment"
+                    checked={paymentMethod === 'card'}
+                    readOnly
+                    className="text-primary w-3.5 h-3.5"
+                  />
+                </div>
               </div>
             </div>
 

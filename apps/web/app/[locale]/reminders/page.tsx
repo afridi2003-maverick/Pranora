@@ -314,11 +314,7 @@ function ReminderCard({ reminder, petName, locale, t, onDone, onDelete }: Remind
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function RemindersPage({
-  initialPets,
-}: {
-  initialPets?: Array<{ id: string; name: string; species: string }>;
-} = {}) {
+export default function RemindersPage() {
   const { t, locale } = useLocale();
   const { supabase, isAuthenticated, isConfigured, isLoading: sessionLoading } = useSession();
   const useLiveApi = isConfigured && isAuthenticated;
