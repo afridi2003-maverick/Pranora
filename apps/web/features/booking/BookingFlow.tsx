@@ -18,6 +18,7 @@ import {
   createPaymentSession,
 } from '@pranora/api';
 import { PetPicker } from '../pets/PetPicker';
+import { useSession } from '../../hooks/useSession';
 
 export interface BookingFlowProps {
   initialLocationId?: string;
@@ -40,6 +41,7 @@ export function BookingFlow({
 }: BookingFlowProps) {
   const { t, isBangla, locale } = useLocale();
   const router = useRouter();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   // ── 1. Flow Step State ──────────────────────────────────────
   // 1: Service, 2: Pet, 3: DateTime, 4: Problem, 5: Review & Confirm, 6: Success
@@ -98,7 +100,7 @@ export function BookingFlow({
         const targetLocId = selectedLocationId || clinicsList[0]?.location.id || '';
         if (targetLocId) {
           if (!selectedLocationId) setSelectedLocationId(targetLocId);
-          const detail = await getClinicFullDetail(targetLocId);
+          const detail = await getClinicFullDetail(targetLocId, isConfigured ? supabase : null);
           if (isMounted && detail) {
             setClinic(detail);
             if (initialServiceId && detail.services.some((s) => s.id === initialServiceId)) {
@@ -109,13 +111,17 @@ export function BookingFlow({
           }
         }
 
-        // Try to load user pets (no auth client in page context, fallback gracefully)
+        // Try to load user pets when authenticated
         try {
-          const petsResult = await listMyPets(null as any);
-          const userPets = petsResult.data ?? [];
-          if (isMounted && userPets.length > 0) {
-            setPets(userPets);
-            setSelectedPet(userPets[0]!);
+          if (isConfigured && isAuthenticated) {
+            const petsResult = await listMyPets(supabase);
+            const userPets = petsResult.data ?? [];
+            if (isMounted && userPets.length > 0) {
+              setPets(userPets);
+              setSelectedPet(userPets[0]!);
+            } else {
+              setNoPetProfile(true);
+            }
           } else {
             setNoPetProfile(true);
           }
@@ -146,7 +152,8 @@ export function BookingFlow({
       setSelectedSerialNo(null);
 
       try {
-        const response = await getAvailableSlots(null as any, {
+        if (!isConfigured) throw new Error('Offline mode');
+        const response = await getAvailableSlots(supabase, {
           locationId: selectedLocationId,
           vetId: selectedVetId || undefined,
           date: selectedDate,
@@ -273,7 +280,8 @@ export function BookingFlow({
 
       let result: CreateBookingResult;
       try {
-        result = await createBooking(null as any, payload);
+        if (!isConfigured || !isAuthenticated) throw new Error('Demo mode');
+        result = await createBooking(supabase, payload);
       } catch {
         // Fallback simulated booking for development/smoke testing
         result = {

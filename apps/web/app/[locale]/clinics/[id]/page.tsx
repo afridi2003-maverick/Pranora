@@ -12,6 +12,7 @@ import {
   buildTelUrl,
 } from '@pranora/api';
 import { ReportModal } from '../../components/ReportModal';
+import { useSession } from '../../../../hooks/useSession';
 
 const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const WEEKDAYS_BN = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
@@ -20,6 +21,7 @@ export default function ClinicDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { isBangla, locale } = useLocale();
+  const { supabase, isConfigured } = useSession();
 
   const clinicId = (Array.isArray(params?.id) ? params.id[0] : (params?.id as string)) || '';
 
@@ -39,7 +41,7 @@ export default function ClinicDetailPage() {
       }
       setLoading(true);
       try {
-        const data = await getClinicFullDetail(clinicId);
+        const data = await getClinicFullDetail(clinicId, isConfigured ? supabase : null);
         if (isMounted) {
           setClinic(data);
         }
@@ -53,7 +55,7 @@ export default function ClinicDetailPage() {
     return () => {
       isMounted = false;
     };
-  }, [clinicId]);
+  }, [clinicId, isConfigured, supabase]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);

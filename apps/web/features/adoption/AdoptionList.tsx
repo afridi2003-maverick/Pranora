@@ -1,12 +1,18 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocale } from '@pranora/i18n';
-import type { AdoptionListingRow } from '@pranora/api';
+import {
+  getMyFavoriteListingIds,
+  getPublicAdoptionListings,
+  toggleAdoptionFavorite,
+  type AdoptionListingRow,
+} from '@pranora/api';
 import { AdoptionCard } from './AdoptionCard';
 import { AdoptionFilters, type FilterState } from './AdoptionFilters';
 import { AdoptionDetailModal } from './AdoptionDetailModal';
 import { MOCK_ADOPTION_LISTINGS, MOCK_SAVED_LISTING_IDS } from './mockData';
+import { useSession } from '../../hooks/useSession';
 
 interface AdoptionListProps {
   initialListings?: AdoptionListingRow[];
@@ -18,19 +24,51 @@ export function AdoptionList({
   onApply,
 }: AdoptionListProps) {
   const { isBangla } = useLocale();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
 
+  const [listings, setListings] = useState<AdoptionListingRow[]>(initialListings);
   const [filters, setFilters] = useState<FilterState>({});
   const [selectedListing, setSelectedListing] = useState<AdoptionListingRow | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set(MOCK_SAVED_LISTING_IDS));
 
-  const handleToggleSave = (id: string) => {
+  useEffect(() => {
+    if (!isConfigured) return;
+    let active = true;
+
+    async function loadListings() {
+      try {
+        const rows = await getPublicAdoptionListings(supabase);
+        if (active && rows && rows.length > 0) {
+          setListings(rows);
+        }
+        if (active && isAuthenticated && user) {
+          const favIds = await getMyFavoriteListingIds(supabase, user.id).catch(() => null);
+          if (active && favIds) {
+            setSavedIds(new Set(favIds));
+          }
+        }
+      } catch {
+        // Fallback to mock listings
+      }
+    }
+
+    void loadListings();
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, isAuthenticated, user, supabase]);
+
+  const handleToggleSave = async (id: string) => {
     setSavedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+    if (isConfigured && isAuthenticated) {
+      await toggleAdoptionFavorite(supabase, id).catch(() => {});
+    }
   };
 
   const handleOpenDetail = (listing: AdoptionListingRow) => {
@@ -43,7 +81,7 @@ export function AdoptionList({
   };
 
   const filteredListings = useMemo(() => {
-    return initialListings.filter((item) => {
+    return listings.filter((item) => {
       // 1. Species Filter
       if (filters.species && item.species !== filters.species) {
         return false;

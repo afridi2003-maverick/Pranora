@@ -1,6 +1,6 @@
 import React from 'react';
 import { LocaleProvider, isValidLocale, DEFAULT_LOCALE } from '@pranora/i18n';
-import { LanguageHeader } from '../../components/LanguageHeader';
+import { AppShell } from '../../components/AppShell';
 
 export default function LocaleLayout({
   children,
@@ -13,10 +13,7 @@ export default function LocaleLayout({
 
   return (
     <LocaleProvider initialLocale={activeLocale}>
-      <div lang={activeLocale} className="min-h-screen flex flex-col bg-app-bg text-content-primary">
-        <LanguageHeader />
-        <div className="flex-1">{children}</div>
-      </div>
+      <AppShell>{children}</AppShell>
     </LocaleProvider>
   );
 }

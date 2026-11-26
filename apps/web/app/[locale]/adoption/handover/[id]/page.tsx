@@ -9,19 +9,38 @@ import {
   findHandoverByIdOrListing,
   MOCK_HANDOVERS,
 } from '../../../../../features/adoption';
+import { confirmHandover } from '@pranora/api';
+import { useSession } from '../../../../../hooks/useSession';
+import { useToast } from '../../../../../components/ToastProvider';
 
 export default function AdoptionHandoverPage() {
   const { isBangla, locale } = useLocale();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const idOrListingId = params?.id || 'hnd-001';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
 
   const handoverDetails =
     findHandoverByIdOrListing(idOrListingId) ||
     MOCK_HANDOVERS['hnd-001']!;
 
-  const handleConfirmHandover = async (_handoverId: string) => {
-    // In production, calls Supabase RPC confirm_handover
+  const handleConfirmHandover = async (handoverId: string) => {
+    if (isConfigured && isAuthenticated) {
+      try {
+        await confirmHandover(supabase, handoverId);
+        showToast({
+          type: 'success',
+          message: isBangla ? 'হস্তান্তর নিশ্চিত হয়েছে!' : 'Handover confirmed!',
+        });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : 'Handover confirmation failed',
+        };
+      }
+    }
     return { success: true };
   };
 

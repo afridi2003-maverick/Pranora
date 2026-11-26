@@ -13,6 +13,7 @@ import {
   type ProviderDashboardStats,
   type SerialQueueItem,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
@@ -117,6 +118,7 @@ type TabKey = 'schedule' | 'serials' | 'bookings' | 'info';
 export function ProviderDashboard() {
   const { locale } = useLocale();
   const isBangla = locale === 'bn';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [activeTab, setActiveTab] = useState<TabKey>('schedule');
   const [profile, setProfile] = useState<ProviderRow>(MOCK_PROFILE);
@@ -127,7 +129,8 @@ export function ProviderDashboard() {
   const [nowServing, setNowServing] = useState<number>(MOCK_STATS.currentServingSerial ?? 7);
 
   useEffect(() => {
-    const client = null as any;
+    if (!isConfigured || !isAuthenticated) return;
+    const client = supabase;
     getMyProviderProfile(client)
       .then((p) => {
         if (p) {

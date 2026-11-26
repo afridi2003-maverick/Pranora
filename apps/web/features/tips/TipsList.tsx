@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import type { Article, ArticleCategory } from '@pranora/api';
-import { MOCK_ARTICLES } from '@pranora/api';
+import { listArticles, MOCK_ARTICLES } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 export interface TipsListProps {
   initialArticles?: Article[];
@@ -15,8 +16,22 @@ export function TipsList({ initialArticles }: TipsListProps) {
   const { t, isBangla } = useLocale();
   const params = useParams();
   const localeParam = (params?.locale as string) ?? 'bn';
+  const { supabase, isConfigured } = useSession();
 
-  const [articles] = useState<Article[]>(() => initialArticles ?? MOCK_ARTICLES);
+  const [articles, setArticles] = useState<Article[]>(() => initialArticles ?? MOCK_ARTICLES);
+
+  useEffect(() => {
+    if (!isConfigured || initialArticles) return;
+    let active = true;
+    listArticles(supabase)
+      .then((res) => {
+        if (active && res.data && res.data.length > 0) setArticles(res.data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, initialArticles, supabase]);
   const [selectedCategory, setSelectedCategory] = useState<ArticleCategory>('all');
   const [selectedSpecies, setSelectedSpecies] = useState<'all' | 'cat' | 'dog'>('all');
   const [searchQuery, setSearchQuery] = useState('');

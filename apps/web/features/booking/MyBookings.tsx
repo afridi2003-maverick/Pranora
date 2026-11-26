@@ -11,6 +11,7 @@ import {
   CANCELLATION_REASONS,
   type BookingDetails,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 const STATUS_TYPE_MAP: Record<string, 'pending' | 'confirmed' | 'completed' | 'emergency' | 'neutral'> = {
   pending: 'pending',
@@ -93,6 +94,7 @@ type BookingTab = 'upcoming' | 'past';
 
 export function MyBookings() {
   const { t, isBangla } = useLocale();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
   const [tab, setTab] = useState<BookingTab>('upcoming');
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -116,9 +118,13 @@ export function MyBookings() {
     async function fetchBookings() {
       setLoading(true);
       try {
-        const data = await listUserBookings(null as any);
+        if (!isConfigured || !isAuthenticated) {
+          if (isMounted) setBookings(MOCK_BOOKINGS);
+          return;
+        }
+        const data = await listUserBookings(supabase);
         if (isMounted) {
-          setBookings(data.length > 0 ? data : MOCK_BOOKINGS);
+          setBookings(data.length > 0 ? data : []);
         }
       } catch {
         if (isMounted) setBookings(MOCK_BOOKINGS);
@@ -130,7 +136,7 @@ export function MyBookings() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isConfigured, isAuthenticated, supabase]);
 
   const handleConfirmCancel = async () => {
     if (!cancelTargetBooking) return;
@@ -144,10 +150,12 @@ export function MyBookings() {
       : cancelReason;
 
     try {
-      await cancelBooking(null as any, {
-        bookingId: cancelTargetBooking.id,
-        reason: fullReason,
-      });
+      if (isConfigured && isAuthenticated) {
+        await cancelBooking(supabase, {
+          bookingId: cancelTargetBooking.id,
+          reason: fullReason,
+        });
+      }
 
       setBookings((prev) =>
         prev.map((b) =>
@@ -177,11 +185,13 @@ export function MyBookings() {
     const newStartsAt = targetDate.toISOString();
 
     try {
-      await rescheduleBooking(null as any, {
-        bookingId: rescheduleTargetBooking.id,
-        startsAt: newStartsAt,
-        reason: rescheduleReason.trim() || undefined,
-      });
+      if (isConfigured && isAuthenticated) {
+        await rescheduleBooking(supabase, {
+          bookingId: rescheduleTargetBooking.id,
+          startsAt: newStartsAt,
+          reason: rescheduleReason.trim() || undefined,
+        });
+      }
 
       setBookings((prev) =>
         prev.map((b) =>

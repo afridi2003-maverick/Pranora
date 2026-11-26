@@ -17,12 +17,14 @@ import {
   getUpazilaById,
   type AreaSearchResult,
 } from '@pranora/api';
+import { useSession } from '../../../hooks/useSession';
 
 const DEFAULT_DHAKA_COORDS = { lat: 23.7465, lng: 90.3752 }; // Dhanmondi
 
 export default function WebMapPage() {
   const router = useRouter();
   const { isBangla, locale } = useLocale();
+  const { supabase, isConfigured } = useSession();
 
   // Location state
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number }>(DEFAULT_DHAKA_COORDS);
@@ -159,17 +161,20 @@ export default function WebMapPage() {
     async function fetchClinics() {
       setLoading(true);
       try {
-        const results = await getNearbyClinicsWithFallback({
-          lat: userCoords.lat,
-          lng: userCoords.lng,
-          radiusM: 25000,
-          openNow: filterOpenNow,
-          emergency: filterEmergency,
-          homeVisit: filterHomeVisit,
-          species: selectedSpecies !== 'all' ? selectedSpecies : undefined,
-          maxFee: maxFee !== null ? maxFee : undefined,
-          limit: 50,
-        });
+        const results = await getNearbyClinicsWithFallback(
+          {
+            lat: userCoords.lat,
+            lng: userCoords.lng,
+            radiusM: 25000,
+            openNow: filterOpenNow,
+            emergency: filterEmergency,
+            homeVisit: filterHomeVisit,
+            species: selectedSpecies !== 'all' ? selectedSpecies : undefined,
+            maxFee: maxFee !== null ? maxFee : undefined,
+            limit: 50,
+          },
+          isConfigured ? supabase : null
+        );
 
         if (active) {
           setClinics(results);
@@ -188,7 +193,7 @@ export default function WebMapPage() {
     return () => {
       active = false;
     };
-  }, [userCoords, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee]);
+  }, [userCoords, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee, isConfigured, supabase]);
 
   // Client-side search and ownership filter (MAP-3)
   const displayedClinics = useMemo(() => {

@@ -1,17 +1,56 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button } from '@pranora/ui';
 import { AdoptionApplicationStatusTracker } from '../../../../features/adoption';
+import {
+  getMyApplicationsWithListings,
+  withdrawAdoptionApplication,
+  type AdoptionApplicationWithListing,
+} from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
+import { useToast } from '../../../../components/ToastProvider';
 
 export default function MyAdoptionApplicationsPage() {
   const { locale, isBangla } = useLocale();
   const router = useRouter();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
+  const [applications, setApplications] = useState<AdoptionApplicationWithListing[] | undefined>(
+    undefined
+  );
 
-  const handleWithdraw = async (_applicationId: string) => {
-    // In production, calls withdrawAdoptionApplication
+  useEffect(() => {
+    if (!isConfigured || !isAuthenticated || !user) return;
+    let active = true;
+    getMyApplicationsWithListings(supabase, user.id)
+      .then((rows) => {
+        if (active && rows.length > 0) setApplications(rows);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isConfigured, isAuthenticated, user, supabase]);
+
+  const handleWithdraw = async (applicationId: string) => {
+    if (isConfigured && isAuthenticated && user) {
+      try {
+        await withdrawAdoptionApplication(supabase, applicationId, user.id);
+        showToast({
+          type: 'info',
+          message: isBangla ? 'আবেদন প্রত্যাহার করা হয়েছে' : 'Application withdrawn',
+        });
+        return { success: true };
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : 'Withdraw failed',
+        };
+      }
+    }
     return { success: true };
   };
 
@@ -49,6 +88,7 @@ export default function MyAdoptionApplicationsPage() {
         </div>
 
         <AdoptionApplicationStatusTracker
+          initialApplications={applications}
           onWithdrawApplication={handleWithdraw}
           onViewListing={handleViewListing}
           onGoToHandover={handleGoToHandover}

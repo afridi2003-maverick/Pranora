@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { SessionProvider } from '../hooks/useSession';
+import { ToastProvider } from '../components/ToastProvider';
 
 export const metadata: Metadata = {
   title: 'Pranora · প্রাণোরা',
@@ -12,9 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="bn">
-      <body>{children}</body>
+    <html lang="bn" suppressHydrationWarning>
+      <body>
+        <SessionProvider>
+          <ToastProvider>{children as any}</ToastProvider>
+        </SessionProvider>
+      </body>
     </html>
   );
 }
-

@@ -11,6 +11,7 @@ import {
   type ScheduleRule,
   type AvailabilityException,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 // ─── Default Weekly Rules ───────────────────────────────────────────────────
 
@@ -37,6 +38,7 @@ const DAY_NAMES_BN = ['রবিবার', 'সোমবার', 'মঙ্গ�
 export function VetScheduleManager() {
   const { locale } = useLocale();
   const isBangla = locale === 'bn';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [activeTab, setActiveTab] = useState<'weekly' | 'holidays'>('weekly');
   const [rules, setRules] = useState<ScheduleRule[]>(DEFAULT_RULES);
@@ -50,7 +52,7 @@ export function VetScheduleManager() {
   const [addingHoliday, setAddingHoliday] = useState(false);
 
   useEffect(() => {
-    const client = null as any;
+    const client = isConfigured && isAuthenticated ? supabase : (null as any);
     getVetSchedule(client, 'loc-001')
       .then((data) => {
         if (data && data.rules && data.rules.length > 0) {
@@ -111,7 +113,7 @@ export function VetScheduleManager() {
     setSaving(true);
     setSaveSuccess(false);
     try {
-      const client = null as any;
+      const client = isConfigured && isAuthenticated ? supabase : (null as any);
       const activeRules = rules.filter((r) => r.isActive);
       await saveScheduleRules(client, {
         locationId: 'loc-001',
@@ -144,7 +146,7 @@ export function VetScheduleManager() {
     };
 
     try {
-      const client = null as any;
+      const client = isConfigured && isAuthenticated ? supabase : (null as any);
       await addAvailabilityException(client, {
         locationId: 'loc-001',
         date: holidayDate,
@@ -165,7 +167,7 @@ export function VetScheduleManager() {
 
   async function handleDeleteException(id: string) {
     try {
-      const client = null as any;
+      const client = isConfigured && isAuthenticated ? supabase : (null as any);
       await deleteAvailabilityException(client, id);
     } catch {
       // offline fallback

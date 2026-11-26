@@ -9,10 +9,15 @@ import {
   AssignRescuerModal,
   MOCK_ASSIGNMENTS,
 } from '../../../../features/rescue';
+import { assignRescuer, respondToAssignment } from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
+import { useToast } from '../../../../components/ToastProvider';
 
 export default function RescuerAssignmentsPage() {
   const { isBangla, locale } = useLocale();
   const router = useRouter();
+  const { supabase, isConfigured, isAuthenticated } = useSession();
+  const { showToast } = useToast();
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
@@ -21,17 +26,40 @@ export default function RescuerAssignmentsPage() {
     accept: boolean,
     declineReason?: string
   ): Promise<void> => {
-    // 500ms simulation
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Assignment response:', { assignmentId, accept, declineReason });
+    if (isConfigured && isAuthenticated) {
+      await respondToAssignment(supabase, assignmentId, accept, declineReason);
+      showToast({
+        type: 'success',
+        message: accept
+          ? isBangla
+            ? 'অ্যাসাইনমেন্ট গৃহীত হয়েছে'
+            : 'Assignment accepted'
+          : isBangla
+          ? 'অ্যাসাইনমেন্ট প্রত্যাখ্যাত হয়েছে'
+          : 'Assignment declined',
+      });
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
   };
 
   const handleAssign = async (
     caseId: string,
     rescuerId: string
   ): Promise<{ success: boolean; error?: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Assigned rescuer:', { caseId, rescuerId });
+    if (isConfigured && isAuthenticated) {
+      try {
+        await assignRescuer(supabase, caseId, rescuerId);
+        showToast({
+          type: 'success',
+          message: isBangla ? 'উদ্ধারকারী নিযুক্ত হয়েছে' : 'Rescuer assigned',
+        });
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : 'Assign failed' };
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
     return { success: true };
   };
 

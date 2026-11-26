@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { ReportStatusTracker } from '../../../../features/rescue';
-import type { MyReportStatusResponse } from '@pranora/api';
+import { getMyReportStatus, type MyReportStatusResponse } from '@pranora/api';
+import { useSession } from '../../../../hooks/useSession';
 
 const MOCK_REPORTS: Record<string, MyReportStatusResponse> = {
   'rep-demo-1': {
@@ -49,15 +50,23 @@ export default function RescueStatusPage() {
   const { isBangla, locale } = useLocale();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { supabase, isConfigured } = useSession();
   const initialId = searchParams.get('id');
 
   const [initialReport, setInitialReport] = useState<MyReportStatusResponse | null>(null);
 
   const fetchReport = useCallback(async (reportId: string): Promise<MyReportStatusResponse | null> => {
-    // 400ms network simulation
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    if (isConfigured) {
+      try {
+        const live = await getMyReportStatus(supabase, reportId);
+        if (live) return live;
+      } catch {
+        // Fallback to mock lookup when offline/demo ID
+      }
+    }
 
-    // Return matching mock report or generate dynamic report for any newly submitted ID
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     if (MOCK_REPORTS[reportId]) {
       return MOCK_REPORTS[reportId];
     }
@@ -78,7 +87,7 @@ export default function RescueStatusPage() {
     }
 
     return null;
-  }, []);
+  }, [isConfigured, supabase]);
 
   useEffect(() => {
     if (initialId) {

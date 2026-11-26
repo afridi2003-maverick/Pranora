@@ -18,6 +18,7 @@ import {
   type AdoptionListingRow,
   type AdoptionApplicationRow,
 } from '@pranora/api';
+import { useSession } from '../../hooks/useSession';
 
 // ── Mock Fallback Data ───────────────────────────────────────────────────────
 
@@ -176,6 +177,7 @@ const MOCK_APPLICATIONS: AdoptionApplicationRow[] = [
 export function ShelterDashboard() {
   const { locale } = useLocale();
   const isBn = locale === 'bn';
+  const { supabase, isConfigured, isAuthenticated } = useSession();
 
   const [shelter, setShelter] = useState<ShelterProviderRow>(MOCK_SHELTER);
   const [activeTab, setActiveTab] = useState<'queue' | 'cases' | 'listings' | 'applications'>('queue');
@@ -187,16 +189,17 @@ export function ShelterDashboard() {
   const [applications, setApplications] = useState<AdoptionApplicationRow[]>(MOCK_APPLICATIONS);
 
   useEffect(() => {
+    if (!isConfigured || !isAuthenticated) return;
     async function loadData() {
       try {
-        const profile = await getMyShelterProfile(null as any);
+        const profile = await getMyShelterProfile(supabase);
         if (profile) {
           setShelter(profile);
           const [qData, cData, lData, aData] = await Promise.all([
-            getShelterRescueQueue(null as any, profile.id).catch(() => MOCK_QUEUE),
-            getShelterActiveCases(null as any, profile.id).catch(() => MOCK_CASES),
-            getShelterAdoptionListings(null as any, profile.id).catch(() => MOCK_LISTINGS),
-            getShelterPendingApplications(null as any, profile.id).catch(() => MOCK_APPLICATIONS),
+            getShelterRescueQueue(supabase, profile.id).catch(() => MOCK_QUEUE),
+            getShelterActiveCases(supabase, profile.id).catch(() => MOCK_CASES),
+            getShelterAdoptionListings(supabase, profile.id).catch(() => MOCK_LISTINGS),
+            getShelterPendingApplications(supabase, profile.id).catch(() => MOCK_APPLICATIONS),
           ]);
           if (qData.length > 0) setQueue(qData);
           if (cData.length > 0) setCases(cData);
@@ -214,7 +217,7 @@ export function ShelterDashboard() {
   const handleAdmitReport = async (reportId: string) => {
     setActionInProgress(reportId);
     try {
-      await reviewAnimalReport(null as any, reportId, true, shelter.id);
+      await reviewAnimalReport(isConfigured && isAuthenticated ? supabase : (null as any), reportId, true, shelter.id);
     } catch {
       // optimistic fallback
     }
@@ -241,7 +244,7 @@ export function ShelterDashboard() {
   const handleDeclineReport = async (reportId: string) => {
     setActionInProgress(reportId);
     try {
-      await reviewAnimalReport(null as any, reportId, false);
+      await reviewAnimalReport(isConfigured && isAuthenticated ? supabase : (null as any), reportId, false);
     } catch {
       // optimistic fallback
     }
@@ -252,7 +255,7 @@ export function ShelterDashboard() {
   const handleCloseCase = async (caseId: string) => {
     setActionInProgress(caseId);
     try {
-      await closeRescueCase(null as any, caseId, 'adopted', 'Rehabilitated and ready for adoption');
+      await closeRescueCase(isConfigured && isAuthenticated ? supabase : (null as any), caseId, 'adopted', 'Rehabilitated and ready for adoption');
     } catch {
       // optimistic fallback
     }
@@ -263,7 +266,7 @@ export function ShelterDashboard() {
   const handleDecideApplication = async (appId: string, approve: boolean) => {
     setActionInProgress(appId);
     try {
-      await decideAdoptionApplication(null as any, appId, approve);
+      await decideAdoptionApplication(isConfigured && isAuthenticated ? supabase : (null as any), appId, approve);
     } catch {
       // optimistic fallback
     }
