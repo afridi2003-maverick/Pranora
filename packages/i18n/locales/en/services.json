@@ -49,5 +49,30 @@
     "title": "Tips & Articles",
     "readMore": "Read More",
     "disclaimer": "This is not a substitute for a vet's advice"
+  },
+  "onlineConsult": {
+    "title": "Online Vet Consultation",
+    "subtitle": "Book a paid audio or video consultation with a verified vet",
+    "selectVet": "Choose an Online Vet",
+    "callMode": "Consultation Mode",
+    "video": "Video Call",
+    "audio": "Audio Call",
+    "symptoms": "Pet Symptoms / Chief Complaint",
+    "symptomsPlaceholder": "Describe symptoms, duration, and any recent changes...",
+    "payAndBook": "Pay & Confirm Consultation",
+    "joinCall": "Join Call Room",
+    "myConsultations": "My Online Consultations"
+  },
+  "petTaxi": {
+    "title": "Pet Taxi",
+    "subtitle": "Safe, pet-friendly transport to clinics, groomers, or home",
+    "pickup": "Pickup Address",
+    "dropoff": "Dropoff Address / Clinic",
+    "vehicleType": "Vehicle Type",
+    "needsCrate": "Include sanitized pet carrier/crate (+৳80)",
+    "roundTrip": "Round trip (wait & return)",
+    "estimatedFare": "Estimated Fare",
+    "bookTaxi": "Book Pet Taxi",
+    "myRides": "My Pet Taxi Rides"
   }
 }
