@@ -40,3 +40,27 @@ export const CategorySlugSchema = z.enum([
 ]);
 
 export type CategorySlug = z.infer<typeof CategorySlugSchema>;
+
+// ─── SVC-ONL: Online Consultation ─────────────────────────────────────────────
+
+export const OnlineConsultModeSchema = z.enum(['audio', 'video']);
+export type OnlineConsultMode = z.infer<typeof OnlineConsultModeSchema>;
+
+export const OnlineConsultStatusSchema = z.enum([
+  'pending_payment',
+  'confirmed',
+  'in_call',
+  'completed',
+  'cancelled',
+]);
+export type OnlineConsultStatus = z.infer<typeof OnlineConsultStatusSchema>;
+
+export const createOnlineConsultSchema = z.object({
+  vetId: z.string().uuid('Valid vet ID required'),
+  petId: z.string().uuid('Valid pet ID required'),
+  callMode: OnlineConsultModeSchema.default('video'),
+  chiefComplaint: z.string().min(5, 'Please describe the pet symptoms').max(1000),
+  scheduledAt: z.string().datetime(),
+  feeBdt: z.number().int().min(0),
+});
+export type CreateOnlineConsultInput = z.infer<typeof createOnlineConsultSchema>;

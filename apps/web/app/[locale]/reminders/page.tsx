@@ -319,7 +319,7 @@ export default function RemindersPage() {
   const { supabase, isAuthenticated, isConfigured, isLoading: sessionLoading } = useSession();
   const useLiveApi = isConfigured && isAuthenticated;
 
-  const [pets, setPets] = useState(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+  const [pets, setPets] = useState(MOCK_PETS);
   const [reminders, setReminders] = useState<ReminderItem[]>(INITIAL_REMINDERS);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -336,7 +336,7 @@ export default function RemindersPage() {
 
     async function loadData() {
       if (!useLiveApi) {
-        setPets(initialPets && initialPets.length > 0 ? initialPets : MOCK_PETS);
+        setPets(MOCK_PETS);
         setReminders(INITIAL_REMINDERS);
         setLoading(false);
         return;
@@ -367,7 +367,7 @@ export default function RemindersPage() {
     return () => {
       active = false;
     };
-  }, [sessionLoading, useLiveApi, supabase, initialPets]);
+  }, [sessionLoading, useLiveApi, supabase]);
 
   async function handleAdd(params: CreateReminderParams) {
     if (useLiveApi) {

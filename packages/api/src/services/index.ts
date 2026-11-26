@@ -1,4 +1,5 @@
 import type { TypedSupabaseClient } from '../client';
+export * from './online-consult';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
