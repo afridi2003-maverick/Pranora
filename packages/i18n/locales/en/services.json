@@ -74,5 +74,16 @@
     "estimatedFare": "Estimated Fare",
     "bookTaxi": "Book Pet Taxi",
     "myRides": "My Pet Taxi Rides"
+  },
+  "homeVisit": {
+    "title": "Home Vet Visit",
+    "subtitle": "Request a licensed veterinary doctor to visit your home",
+    "coverage": "Coverage Radius",
+    "travelAllowance": "Travel Allowance",
+    "timeWindow": "Visit Time Window",
+    "morning": "Morning (10:00 AM – 1:00 PM)",
+    "afternoon": "Afternoon (2:00 PM – 5:00 PM)",
+    "evening": "Evening (6:00 PM – 9:00 PM)",
+    "confirm": "Confirm Home Visit Request"
   }
 }

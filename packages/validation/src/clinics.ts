@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { providerTypeSchema, speciesTypeSchema } from './map';
+import { providerTypeSchema, speciesTypeSchema } from './map.ts';
 
 /**
  * Provider / vet verification status according to schema.md
@@ -146,3 +146,148 @@ export const providerServiceSchema = z.object({
   isActive: z.boolean().default(true),
 });
 export type ProviderService = z.infer<typeof providerServiceSchema>;
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Phase 2: Home Visit Request (SVC-HOME)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const homeVisitTimeSlotSchema = z.enum(['morning', 'afternoon', 'evening']);
+export type HomeVisitTimeSlot = z.infer<typeof homeVisitTimeSlotSchema>;
+
+export const homeVisitRequestSchema = z.object({
+  clinicId: z.string().uuid('Invalid clinic ID'),
+  locationId: z.string().uuid('Invalid location ID'),
+  petId: z.string().uuid().optional(),
+  petName: z.string().min(1, 'Pet name is required'),
+  petSpecies: speciesTypeSchema,
+  visitDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Visit date must be YYYY-MM-DD'),
+  timeSlot: homeVisitTimeSlotSchema,
+  address: z.string().min(5, 'Detailed address is required'),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  symptoms: z.string().min(3, 'Please describe symptoms or reason for home visit'),
+  phone: z.string().min(8, 'Phone number is required'),
+  emergencyNotes: z.string().optional(),
+  paymentMethod: z.enum(['cash', 'sslcommerz', 'bkash']).default('cash'),
+});
+export type HomeVisitRequest = z.infer<typeof homeVisitRequestSchema>;
+
+export function calculateHomeVisitFee(baseFee: number, distanceKm: number, maxRadiusKm: number = 10) {
+  const isWithinRadius = distanceKm <= maxRadiusKm;
+  // Base consultation fee + travel allowance (e.g. 50 BDT/km, min 150 BDT)
+  const travelFee = Math.max(150, Math.round(distanceKm * 50));
+  const totalFee = baseFee + travelFee;
+  return {
+    baseFee,
+    travelFee,
+    totalFee,
+    isWithinRadius,
+    distanceKm: Math.round(distanceKm * 10) / 10,
+    maxRadiusKm,
+  };
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Phase 2: Grooming Booking (SVC-GRM)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const groomingPackageSchema = z.enum([
+  'bath_brush',     // বেসিক গোসল ও ব্রাশ
+  'full_groom',     // সম্পূর্ণ গ্রুমিং (গোসল, হেয়ারকাট, নখ কাটা, কান পরিষ্কার)
+  'medicated_bath', // অ্যান্টি-টিক / মেডিকেটেড গোসল
+  'nail_ear_care',  // নখ ও কান পরিচর্যা
+]);
+export type GroomingPackage = z.infer<typeof groomingPackageSchema>;
+
+export const petSizeSchema = z.enum(['small', 'medium', 'large']); // <5kg, 5-15kg, >15kg
+export type PetSize = z.infer<typeof petSizeSchema>;
+
+export const groomingBookingSchema = z.object({
+  clinicId: z.string().uuid('Invalid clinic ID'),
+  locationId: z.string().uuid('Invalid location ID'),
+  petId: z.string().uuid().optional(),
+  petName: z.string().min(1, 'Pet name is required'),
+  petSpecies: speciesTypeSchema,
+  petSize: petSizeSchema,
+  packageType: groomingPackageSchema,
+  appointmentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
+  appointmentTime: z.string().min(1, 'Time slot is required'),
+  specialInstructions: z.string().optional(),
+  addons: z.array(z.string()).default([]),
+  phone: z.string().min(8, 'Phone number is required'),
+  paymentMethod: z.enum(['cash', 'sslcommerz', 'bkash']).default('cash'),
+});
+export type GroomingBooking = z.infer<typeof groomingBookingSchema>;
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Phase 2: Boarding Booking (SVC-BRD)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const boardingRoomTypeSchema = z.enum([
+  'standard_kennel', // সাধারণ খাঁচা/রুম
+  'deluxe_ac',       // ডিলাক্স এসি কেবিন
+  'vip_suite',       // ভিআইপি স্যুট
+]);
+export type BoardingRoomType = z.infer<typeof boardingRoomTypeSchema>;
+
+export const boardingBookingSchema = z.object({
+  clinicId: z.string().uuid('Invalid clinic ID'),
+  locationId: z.string().uuid('Invalid location ID'),
+  petId: z.string().uuid().optional(),
+  petName: z.string().min(1, 'Pet name is required'),
+  petSpecies: speciesTypeSchema,
+  checkInDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Check-in date must be YYYY-MM-DD'),
+  checkOutDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Check-out date must be YYYY-MM-DD'),
+  roomType: boardingRoomTypeSchema,
+  vaccinationUpToDate: z.boolean().refine((val) => val === true, {
+    message: 'Vaccinations must be up to date for boarding safety',
+  }),
+  dietaryInstructions: z.string().optional(),
+  emergencyContact: z.string().min(8, 'Emergency contact phone is required'),
+  phone: z.string().min(8, 'Phone number is required'),
+  paymentMethod: z.enum(['cash', 'sslcommerz', 'bkash']).default('cash'),
+});
+export type BoardingBooking = z.infer<typeof boardingBookingSchema>;
+
+export function calculateBoardingCost(
+  checkInDate: string,
+  checkOutDate: string,
+  nightlyRate: number
+) {
+  const start = new Date(checkInDate);
+  const end = new Date(checkOutDate);
+  const diffTime = Math.max(0, end.getTime() - start.getTime());
+  const nights = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
+  return {
+    nights,
+    nightlyRate,
+    subtotal: nights * nightlyRate,
+    foodAndCareFee: nights * 150, // 150 BDT/night food & care
+    totalAmount: nights * nightlyRate + nights * 150,
+  };
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Phase 2: Suggest a Clinic (MAP-11)
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+export const clinicSuggestionSchema = z.object({
+  name: z.string().min(2, 'Clinic name is required'),
+  nameEn: z.string().optional(),
+  divisionId: z.number().int().optional(),
+  districtId: z.number().int().optional(),
+  address: z.string().min(5, 'Address details are required'),
+  phone: z.string().min(8, 'Contact phone number is required'),
+  is24h: z.boolean().default(false),
+  hasEmergency: z.boolean().default(false),
+  offersHomeVisit: z.boolean().default(false),
+  services: z.array(z.string()).default([]),
+  notes: z.string().optional(),
+  photoUrl: z.string().url().optional(),
+});
+export type ClinicSuggestion = z.infer<typeof clinicSuggestionSchema>;
+
