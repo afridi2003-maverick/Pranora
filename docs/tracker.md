@@ -188,7 +188,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-GRM | Grooming booking | Zimia | M | S7 | APT-1, SVC-2 | ⬜ |
 | SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ✅ |
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
-| REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
+| REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ✅ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ✅ |
 | SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ⬜ |
