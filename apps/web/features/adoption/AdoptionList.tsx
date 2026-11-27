@@ -6,8 +6,10 @@ import {
   getMyFavoriteListingIds,
   getPublicAdoptionListings,
   toggleAdoptionFavorite,
+  reportAdoptionListing,
   type AdoptionListingRow,
 } from '@pranora/api';
+import type { ListingReportReason } from '@pranora/validation';
 import { AdoptionCard } from './AdoptionCard';
 import { AdoptionFilters, type FilterState } from './AdoptionFilters';
 import { AdoptionDetailModal } from './AdoptionDetailModal';
@@ -182,6 +184,21 @@ export function AdoptionList({
         onApply={onApply}
         onSave={handleToggleSave}
         isSaved={selectedListing ? savedIds.has(selectedListing.id) : false}
+        onReport={async (payload: {
+          listingId: string;
+          reason: ListingReportReason;
+          details?: string;
+        }) => {
+          if (isConfigured && supabase) {
+            try {
+              await reportAdoptionListing(supabase, payload);
+              return { success: true };
+            } catch (err: any) {
+              return { success: false, error: err?.message || 'Report failed' };
+            }
+          }
+          return { success: true };
+        }}
       />
     </div>
   );

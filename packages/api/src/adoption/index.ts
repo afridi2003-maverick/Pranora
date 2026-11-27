@@ -683,3 +683,43 @@ export async function getReviewableAdoptionApplications(
   }));
 }
 
+export type ListingReportReason =
+  | 'fake'
+  | 'scam'
+  | 'commercial_sale'
+  | 'animal_cruelty'
+  | 'inaccurate_info'
+  | 'other';
+
+export interface ReportAdoptionListingParams {
+  listingId: string;
+  reason: ListingReportReason;
+  details?: string;
+  evidenceUrls?: string[];
+}
+
+/** Report a fake or fraudulent adoption listing (ADP-8 shared with REV-2/ADM-2) */
+export async function reportAdoptionListing(
+  client: TypedSupabaseClient,
+  params: ReportAdoptionListingParams
+): Promise<{ reportId: string; status: 'submitted' }> {
+  const { listingId, reason, details, evidenceUrls = [] } = params;
+
+  const { data, error } = await (client as any).rpc('submit_content_report', {
+    p_target_type: 'adoption_listing',
+    p_target_id: listingId,
+    p_reason: reason,
+    p_details: details ?? null,
+    p_evidence_urls: evidenceUrls,
+  });
+
+  if (error) {
+    throw new Error(`Failed to report listing: ${error.message}`);
+  }
+
+  return {
+    reportId: data as string,
+    status: 'submitted',
+  };
+}
+
