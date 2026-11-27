@@ -1250,6 +1250,36 @@ export interface Database {
         };
         Returns: boolean;
       };
+      nearby_rescuers: {
+        Args: {
+          p_lat: number;
+          p_lng: number;
+          p_radius_m?: number | null;
+          p_species?: SpeciesType | null;
+        };
+        Returns: {
+          rescuer_id: string;
+          distance_meters: number;
+          radius_km: number;
+          is_available: boolean;
+          species: SpeciesType[];
+          display_name: string | null;
+          avatar_url: string | null;
+          active_cases_count: number;
+        }[];
+      };
+      upsert_rescuer_profile: {
+        Args: {
+          p_user_id: string;
+          p_lat?: number | null;
+          p_lng?: number | null;
+          p_district_id?: number | null;
+          p_radius_km?: number | null;
+          p_species?: SpeciesType[] | null;
+          p_is_available?: boolean | null;
+        };
+        Returns: Database['public']['Tables']['rescuer_profiles']['Row'];
+      };
       my_report_status: {
         Args: {
           p_report_id: string;

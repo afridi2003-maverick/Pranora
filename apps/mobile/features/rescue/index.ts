@@ -11,3 +11,4 @@ export * from './CloseCaseOutcomeModal';
 export * from './caseDetailMockData';
 export * from './UrgentReportAlertBanner';
 export * from './DuplicateReportsCard';
+export * from './RescuerProfileCard';

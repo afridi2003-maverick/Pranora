@@ -183,7 +183,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | ADP-8 | Report fake listing | Brehat | S | S8 | ADP-1, (REV-2) | ✅ |
 | ADP-9 | Post-adoption follow-up | Brehat | M | S6 | ADP-6, HLT-2 | ✅ |
 | RSC-8 | Duplicate report detection + merge | Brehat | M | S7 | RSC-1 | ✅ |
-| RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ⬜ |
+| RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ✅ |
 | RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | Brehat | M | S8 | RSC-1, NOTIF-1 | ⬜ |
 | SVC-GRM | Grooming booking | Zimia | M | S7 | APT-1, SVC-2 | ⬜ |
 | SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ⬜ |

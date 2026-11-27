@@ -1,5 +1,6 @@
 import type { TypedSupabaseClient } from '../client';
 import type {
+  Database,
   AnimalReportKind,
   SpeciesType,
   UrgencyLevel,
@@ -510,5 +511,100 @@ export async function mergeAnimalReports(
 
   if (error) throw error;
   return Boolean(data);
+}
+
+export type RescuerProfileRow = Database['public']['Tables']['rescuer_profiles']['Row'];
+
+export interface NearbyRescuer {
+  rescuer_id: string;
+  distance_meters: number;
+  radius_km: number;
+  is_available: boolean;
+  species: SpeciesType[];
+  display_name: string | null;
+  avatar_url: string | null;
+  active_cases_count: number;
+}
+
+export interface FindNearbyRescuersParams {
+  lat: number;
+  lng: number;
+  radius_m?: number;
+  species?: SpeciesType;
+}
+
+export interface UpsertRescuerProfileParams {
+  userId: string;
+  lat?: number;
+  lng?: number;
+  districtId?: number;
+  radiusKm?: number;
+  species?: SpeciesType[];
+  isAvailable?: boolean;
+}
+
+/** Search nearby available verified rescuers within coverage radius (RSC-9) */
+export async function findNearbyRescuers(
+  client: TypedSupabaseClient,
+  params: FindNearbyRescuersParams
+): Promise<NearbyRescuer[]> {
+  const { data, error } = await client.rpc('nearby_rescuers', {
+    p_lat: params.lat,
+    p_lng: params.lng,
+    p_radius_m: params.radius_m ?? null,
+    p_species: params.species ?? null,
+  });
+
+  if (error) throw error;
+  return (data as unknown as NearbyRescuer[]) ?? [];
+}
+
+/** Fetch a rescuer's profile and availability details */
+export async function getRescuerProfile(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<RescuerProfileRow | null> {
+  const { data, error } = await client
+    .from('rescuer_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as RescuerProfileRow | null;
+}
+
+/** Update or create a rescuer coverage profile */
+export async function upsertRescuerProfile(
+  client: TypedSupabaseClient,
+  params: UpsertRescuerProfileParams
+): Promise<RescuerProfileRow> {
+  const { data, error } = await client.rpc('upsert_rescuer_profile', {
+    p_user_id: params.userId,
+    p_lat: params.lat ?? null,
+    p_lng: params.lng ?? null,
+    p_district_id: params.districtId ?? null,
+    p_radius_km: params.radiusKm ?? null,
+    p_species: params.species ?? null,
+    p_is_available: params.isAvailable ?? null,
+  });
+
+  if (error) throw error;
+  return data as unknown as RescuerProfileRow;
+}
+
+/** Quick toggle for rescuer availability status */
+export async function setRescuerAvailability(
+  client: TypedSupabaseClient,
+  userId: string,
+  isAvailable: boolean
+): Promise<boolean> {
+  const { error } = await client
+    .from('rescuer_profiles')
+    .update({ is_available: isAvailable, updated_at: new Date().toISOString() })
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return true;
 }
 

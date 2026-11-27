@@ -121,3 +121,34 @@ export const AddCaseUpdateSchema = z.object({
   photos: z.array(z.string().url()).max(6).default([]),
 });
 export type AddCaseUpdateInput = z.infer<typeof AddCaseUpdateSchema>;
+
+export const FindNearbyRescuersSchema = z.object({
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  radius_m: z.number().int().min(100).max(100000).optional(),
+  species: SpeciesSchema.optional(),
+});
+export type FindNearbyRescuersInput = z.infer<typeof FindNearbyRescuersSchema>;
+
+export const NearbyRescuerItemSchema = z.object({
+  rescuer_id: z.string().uuid(),
+  distance_meters: z.number(),
+  radius_km: z.number(),
+  is_available: z.boolean(),
+  species: z.array(SpeciesSchema),
+  display_name: z.string().nullable().optional(),
+  avatar_url: z.string().nullable().optional(),
+  active_cases_count: z.number().int(),
+});
+export type NearbyRescuerItem = z.infer<typeof NearbyRescuerItemSchema>;
+
+export const UpsertRescuerProfileSchema = z.object({
+  user_id: z.string().uuid(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  district_id: z.number().int().positive().optional(),
+  radius_km: z.number().min(0.5).max(100).default(5),
+  species: z.array(SpeciesSchema).min(1).default(['dog', 'cat']),
+  is_available: z.boolean().default(true),
+});
+export type UpsertRescuerProfileInput = z.infer<typeof UpsertRescuerProfileSchema>;
