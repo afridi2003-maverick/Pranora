@@ -40,6 +40,15 @@ export default function AdoptionScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            onPress={() => router.push('/adoption/matches')}
+            className="bg-amber-100 px-2.5 py-1.5 rounded-lg border border-amber-300"
+          >
+            <Text className="text-amber-900 text-xs font-bold">
+              🎯 {isBangla ? 'ম্যাচ' : 'Match'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={() => router.push('/adoption/applications')}
             className="bg-emerald-100 px-2.5 py-1.5 rounded-lg border border-emerald-300"
           >

@@ -1330,6 +1330,75 @@ export interface Database {
         };
         Relationships: [];
       };
+      adopter_preferences: {
+        Row: {
+          id: string;
+          user_id: string;
+          species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other' | 'any';
+          preferred_gender: 'male' | 'female' | 'unknown' | 'any';
+          age_group: 'baby' | 'young' | 'adult' | 'senior' | 'any';
+          district_id: number | null;
+          wants_vaccinated: boolean;
+          wants_neutered: boolean;
+          has_other_pets: boolean;
+          home_type: 'own_house' | 'rented_house' | 'own_flat' | 'rented_flat' | 'other';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          species?: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other' | 'any';
+          preferred_gender?: 'male' | 'female' | 'unknown' | 'any';
+          age_group?: 'baby' | 'young' | 'adult' | 'senior' | 'any';
+          district_id?: number | null;
+          wants_vaccinated?: boolean;
+          wants_neutered?: boolean;
+          has_other_pets?: boolean;
+          home_type?: 'own_house' | 'rented_house' | 'own_flat' | 'rented_flat' | 'other';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          species?: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other' | 'any';
+          preferred_gender?: 'male' | 'female' | 'unknown' | 'any';
+          age_group?: 'baby' | 'young' | 'adult' | 'senior' | 'any';
+          district_id?: number | null;
+          wants_vaccinated?: boolean;
+          wants_neutered?: boolean;
+          has_other_pets?: boolean;
+          home_type?: 'own_house' | 'rented_house' | 'own_flat' | 'rented_flat' | 'other';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      adoption_match_logs: {
+        Row: {
+          id: string;
+          user_id: string;
+          listing_id: string;
+          score: number;
+          surfaced_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          listing_id: string;
+          score: number;
+          surfaced_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          listing_id?: string;
+          score?: number;
+          surfaced_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -1619,6 +1688,43 @@ export interface Database {
           method: string;
           status: string;
         };
+      };
+      upsert_adopter_preferences: {
+        Args: {
+          p_user_id: string;
+          p_species?: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other' | 'any';
+          p_preferred_gender?: 'male' | 'female' | 'unknown' | 'any';
+          p_age_group?: 'baby' | 'young' | 'adult' | 'senior' | 'any';
+          p_district_id?: number | null;
+          p_wants_vaccinated?: boolean;
+          p_wants_neutered?: boolean;
+          p_has_other_pets?: boolean;
+          p_home_type?: 'own_house' | 'rented_house' | 'own_flat' | 'rented_flat' | 'other';
+        };
+        Returns: void;
+      };
+      get_adoption_matches: {
+        Args: {
+          p_user_id: string;
+          p_limit?: number;
+        };
+        Returns: {
+          listing_id: string;
+          score: number;
+          species: string;
+          gender: string;
+          age_months: number | null;
+          title_bn: string | null;
+          title_en: string | null;
+          description_bn: string | null;
+          description_en: string | null;
+          photos: string[];
+          is_vaccinated: boolean;
+          is_neutered: boolean;
+          district_id: number;
+          status: string;
+          created_at: string;
+        }[];
       };
     };
     Enums: {

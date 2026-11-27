@@ -723,3 +723,117 @@ export async function reportAdoptionListing(
   };
 }
 
+
+// ── ADP-10: Smart Adoption Matching ─────────────────────────────────────────
+
+import type { AdopterPreference, AdoptionMatch } from '@pranora/validation';
+export type { AdopterPreference, AdoptionMatch };
+
+/** Upsert adopter preferences for smart matching */
+export async function saveAdopterPreferences(
+  client: TypedSupabaseClient | null,
+  userId: string,
+  prefs: AdopterPreference
+): Promise<void> {
+  if (!client) return;
+  const { error } = await (client as any).rpc('upsert_adopter_preferences', {
+    p_user_id: userId,
+    p_species: prefs.species,
+    p_preferred_gender: prefs.preferred_gender,
+    p_age_group: prefs.age_group,
+    p_district_id: prefs.district_id ?? null,
+    p_wants_vaccinated: prefs.wants_vaccinated,
+    p_wants_neutered: prefs.wants_neutered,
+    p_has_other_pets: prefs.has_other_pets,
+    p_home_type: prefs.home_type,
+  });
+
+  if (error) throw new Error(`saveAdopterPreferences: ${error.message}`);
+}
+
+/** Fetch smart adoption matches for a user */
+export async function getAdoptionMatches(
+  client: TypedSupabaseClient | null,
+  userId: string,
+  limit = 10
+): Promise<AdoptionMatch[]> {
+  if (!client) return MOCK_ADOPTION_MATCHES;
+  const { data, error } = await (client as any).rpc('get_adoption_matches', {
+    p_user_id: userId,
+    p_limit: limit,
+  });
+
+  if (error) throw new Error(`getAdoptionMatches: ${error.message}`);
+  return (data ?? []) as AdoptionMatch[];
+}
+
+/** Fetch the saved adopter preferences for a user (or null if not set) */
+export async function getAdopterPreferences(
+  client: TypedSupabaseClient | null,
+  userId: string
+): Promise<AdopterPreference | null> {
+  if (!client) return null;
+  const { data, error } = await (client as any)
+    .from('adopter_preferences')
+    .select('species,preferred_gender,age_group,district_id,wants_vaccinated,wants_neutered,has_other_pets,home_type')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) throw new Error(`getAdopterPreferences: ${error.message}`);
+  return data as AdopterPreference | null;
+}
+
+/** Mock matches for local dev / no-auth fallback */
+export const MOCK_ADOPTION_MATCHES: AdoptionMatch[] = [
+  {
+    listing_id: 'a1000000-0000-0000-0000-000000000001',
+    score: 95,
+    species: 'dog',
+    gender: 'male',
+    age_months: 10,
+    title_bn: 'সুস্থ, টিকাদানকৃত কুকুরছানা দত্তক দেওয়া হবে',
+    title_en: 'Healthy vaccinated puppy for adoption',
+    description_bn: 'বাড়িতে জন্মানো মিষ্টি কুকুরছানা, সব টিকা দেওয়া আছে।',
+    description_en: 'Home-raised sweet puppy, fully vaccinated.',
+    photos: ['https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=500&auto=format&fit=crop&q=60'],
+    is_vaccinated: true,
+    is_neutered: false,
+    district_id: 1,
+    status: 'available',
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+  {
+    listing_id: 'a1000000-0000-0000-0000-000000000002',
+    score: 85,
+    species: 'cat',
+    gender: 'female',
+    age_months: 18,
+    title_bn: 'বিনামূল্যে দত্তক: ভ্যাকসিনেটেড মেয়ে বিড়াল',
+    title_en: 'Free adoption: vaccinated female cat',
+    description_bn: 'শান্ত স্বভাবের প্রাপ্তবয়স্ক মেয়ে বিড়াল, ইনডোর পরিবেশে অভ্যস্ত।',
+    description_en: 'Calm adult female cat, accustomed to indoor living.',
+    photos: ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&auto=format&fit=crop&q=60'],
+    is_vaccinated: true,
+    is_neutered: true,
+    district_id: 2,
+    status: 'available',
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+  {
+    listing_id: 'a1000000-0000-0000-0000-000000000003',
+    score: 75,
+    species: 'dog',
+    gender: 'female',
+    age_months: 36,
+    title_bn: 'প্রশিক্ষিত প্রাপ্তবয়স্ক কুকুর দত্তক দেওয়া হবে',
+    title_en: 'Trained adult dog for adoption',
+    description_bn: 'বাড়িতে থাকতে পারে, পরিষ্কার ও বাধ্য।',
+    description_en: 'House-trained, clean and obedient.',
+    photos: ['https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=500&auto=format&fit=crop&q=60'],
+    is_vaccinated: true,
+    is_neutered: true,
+    district_id: 1,
+    status: 'available',
+    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+  },
+];

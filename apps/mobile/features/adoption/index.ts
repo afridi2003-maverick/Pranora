@@ -9,3 +9,5 @@ export * from './AdoptionFollowupCard';
 export * from './ReportListingModal';
 export * from './AdoptionReviewScreen';
 export * from './mockData';
+export * from './SmartMatchCard';
+export * from './SmartMatchList';
