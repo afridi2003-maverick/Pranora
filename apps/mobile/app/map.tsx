@@ -24,6 +24,9 @@ import {
   getUpazilasByDistrict,
   getUpazilaById,
   type AreaSearchResult,
+  clusterMarkers,
+  autoExpandRadius,
+  RADIUS_TIERS_KM,
 } from '@pranora/api';
 import { Modal } from 'react-native';
 
@@ -43,6 +46,11 @@ export default function MobileMapScreen() {
   const [filterEmergency, setFilterEmergency] = useState(params.emergency === 'true');
   const [filterGovt, setFilterGovt] = useState<'all' | 'govt' | 'private'>('all');
   const [selectedSpecies] = useState<'all' | 'dog' | 'cat'>('all');
+
+  // MAP-8 & MAP-10
+  const [radiusKm, setRadiusKm] = useState<number>(10);
+  const [autoExpandNotice, setAutoExpandNotice] = useState<string | null>(null);
+  const [activeLayer, setActiveLayer] = useState<'all' | 'vet' | 'grooming' | 'boarding' | 'home_visit' | 'emergency'>('all');
 
   // Area Picker state (MAP-4)
   const [locationName, setLocationName] = useState('ধানমন্ডি, ঢাকা');
@@ -91,13 +99,27 @@ export default function MobileMapScreen() {
         const results = await getNearbyClinicsWithFallback({
           lat: userCoords.lat,
           lng: userCoords.lng,
-          radiusM: 20000,
+          radiusM: radiusKm * 1000,
           openNow: filterOpenNow,
-          emergency: filterEmergency,
+          emergency: filterEmergency || activeLayer === 'emergency',
           species: selectedSpecies !== 'all' ? selectedSpecies : undefined,
           limit: 50,
         });
         if (active) {
+          if (results.length === 0) {
+            const expansion = autoExpandRadius(radiusKm, 0);
+            if (expansion.didExpand) {
+              setRadiusKm(expansion.nextRadiusKm);
+              setAutoExpandNotice(
+                isBangla
+                  ? `${radiusKm} কিমিতে পাওয়া যায়নি, বাড়ানো হয়েছে ${expansion.nextRadiusKm} কিমি`
+                  : `Expanded radius to ${expansion.nextRadiusKm} km`
+              );
+            }
+          } else {
+            setAutoExpandNotice(null);
+          }
+
           setClinics(results);
           if (results.length > 0 && !selectedClinicId) {
             setSelectedClinicId(results[0]?.locationId ?? null);
@@ -113,7 +135,7 @@ export default function MobileMapScreen() {
     return () => {
       active = false;
     };
-  }, [userCoords, filterOpenNow, filterEmergency, selectedSpecies]);
+  }, [userCoords, radiusKm, activeLayer, filterOpenNow, filterEmergency, selectedSpecies, isBangla]);
 
   const filteredClinics = useMemo(() => {
     return clinics.filter((c) => {
@@ -128,9 +150,19 @@ export default function MobileMapScreen() {
       if (filterGovt === 'govt' && !c.isGovernment) return false;
       if (filterGovt === 'private' && c.isGovernment) return false;
 
+      // Layer filtering (MAP-10)
+      if (activeLayer === 'grooming' && !c.offersHomeVisit) return false;
+      if (activeLayer === 'boarding' && c.isGovernment) return false;
+      if (activeLayer === 'home_visit' && !c.offersHomeVisit) return false;
+      if (activeLayer === 'emergency' && !c.hasEmergency && !c.is24h) return false;
+
       return true;
     });
-  }, [clinics, search, filter24h, filterGovt, isBangla]);
+  }, [clinics, search, filter24h, filterGovt, activeLayer, isBangla]);
+
+  const mobileClusters = useMemo(() => {
+    return clusterMarkers(filteredClinics, 12, 50);
+  }, [filteredClinics]);
 
   const handleCall = (phone: string | null) => {
     if (phone) {
@@ -222,8 +254,31 @@ export default function MobileMapScreen() {
           </View>
         )}
 
-        {/* Filter Badges Horizontal Scroll */}
+        {/* Filter Badges & Service Layers Horizontal Scroll (MAP-10) */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-1.5 pt-1">
+          {/* Service Layers */}
+          {[
+            { id: 'all', icon: '🌐', labelBn: 'সকল', labelEn: 'All' },
+            { id: 'vet', icon: '🩺', labelBn: 'চিকিৎসা', labelEn: 'Vet' },
+            { id: 'grooming', icon: '✂️', labelBn: 'গ্রুমিং', labelEn: 'Grooming' },
+            { id: 'boarding', icon: '🏨', labelBn: 'বোর্ডিং', labelEn: 'Boarding' },
+            { id: 'home_visit', icon: '🏡', labelBn: 'হোম ভিজিট', labelEn: 'Home Visit' },
+            { id: 'emergency', icon: '🚨', labelBn: '২৪/৭ জরুরি', labelEn: '24/7' },
+          ].map((layer) => (
+            <TouchableOpacity
+              key={layer.id}
+              onPress={() => setActiveLayer(layer.id as any)}
+              className={`px-2.5 py-1 rounded-full border flex-row items-center gap-1 ${
+                activeLayer === layer.id ? 'bg-emerald-700 border-emerald-700' : 'bg-gray-100 border-gray-200'
+              }`}
+            >
+              <Text className="text-[10px]">{layer.icon}</Text>
+              <Text className={`text-[11px] ${activeLayer === layer.id ? 'text-white font-bold' : 'text-gray-700'}`}>
+                {isBangla ? layer.labelBn : layer.labelEn}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
           <TouchableOpacity
             onPress={() => setFilterOpenNow((p) => !p)}
             className={`px-2.5 py-1 rounded-full border ${
@@ -232,17 +287,6 @@ export default function MobileMapScreen() {
           >
             <Text className={`text-[11px] ${filterOpenNow ? 'text-white font-bold' : 'text-gray-700'}`}>
               {isBangla ? 'এখন খোলা' : 'Open Now'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setFilter24h((p) => !p)}
-            className={`px-2.5 py-1 rounded-full border ${
-              filter24h ? 'bg-green-700 border-green-700' : 'bg-gray-100 border-gray-200'
-            }`}
-          >
-            <Text className={`text-[11px] ${filter24h ? 'text-white font-bold' : 'text-gray-700'}`}>
-              {isBangla ? '২৪/৭ খোলা' : '24/7'}
             </Text>
           </TouchableOpacity>
 
@@ -256,18 +300,39 @@ export default function MobileMapScreen() {
               🏛️ {isBangla ? 'সরকারি' : 'Govt'}
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setFilterGovt((p) => (p === 'private' ? 'all' : 'private'))}
-            className={`px-2.5 py-1 rounded-full border ${
-              filterGovt === 'private' ? 'bg-purple-600 border-purple-600' : 'bg-gray-100 border-gray-200'
-            }`}
-          >
-            <Text className={`text-[11px] ${filterGovt === 'private' ? 'text-white font-bold' : 'text-gray-700'}`}>
-              🏥 {isBangla ? 'বেসরকারি' : 'Private'}
-            </Text>
-          </TouchableOpacity>
         </ScrollView>
+
+        {/* Radius Selector Row (MAP-8) */}
+        <View className="flex-row items-center justify-between pt-1.5 border-t border-gray-100 mt-1">
+          <Text className="text-[10px] text-gray-500 font-semibold">
+            📏 {isBangla ? 'পরিধি:' : 'Radius:'} <Text className="font-bold text-emerald-700">{radiusKm} km</Text>
+          </Text>
+          <View className="flex-row gap-1">
+            {RADIUS_TIERS_KM.map((tier) => (
+              <TouchableOpacity
+                key={tier}
+                onPress={() => setRadiusKm(tier)}
+                className={`px-2 py-0.5 rounded text-[10px] ${
+                  radiusKm === tier ? 'bg-emerald-700' : 'bg-gray-100'
+                }`}
+              >
+                <Text className={`text-[10px] font-bold ${radiusKm === tier ? 'text-white' : 'text-gray-600'}`}>
+                  {tier}k
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Auto-Expand Notice (MAP-8) */}
+        {autoExpandNotice && (
+          <View className="bg-amber-50 p-1.5 rounded mt-1 border border-amber-200 flex-row justify-between items-center">
+            <Text className="text-[10px] text-amber-800 flex-1">⚠️ {autoExpandNotice}</Text>
+            <TouchableOpacity onPress={() => setAutoExpandNotice(null)}>
+              <Text className="text-[10px] font-bold text-amber-700 ml-1">✕</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Interactive Map Visualizer (Center User Pin & Markers) */}
@@ -284,10 +349,40 @@ export default function MobileMapScreen() {
           </Text>
         </View>
 
-        {/* Clinic Pins */}
-        {filteredClinics.map((c) => {
-          const dx = (c.lng - userCoords.lng) * 2500;
-          const dy = (userCoords.lat - c.lat) * 2500;
+        {/* Clustered Map Markers (MAP-9) */}
+        {mobileClusters.map((cluster) => {
+          const dx = (cluster.lng - userCoords.lng) * 2500;
+          const dy = (userCoords.lat - cluster.lat) * 2500;
+
+          if (cluster.isCluster) {
+            return (
+              <TouchableOpacity
+                key={cluster.id}
+                onPress={() => {
+                  if (cluster.items[0]?.locationId) {
+                    setSelectedClinicId(cluster.items[0].locationId);
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  transform: [{ translateX: dx }, { translateY: dy }],
+                }}
+                className="items-center z-25"
+              >
+                <View className="w-10 h-10 rounded-full bg-emerald-700 items-center justify-center border-2 border-white shadow-xl">
+                  <Text className="text-xs font-bold text-white">+{cluster.count}</Text>
+                </View>
+                <View className="bg-black/80 px-1.5 py-0.5 rounded mt-0.5">
+                  <Text className="text-[9px] text-emerald-300 font-bold">
+                    {cluster.count} {isBangla ? 'ক্লিনিক' : 'clinics'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }
+
+          const c = cluster.items[0];
+          if (!c) return null;
           const isSelected = c.locationId === selectedClinicId;
 
           return (
@@ -302,10 +397,28 @@ export default function MobileMapScreen() {
             >
               <View
                 className={`w-9 h-9 rounded-full items-center justify-center border-2 border-white shadow-lg ${
-                  c.hasEmergency ? 'bg-red-600' : c.isGovernment ? 'bg-blue-600' : 'bg-green-700'
+                  c.hasEmergency
+                    ? 'bg-red-600'
+                    : c.isGovernment
+                      ? 'bg-blue-600'
+                      : activeLayer === 'grooming'
+                        ? 'bg-purple-600'
+                        : activeLayer === 'boarding'
+                          ? 'bg-amber-600'
+                          : 'bg-green-700'
                 }`}
               >
-                <Text className="text-sm">{c.hasEmergency ? '🚨' : c.isGovernment ? '🏛️' : '🏥'}</Text>
+                <Text className="text-sm">
+                  {c.hasEmergency
+                    ? '🚨'
+                    : c.isGovernment
+                      ? '🏛️'
+                      : activeLayer === 'grooming'
+                        ? '✂️'
+                        : activeLayer === 'boarding'
+                          ? '🏨'
+                          : '🏥'}
+                </Text>
               </View>
               <View className="bg-black/80 px-2 py-0.5 rounded mt-0.5">
                 <Text className="text-[10px] text-white font-bold truncate max-w-[100px]">
@@ -330,18 +443,30 @@ export default function MobileMapScreen() {
         style={{ height: bottomSheetExpanded ? SCREEN_HEIGHT * 0.65 : 230 }}
         className="bg-white rounded-t-3xl shadow-2xl border-t border-gray-200 z-30"
       >
-        {/* Drag Handle */}
-        <TouchableOpacity
-          onPress={() => setBottomSheetExpanded((p) => !p)}
-          className="items-center py-2 border-b border-gray-100"
-        >
-          <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-1" />
-          <Text className="text-[11px] text-gray-500 font-bold">
-            {isBangla
-              ? `${filteredClinics.length}টি ক্লিনিক পাওয়া গেছে (${bottomSheetExpanded ? 'সংক্ষিপ্ত করুন ▼' : 'সম্পূর্ণ তালিকা দেখুন ▲'})`
-              : `${filteredClinics.length} clinics nearby (${bottomSheetExpanded ? 'Collapse ▼' : 'Expand full list ▲'})`}
-          </Text>
-        </TouchableOpacity>
+        {/* Drag Handle & Suggest Clinic Header (MAP-11) */}
+        <View className="flex-row items-center justify-between px-4 py-2 border-b border-gray-100">
+          <TouchableOpacity
+            onPress={() => setBottomSheetExpanded((p) => !p)}
+            className="flex-1 items-center"
+          >
+            <View className="w-12 h-1.5 bg-gray-300 rounded-full mb-1" />
+            <Text className="text-[11px] text-gray-500 font-bold">
+              {isBangla
+                ? `${filteredClinics.length}টি ক্লিনিক পাওয়া গেছে (${bottomSheetExpanded ? 'সংক্ষিপ্ত করুন ▼' : 'সম্পূর্ণ তালিকা দেখুন ▲'})`
+                : `${filteredClinics.length} clinics nearby (${bottomSheetExpanded ? 'Collapse ▼' : 'Expand full list ▲'})`}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/clinics/suggest' as any)}
+            className="bg-emerald-100 px-2.5 py-1 rounded-full flex-row items-center gap-1 border border-emerald-300"
+          >
+            <Text className="text-[10px]">➕</Text>
+            <Text className="text-[10px] font-bold text-emerald-800">
+              {isBangla ? 'ক্লিনিক যোগ' : 'Suggest'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         {loading ? (
           <View className="flex-1 items-center justify-center p-4">

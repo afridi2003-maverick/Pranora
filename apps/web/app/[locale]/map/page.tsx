@@ -16,6 +16,10 @@ import {
   getUpazilasByDistrict,
   getUpazilaById,
   type AreaSearchResult,
+  clusterMarkers,
+  autoExpandRadius,
+  RADIUS_TIERS_KM,
+  type RadiusTierKm,
 } from '@pranora/api';
 import { useSession } from '../../../hooks/useSession';
 
@@ -41,6 +45,13 @@ export default function WebMapPage() {
   const [selectedSpecies, setSelectedSpecies] = useState<'all' | 'dog' | 'cat' | 'bird' | 'rabbit'>('all');
   const [maxFee, setMaxFee] = useState<number | null>(null);
   const [filterModalOpen, setFilterModalOpen] = useState<boolean>(false);
+
+  // Radius Slider (MAP-8)
+  const [radiusKm, setRadiusKm] = useState<number>(10);
+  const [autoExpandNotice, setAutoExpandNotice] = useState<string | null>(null);
+
+  // Service Layers (MAP-10)
+  const [activeLayer, setActiveLayer] = useState<'all' | 'vet' | 'grooming' | 'boarding' | 'home_visit' | 'emergency'>('all');
 
   // Area Picker state (MAP-4)
   const [areaModalOpen, setAreaModalOpen] = useState<boolean>(false);
@@ -165,10 +176,10 @@ export default function WebMapPage() {
           {
             lat: userCoords.lat,
             lng: userCoords.lng,
-            radiusM: 25000,
+            radiusM: radiusKm * 1000,
             openNow: filterOpenNow,
-            emergency: filterEmergency,
-            homeVisit: filterHomeVisit,
+            emergency: filterEmergency || activeLayer === 'emergency',
+            homeVisit: filterHomeVisit || activeLayer === 'home_visit',
             species: selectedSpecies !== 'all' ? selectedSpecies : undefined,
             maxFee: maxFee !== null ? maxFee : undefined,
             limit: 50,
@@ -177,6 +188,21 @@ export default function WebMapPage() {
         );
 
         if (active) {
+          if (results.length === 0) {
+            // Auto-expand search radius if nothing found (MAP-8)
+            const expansion = autoExpandRadius(radiusKm, 0);
+            if (expansion.didExpand) {
+              setRadiusKm(expansion.nextRadiusKm);
+              setAutoExpandedNotice(
+                isBangla
+                  ? `${radiusKm} কিমিতে কোনো ক্লিনিক পাওয়া যায়নি, অনুসন্ধান পরিধি বাড়িয়ে ${expansion.nextRadiusKm} কিমি করা হয়েছে`
+                  : `No clinics found within ${radiusKm} km, automatically expanded search to ${expansion.nextRadiusKm} km`
+              );
+            }
+          } else {
+            setAutoExpandedNotice(null);
+          }
+
           setClinics(results);
           if (results.length > 0 && !selectedClinicId) {
             setSelectedClinicId(results[0]?.locationId ?? null);
@@ -193,11 +219,46 @@ export default function WebMapPage() {
     return () => {
       active = false;
     };
-  }, [userCoords, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee, isConfigured, supabase]);
+  }, [userCoords, radiusKm, activeLayer, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee, isConfigured, supabase, isBangla]);
 
-  // Client-side search and ownership filter (MAP-3)
+  // Client-side search and ownership filter (MAP-3 & MAP-10)
   const displayedClinics = useMemo(() => {
     return clinics.filter((c) => {
+      const name = (isBangla ? c.nameBn : c.nameEn) || c.nameEn || '';
+      const address = (isBangla ? c.addressBn : c.addressEn) || c.addressEn || '';
+      const matchesSearch =
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        address.toLowerCase().includes(searchQuery.toLowerCase());
+
+      if (!matchesSearch) return false;
+
+      if (filter24h && !c.is24h) return false;
+      if (filterGovt === 'govt' && !c.isGovernment) return false;
+      if (filterGovt === 'private' && c.isGovernment) return false;
+      if (maxFee !== null && (c.feeFrom ?? 500) > maxFee) return false;
+
+      // Layer filtering (MAP-10)
+      if (activeLayer === 'grooming' && !c.nameEn?.toLowerCase().includes('animal') && !c.offersHomeVisit) {
+        return false;
+      }
+      if (activeLayer === 'boarding' && c.isGovernment) {
+        return false;
+      }
+      if (activeLayer === 'home_visit' && !c.offersHomeVisit) {
+        return false;
+      }
+      if (activeLayer === 'emergency' && !c.hasEmergency && !c.is24h) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [clinics, searchQuery, filter24h, filterGovt, maxFee, activeLayer, isBangla]);
+
+  // Marker clustering (MAP-9)
+  const mapClusters = useMemo(() => {
+    return clusterMarkers(displayedClinics, 12, 50);
+  }, [displayedClinics]);
       const name = (isBangla ? c.nameBn : c.nameEn) || c.nameEn || '';
       const address = (isBangla ? c.addressBn : c.addressEn) || c.addressEn || '';
       const matchesSearch =
@@ -461,7 +522,80 @@ export default function WebMapPage() {
               ✕ {isBangla ? 'ফিল্টার মুছুন' : 'Reset'}
             </button>
           )}
+
+          {/* Suggest a Clinic Button (MAP-11) */}
+          <button
+            onClick={() => router.push(`/${locale}/clinics/suggest`)}
+            className="ml-auto text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bangla font-bold px-3 py-1 rounded-full shrink-0 flex items-center gap-1 transition"
+          >
+            <span>➕</span>
+            <span>{isBangla ? 'ক্লিনিক যোগ করার অনুরোধ' : 'Suggest Clinic'}</span>
+          </button>
         </div>
+
+        {/* Service Layers (MAP-10) & Search Radius Slider (MAP-8) */}
+        <div className="max-w-7xl mx-auto pt-2 pb-1 border-t border-gray-100 dark:border-gray-700/60 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
+          {/* MAP-10 Service Layers */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            <span className="text-[11px] font-bangla font-semibold text-gray-500 shrink-0">
+              {isBangla ? 'লেয়ার:' : 'Layers:'}
+            </span>
+            {[
+              { id: 'all', icon: '🌐', labelBn: 'সকল সেবা', labelEn: 'All Services' },
+              { id: 'vet', icon: '🩺', labelBn: 'চিকিৎসা', labelEn: 'Veterinary' },
+              { id: 'grooming', icon: '✂️', labelBn: 'গ্রুমিং', labelEn: 'Grooming' },
+              { id: 'boarding', icon: '🏨', labelBn: 'বোর্ডিং', labelEn: 'Boarding' },
+              { id: 'home_visit', icon: '🏡', labelBn: 'হোম ভিজিট', labelEn: 'Home Visit' },
+              { id: 'emergency', icon: '🚨', labelBn: 'জরুরি ২৪/৭', labelEn: '24/7 Emergency' },
+            ].map((layer) => (
+              <button
+                key={layer.id}
+                onClick={() => setActiveLayer(layer.id as any)}
+                className={`px-2.5 py-1 rounded-lg font-bangla text-xs flex items-center gap-1 transition shrink-0 ${
+                  activeLayer === layer.id
+                    ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200'
+                }`}
+              >
+                <span>{layer.icon}</span>
+                <span>{isBangla ? layer.labelBn : layer.labelEn}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* MAP-8 Radius Slider Controls */}
+          <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/80 px-3 py-1 rounded-xl border border-gray-200 dark:border-gray-700 shrink-0">
+            <span className="text-[11px] font-bangla font-semibold text-gray-600 dark:text-gray-300">
+              📏 {isBangla ? 'অনুসন্ধান পরিধি:' : 'Search Radius:'} <strong className="text-emerald-700 dark:text-emerald-400">{radiusKm} km</strong>
+            </span>
+            <div className="flex items-center gap-1">
+              {RADIUS_TIERS_KM.map((tier) => (
+                <button
+                  key={tier}
+                  onClick={() => setRadiusKm(tier)}
+                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-bangla transition ${
+                    radiusKm === tier
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
+                  }`}
+                >
+                  {tier}k
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* MAP-8 Auto-Expansion Notification Banner */}
+        {autoExpandNotice && (
+          <div className="max-w-7xl mx-auto mt-1 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-xs font-bangla flex items-center justify-between animate-fade-in">
+            <div className="flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{autoExpandNotice}</span>
+            </div>
+            <button onClick={() => setAutoExpandNotice(null)} className="text-amber-700 font-bold hover:underline">✕</button>
+          </div>
+        )}
       </header>
 
       {/* Main Split View Area (MAP-1b Desktop Split / Mobile Toggle) */}
@@ -684,10 +818,35 @@ export default function WebMapPage() {
               </span>
             </div>
 
-            {/* Interactive Clinic Map Markers */}
-            {displayedClinics.map((c) => {
-              const dx = (c.lng - userCoords.lng) * 4000;
-              const dy = (userCoords.lat - c.lat) * 4000;
+            {/* Interactive Clustered Map Markers (MAP-9) */}
+            {mapClusters.map((cluster) => {
+              const dx = (cluster.lng - userCoords.lng) * 4000;
+              const dy = (userCoords.lat - cluster.lat) * 4000;
+
+              if (cluster.isCluster) {
+                return (
+                  <div
+                    key={cluster.id}
+                    onClick={() => {
+                      if (cluster.items[0]?.locationId) {
+                        setSelectedClinicId(cluster.items[0].locationId);
+                      }
+                    }}
+                    style={{ transform: `translate(${dx}px, ${dy}px)` }}
+                    className="absolute z-25 cursor-pointer group hover:scale-110 transition-transform duration-200"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-emerald-700 border-2 border-white shadow-xl flex items-center justify-center text-white font-bold text-sm ring-4 ring-emerald-500/30 animate-pulse">
+                      <span>+{cluster.count}</span>
+                    </div>
+                    <div className="absolute top-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-black/80 text-white text-[10px] font-bangla font-semibold pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span>{cluster.count} {isBangla ? 'টি ক্লিনিক ক্লাস্টার' : 'clinics cluster'}</span>
+                    </div>
+                  </div>
+                );
+              }
+
+              const c = cluster.items[0];
+              if (!c) return null;
               const isSelected = c.locationId === selectedClinicId;
 
               return (
@@ -701,18 +860,30 @@ export default function WebMapPage() {
                     isSelected ? 'scale-125 z-30' : 'hover:scale-110'
                   }`}
                 >
-                  {/* Pin Icon */}
+                  {/* Pin Icon with Service Layer Badge (MAP-10) */}
                   <div
                     className={`w-9 h-9 rounded-full flex items-center justify-center text-white shadow-lg border-2 ${
                       c.hasEmergency
                         ? 'bg-red-600 border-white animate-pulse'
                         : c.isGovernment
                           ? 'bg-blue-600 border-white'
-                          : 'bg-green-700 border-white'
+                          : activeLayer === 'grooming'
+                            ? 'bg-purple-600 border-white'
+                            : activeLayer === 'boarding'
+                              ? 'bg-amber-600 border-white'
+                              : 'bg-green-700 border-white'
                     }`}
                   >
                     <span className="text-sm">
-                      {c.hasEmergency ? '🚨' : c.isGovernment ? '🏛️' : '🏥'}
+                      {c.hasEmergency
+                        ? '🚨'
+                        : c.isGovernment
+                          ? '🏛️'
+                          : activeLayer === 'grooming'
+                            ? '✂️'
+                            : activeLayer === 'boarding'
+                              ? '🏨'
+                              : '🏥'}
                     </span>
                   </div>
 
