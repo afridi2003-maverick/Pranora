@@ -1192,6 +1192,144 @@ export interface Database {
         };
         Relationships: [];
       };
+      products: {
+        Row: {
+          id: string;
+          provider_id: string;
+          name_bn: string;
+          name_en: string;
+          description_bn: string | null;
+          description_en: string | null;
+          category: 'food' | 'medicine' | 'accessories' | 'toys' | 'hygiene';
+          species: SpeciesType[];
+          price: number;
+          sale_price: number | null;
+          stock: number;
+          images: string[];
+          requires_prescription: boolean;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          name_bn: string;
+          name_en: string;
+          description_bn?: string | null;
+          description_en?: string | null;
+          category: 'food' | 'medicine' | 'accessories' | 'toys' | 'hygiene';
+          species?: SpeciesType[];
+          price: number;
+          sale_price?: number | null;
+          stock?: number;
+          images?: string[];
+          requires_prescription?: boolean;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          name_bn?: string;
+          name_en?: string;
+          description_bn?: string | null;
+          description_en?: string | null;
+          category?: 'food' | 'medicine' | 'accessories' | 'toys' | 'hygiene';
+          species?: SpeciesType[];
+          price?: number;
+          sale_price?: number | null;
+          stock?: number;
+          images?: string[];
+          requires_prescription?: boolean;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      orders: {
+        Row: {
+          id: string;
+          code: string;
+          owner_id: string;
+          provider_id: string;
+          address_id: string | null;
+          shipping_address: string;
+          phone: string;
+          status: 'placed' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+          subtotal: number;
+          delivery_fee: number;
+          total: number;
+          payment_method: 'cash' | 'bkash' | 'nagad' | 'rocket' | 'card';
+          payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          owner_id: string;
+          provider_id: string;
+          address_id?: string | null;
+          shipping_address: string;
+          phone: string;
+          status?: 'placed' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+          subtotal: number;
+          delivery_fee?: number;
+          total: number;
+          payment_method?: 'cash' | 'bkash' | 'nagad' | 'rocket' | 'card';
+          payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          code?: string;
+          owner_id?: string;
+          provider_id?: string;
+          address_id?: string | null;
+          shipping_address?: string;
+          phone?: string;
+          status?: 'placed' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+          subtotal?: number;
+          delivery_fee?: number;
+          total?: number;
+          payment_method?: 'cash' | 'bkash' | 'nagad' | 'rocket' | 'card';
+          payment_status?: 'pending' | 'paid' | 'failed' | 'refunded';
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      order_items: {
+        Row: {
+          id: string;
+          order_id: string;
+          product_id: string;
+          quantity: number;
+          unit_price: number;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          product_id: string;
+          quantity: number;
+          unit_price: number;
+        };
+        Update: {
+          id?: string;
+          order_id?: string;
+          product_id?: string;
+          quantity?: number;
+          unit_price?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -1431,6 +1569,56 @@ export interface Database {
           lng: number;
           distance_m: number;
         }[];
+      };
+      create_shop_order: {
+        Args: {
+          p_provider_id: string;
+          p_address_id?: string | null;
+          p_shipping_address?: string | null;
+          p_phone?: string | null;
+          p_items?: unknown;
+          p_payment_method?: 'cash' | 'bkash' | 'nagad' | 'rocket' | 'card';
+          p_delivery_fee?: number;
+          p_notes?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          order_id: string;
+          order_code: string;
+          subtotal: number;
+          delivery_fee: number;
+          total: number;
+          payment_method: string;
+          payment_status: string;
+          status: string;
+        };
+      };
+      cancel_shop_order: {
+        Args: {
+          p_order_id: string;
+          p_reason?: string | null;
+        };
+        Returns: {
+          success: boolean;
+          order_id: string;
+          status: string;
+        };
+      };
+      init_order_online_payment: {
+        Args: {
+          p_order_id: string;
+          p_method?: 'cash' | 'bkash' | 'nagad' | 'rocket' | 'card';
+          p_gateway?: string;
+        };
+        Returns: {
+          paymentId?: string;
+          orderId: string;
+          transactionId: string;
+          amount: number;
+          currency: string;
+          method: string;
+          status: string;
+        };
       };
     };
     Enums: {

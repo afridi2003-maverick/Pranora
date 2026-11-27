@@ -186,7 +186,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | RSC-9 | Nearby rescuer search | Brehat | M | S8 | RSC-3 | ✅ |
 | RSC-10 | Public lost & found board (`lost_found_board`) + nearby alerts | Brehat | M | S8 | RSC-1, NOTIF-1 | ✅ |
 | SVC-GRM | Grooming booking | Zimia | M | S7 | APT-1, SVC-2 | ⬜ |
-| SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ⬜ |
+| SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ✅ |
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
 | REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ✅ |
