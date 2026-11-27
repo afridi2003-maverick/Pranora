@@ -102,6 +102,18 @@ export const CloseRescueCaseSchema = z.object({
 });
 export type CloseRescueCaseInput = z.infer<typeof CloseRescueCaseSchema>;
 
+export const MergeAnimalReportsSchema = z.object({
+  duplicate_id: z.string().uuid(),
+  target_id: z.string().uuid(),
+});
+export type MergeAnimalReportsInput = z.infer<typeof MergeAnimalReportsSchema>;
+
+export const FindDuplicateReportsSchema = z.object({
+  report_id: z.string().uuid(),
+  radius_meters: z.number().int().min(100).max(10000).default(1500),
+});
+export type FindDuplicateReportsInput = z.infer<typeof FindDuplicateReportsSchema>;
+
 export const AddCaseUpdateSchema = z.object({
   case_id: z.string().uuid(),
   status: RescueStatusSchema.nullable().optional(),

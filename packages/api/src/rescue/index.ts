@@ -468,3 +468,47 @@ export function calculateEscalationCountdown(
   };
 }
 
+export interface PotentialDuplicateReport {
+  id: string;
+  reporter_id: string;
+  kind: AnimalReportKind;
+  species: SpeciesType;
+  urgency: UrgencyLevel;
+  description: string | null;
+  photos: string[];
+  area_text: string | null;
+  status: RescueStatus;
+  distance_meters: number;
+  created_at: string;
+}
+
+/** Find potential duplicate reports matching species, time, and spatial proximity */
+export async function findPotentialDuplicateReports(
+  client: TypedSupabaseClient,
+  reportId: string,
+  radiusMeters = 1500
+): Promise<PotentialDuplicateReport[]> {
+  const { data, error } = await client.rpc('find_potential_duplicate_reports', {
+    p_report_id: reportId,
+    p_radius_meters: radiusMeters,
+  });
+
+  if (error) throw error;
+  return (data as unknown as PotentialDuplicateReport[]) ?? [];
+}
+
+/** Merge a duplicate animal report into an existing canonical report */
+export async function mergeAnimalReports(
+  client: TypedSupabaseClient,
+  duplicateId: string,
+  targetId: string
+): Promise<boolean> {
+  const { data, error } = await client.rpc('merge_animal_reports', {
+    p_duplicate_id: duplicateId,
+    p_target_id: targetId,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+

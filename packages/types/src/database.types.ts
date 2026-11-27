@@ -1224,6 +1224,32 @@ export interface Database {
         };
         Returns: boolean;
       };
+      find_potential_duplicate_reports: {
+        Args: {
+          p_report_id: string;
+          p_radius_meters?: number;
+        };
+        Returns: {
+          id: string;
+          reporter_id: string;
+          kind: AnimalReportKind;
+          species: SpeciesType;
+          urgency: UrgencyLevel;
+          description: string | null;
+          photos: string[];
+          area_text: string | null;
+          status: RescueStatus;
+          distance_meters: number;
+          created_at: string;
+        }[];
+      };
+      merge_animal_reports: {
+        Args: {
+          p_duplicate_id: string;
+          p_target_id: string;
+        };
+        Returns: boolean;
+      };
       my_report_status: {
         Args: {
           p_report_id: string;

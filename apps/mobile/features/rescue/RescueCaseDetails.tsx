@@ -14,9 +14,13 @@ import { CaseUpdateTimeline } from './CaseUpdateTimeline';
 import { AddCaseUpdateForm } from './AddCaseUpdateForm';
 import { CloseCaseOutcomeModal } from './CloseCaseOutcomeModal';
 import { UrgentReportAlertBanner } from './UrgentReportAlertBanner';
+import { DuplicateReportsCard } from './DuplicateReportsCard';
+import { getMockDuplicatesForReport } from './caseDetailMockData';
+import type { PotentialDuplicateReport } from '@pranora/api';
 
 interface RescueCaseDetailsProps {
   initialDetails: RescueCaseFullDetails;
+  initialDuplicates?: PotentialDuplicateReport[];
   onAddUpdate?: (payload: {
     case_id: string;
     note?: string | null;
@@ -30,13 +34,16 @@ interface RescueCaseDetailsProps {
     pet_id?: string | null;
   }) => Promise<{ error?: string }>;
   onCloseCaseClick?: () => void;
+  onMergeDuplicate?: (duplicateId: string, targetId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function RescueCaseDetails({
   initialDetails,
+  initialDuplicates,
   onAddUpdate,
   onCloseCase,
   onCloseCaseClick,
+  onMergeDuplicate,
 }: RescueCaseDetailsProps) {
   const { isBangla } = useLocale();
   const [details, setDetails] = useState<RescueCaseFullDetails>(initialDetails);
@@ -44,6 +51,31 @@ export function RescueCaseDetails({
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
 
   const { rescueCase, report, updates } = details;
+
+  const handleMergeDuplicate = async (duplicateId: string, targetId: string) => {
+    if (onMergeDuplicate) {
+      const res = await onMergeDuplicate(duplicateId, targetId);
+      if (!res.success) return res;
+    }
+    const mergeUpdate = {
+      id: `upd-merge-${Date.now().toString(36)}`,
+      case_id: rescueCase.id,
+      author_id: 'rescuer-current',
+      author_name: isBangla ? 'বর্তমান উদ্ধারকারী' : 'Current Rescuer',
+      author_role: 'rescuer',
+      status: null,
+      note: isBangla
+        ? `নকল রিপোর্ট #${duplicateId.slice(0, 8)} সফলভাবে এই কেসে একীভূত করা হয়েছে।`
+        : `Duplicate report #${duplicateId.slice(0, 8)} was merged into this case.`,
+      photos: [],
+      created_at: new Date().toISOString(),
+    };
+    setDetails((prev) => ({
+      ...prev,
+      updates: [...prev.updates, mergeUpdate],
+    }));
+    return { success: true };
+  };
 
   const handlePostUpdate = async (payload: {
     case_id: string;
@@ -137,6 +169,13 @@ export function RescueCaseDetails({
     <ScrollView className="flex-1 bg-white p-4" showsVerticalScrollIndicator={false}>
       {/* Urgent Report Alert & 15-min Escalation Banner (RSC-6) */}
       <UrgentReportAlertBanner report={report} />
+
+      {/* Potential Duplicate Reports Detection & Merge (RSC-8) */}
+      <DuplicateReportsCard
+        currentReport={report}
+        duplicates={initialDuplicates ?? getMockDuplicatesForReport(report.id)}
+        onMergeDuplicate={handleMergeDuplicate}
+      />
 
       {/* 1. Header Card */}
       <View className="bg-white rounded-2xl border border-gray-200 p-4 mb-4 shadow-sm">
