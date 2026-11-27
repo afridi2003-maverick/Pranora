@@ -10,3 +10,6 @@ export * from './AdoptionFollowupCard';
 export * from './ReportListingModal';
 export * from './AdoptionReviewQueue';
 export * from './mockData';
+export * from './SmartMatchCard';
+export * from './AdopterPreferenceModal';
+export * from './SmartMatchList';

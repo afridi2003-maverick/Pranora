@@ -57,6 +57,14 @@ export default function AdoptionPublicPage() {
             >
               ♥ {isBangla ? 'সংরক্ষিত তালিকা (ADP-7)' : 'Saved Pets (ADP-7)'}
             </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => router.push(`/${locale}/adoption/matches`)}
+            >
+              🎯 {isBangla ? 'স্মার্ট ম্যাচিং (ADP-10)' : 'Smart Matching (ADP-10)'}
+            </Button>
           </div>
         </div>
 

@@ -164,3 +164,41 @@ export const adoptionReviewItemSchema = z.object({
 });
 export type AdoptionReviewItem = z.infer<typeof adoptionReviewItemSchema>;
 
+// ── ADP-10: Smart Adoption Matching ─────────────────────────────────────────
+
+export const AdopterAgeGroupSchema = z.enum(['any', 'baby', 'young', 'adult', 'senior']);
+export type AdopterAgeGroup = z.infer<typeof AdopterAgeGroupSchema>;
+
+export const AdopterPreferenceSchema = z.object({
+  species: z.enum(['dog', 'cat', 'bird', 'rabbit', 'other', 'any']).default('any'),
+  preferred_gender: z.enum(['male', 'female', 'unknown', 'any']).default('any'),
+  age_group: AdopterAgeGroupSchema.default('any'),
+  district_id: z.number().int().positive().nullable().optional(),
+  wants_vaccinated: z.boolean().default(false),
+  wants_neutered: z.boolean().default(false),
+  has_other_pets: z.boolean().default(false),
+  home_type: z
+    .enum(['own_house', 'rented_house', 'own_flat', 'rented_flat', 'other'])
+    .default('own_flat'),
+});
+export type AdopterPreference = z.infer<typeof AdopterPreferenceSchema>;
+
+export const AdoptionMatchSchema = z.object({
+  listing_id: z.string().uuid(),
+  score: z.number().int().min(0).max(100),
+  species: z.string(),
+  gender: z.string(),
+  age_months: z.number().int().nullable(),
+  title_bn: z.string().nullable(),
+  title_en: z.string().nullable(),
+  description_bn: z.string().nullable(),
+  description_en: z.string().nullable(),
+  photos: z.array(z.string()),
+  is_vaccinated: z.boolean(),
+  is_neutered: z.boolean(),
+  district_id: z.number().int(),
+  status: z.string(),
+  created_at: z.string(),
+});
+export type AdoptionMatch = z.infer<typeof AdoptionMatchSchema>;
+
