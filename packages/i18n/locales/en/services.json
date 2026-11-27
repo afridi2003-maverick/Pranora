@@ -93,5 +93,13 @@
     "petSize": "Pet Size",
     "addons": "Optional Add-ons",
     "confirm": "Confirm Grooming Appointment"
+  },
+  "boarding": {
+    "title": "Pet Boarding & Hostel",
+    "subtitle": "Safe, caring environment for your pet while you travel",
+    "rooms": "Room Tiers",
+    "dateRange": "Boarding Date Range",
+    "vaccineRequired": "Core vaccinations required for admission",
+    "confirm": "Confirm Boarding Reservation"
   }
 }
