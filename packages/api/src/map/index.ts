@@ -237,4 +237,5 @@ export function calculateDistanceMeters(
 }
 
 export * from './areas';
+export * from './clustering';
 
