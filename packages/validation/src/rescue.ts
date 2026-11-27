@@ -152,3 +152,37 @@ export const UpsertRescuerProfileSchema = z.object({
   is_available: z.boolean().default(true),
 });
 export type UpsertRescuerProfileInput = z.infer<typeof UpsertRescuerProfileSchema>;
+
+export const LostFoundKindSchema = z.enum(['lost', 'found']);
+export type LostFoundKind = z.infer<typeof LostFoundKindSchema>;
+
+export const LostFoundBoardFilterSchema = z.object({
+  kind: LostFoundKindSchema.optional(),
+  species: SpeciesSchema.optional(),
+  district_id: z.number().int().positive().optional(),
+  search: z.string().optional(),
+});
+export type LostFoundBoardFilterInput = z.infer<typeof LostFoundBoardFilterSchema>;
+
+export const SubmitLostFoundSightingSchema = z.object({
+  report_id: z.string().uuid(),
+  message: z.string().min(3, 'rescue:validation.message_too_short').max(1000),
+  location_text: z.string().max(200).optional(),
+  photos: z.array(z.string().url()).max(5).default([]),
+  contact_phone: z
+    .string()
+    .regex(bdPhoneRegex, 'rescue:validation.invalid_phone')
+    .optional(),
+});
+export type SubmitLostFoundSightingInput = z.infer<typeof SubmitLostFoundSightingSchema>;
+
+export const ShareSightingContactSchema = z.object({
+  sighting_id: z.string().uuid(),
+});
+export type ShareSightingContactInput = z.infer<typeof ShareSightingContactSchema>;
+
+export const AlertNearbyLostFoundSchema = z.object({
+  report_id: z.string().uuid(),
+  radius_km: z.number().min(0.5).max(50).default(3.0),
+});
+export type AlertNearbyLostFoundInput = z.infer<typeof AlertNearbyLostFoundSchema>;

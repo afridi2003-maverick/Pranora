@@ -400,6 +400,42 @@ export interface Database {
         };
         Relationships: [];
       };
+      lost_found_sightings: {
+        Row: {
+          id: string;
+          report_id: string;
+          reporter_user_id: string | null;
+          message: string;
+          location_text: string | null;
+          photos: string[];
+          contact_phone: string | null;
+          contact_shared: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          report_id: string;
+          reporter_user_id?: string | null;
+          message: string;
+          location_text?: string | null;
+          photos?: string[];
+          contact_phone?: string | null;
+          contact_shared?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          report_id?: string;
+          reporter_user_id?: string | null;
+          message?: string;
+          location_text?: string | null;
+          photos?: string[];
+          contact_phone?: string | null;
+          contact_shared?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       app_config: {
         Row: {
           key: string;
@@ -1279,6 +1315,29 @@ export interface Database {
           p_is_available?: boolean | null;
         };
         Returns: Database['public']['Tables']['rescuer_profiles']['Row'];
+      };
+      submit_lost_found_sighting: {
+        Args: {
+          p_report_id: string;
+          p_message: string;
+          p_location_text?: string | null;
+          p_photos?: string[] | null;
+          p_contact_phone?: string | null;
+        };
+        Returns: string;
+      };
+      share_sighting_contact: {
+        Args: {
+          p_sighting_id: string;
+        };
+        Returns: boolean;
+      };
+      alert_nearby_users_for_lost_found: {
+        Args: {
+          p_report_id: string;
+          p_radius_km?: number | null;
+        };
+        Returns: number;
       };
       my_report_status: {
         Args: {

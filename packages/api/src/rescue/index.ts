@@ -63,6 +63,8 @@ export interface LostFoundBoardItem {
   last_seen_at: string | null;
   created_at: string;
   approx_location: unknown | null;
+  approx_lat?: number | null;
+  approx_lng?: number | null;
 }
 
 export interface RescueCaseRow {
@@ -177,15 +179,29 @@ export async function getMyReports(
 /** Fetch public lost & found reports */
 export async function getLostFoundBoard(
   client: TypedSupabaseClient,
-  species?: SpeciesType
+  speciesOrOptions?: SpeciesType | {
+    kind?: 'lost' | 'found';
+    species?: SpeciesType;
+    districtId?: number;
+  }
 ): Promise<LostFoundBoardItem[]> {
   let query = client
     .from('lost_found_board')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (species) {
-    query = query.eq('species', species);
+  if (typeof speciesOrOptions === 'string') {
+    query = query.eq('species', speciesOrOptions);
+  } else if (speciesOrOptions && typeof speciesOrOptions === 'object') {
+    if (speciesOrOptions.kind) {
+      query = query.eq('kind', speciesOrOptions.kind);
+    }
+    if (speciesOrOptions.species) {
+      query = query.eq('species', speciesOrOptions.species);
+    }
+    if (speciesOrOptions.districtId) {
+      query = query.eq('district_id', speciesOrOptions.districtId);
+    }
   }
 
   const { data, error } = await query;
@@ -606,5 +622,75 @@ export async function setRescuerAvailability(
 
   if (error) throw error;
   return true;
+}
+
+export type LostFoundSightingRow = Database['public']['Tables']['lost_found_sightings']['Row'];
+
+export interface SubmitLostFoundSightingParams {
+  reportId: string;
+  message: string;
+  locationText?: string;
+  photos?: string[];
+  contactPhone?: string;
+}
+
+/** Submit a sighting / "I've seen it" report for a lost or found animal (RSC-10) */
+export async function submitLostFoundSighting(
+  client: TypedSupabaseClient,
+  params: SubmitLostFoundSightingParams
+): Promise<string> {
+  const { data, error } = await client.rpc('submit_lost_found_sighting', {
+    p_report_id: params.reportId,
+    p_message: params.message,
+    p_location_text: params.locationText ?? null,
+    p_photos: params.photos ?? [],
+    p_contact_phone: params.contactPhone ?? null,
+  });
+
+  if (error) throw error;
+  return data as string;
+}
+
+/** Reporter shares their contact phone number with the spotter (RSC-10) */
+export async function shareSightingContact(
+  client: TypedSupabaseClient,
+  sightingId: string
+): Promise<boolean> {
+  const { data, error } = await client.rpc('share_sighting_contact', {
+    p_sighting_id: sightingId,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+/** Fetch sightings submitted for a specific report */
+export async function getReportSightings(
+  client: TypedSupabaseClient,
+  reportId: string
+): Promise<LostFoundSightingRow[]> {
+  const { data, error } = await client
+    .from('lost_found_sightings')
+    .select('*')
+    .eq('report_id', reportId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as unknown as LostFoundSightingRow[];
+}
+
+/** Trigger nearby alerts for a new lost/found report (RSC-10) */
+export async function alertNearbyUsersForLostFound(
+  client: TypedSupabaseClient,
+  reportId: string,
+  radiusKm = 3.0
+): Promise<number> {
+  const { data, error } = await client.rpc('alert_nearby_users_for_lost_found', {
+    p_report_id: reportId,
+    p_radius_km: radiusKm,
+  });
+
+  if (error) throw error;
+  return Number(data ?? 0);
 }
 
