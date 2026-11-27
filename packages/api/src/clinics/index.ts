@@ -13,6 +13,7 @@ export * from './actions';
 export * from './services-providers';
 export * from './home-visit';
 export * from './grooming';
+export * from './boarding';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;

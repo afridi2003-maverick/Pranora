@@ -25,7 +25,7 @@ const CATEGORY_CONFIG: CategoryConfig[] = [
   { slug: 'adoption',     icon: '🏠', isMvp: true,  navigateTo: '/adoption' },
   { slug: 'tips',         icon: '📚', isMvp: true,  navigateTo: '/tips' },
   { slug: 'grooming',     icon: '✂️', isMvp: true,  navigateTo: '/services/grooming' },
-  { slug: 'boarding',     icon: '🏨', isMvp: false, navigateTo: null },
+  { slug: 'boarding',     icon: '🏨', isMvp: true,  navigateTo: '/services/boarding' },
   { slug: 'home_visit',   icon: '🏡', isMvp: true,  navigateTo: '/services/home-visit' },
   { slug: 'online_consult', icon: '💻', isMvp: false, navigateTo: null },
   { slug: 'pet_shop',     icon: '🛒', isMvp: false, navigateTo: null },
