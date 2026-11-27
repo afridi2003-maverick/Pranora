@@ -12,6 +12,7 @@ export { getMockClinicById, MOCK_CLINIC_DETAILS, getAllMockClinics };
 export * from './actions';
 export * from './services-providers';
 export * from './home-visit';
+export * from './grooming';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;

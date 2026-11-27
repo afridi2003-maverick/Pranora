@@ -85,5 +85,13 @@
     "afternoon": "Afternoon (2:00 PM – 5:00 PM)",
     "evening": "Evening (6:00 PM – 9:00 PM)",
     "confirm": "Confirm Home Visit Request"
+  },
+  "grooming": {
+    "title": "Pet Grooming & Spa",
+    "subtitle": "Professional bathing, fur styling, medicated baths and nail trimming",
+    "packages": "Grooming Packages",
+    "petSize": "Pet Size",
+    "addons": "Optional Add-ons",
+    "confirm": "Confirm Grooming Appointment"
   }
 }
