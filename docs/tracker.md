@@ -193,7 +193,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ✅ |
 | MAP-10 | Service layers on map | Zimia | S | S8 | MAP-8/9, SVC-2 | ✅ |
-| MAP-11 | Suggest a clinic | Zimia | M | S8 | MAP-5, ADM-2 | ⬜ |
+| MAP-11 | Suggest a clinic | Zimia | M | S8 | MAP-5, ADM-2 | ✅ |
 
 ## Phase 3 (P2)
 

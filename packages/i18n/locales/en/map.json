@@ -90,5 +90,21 @@
     "selectDivision": "Select Division",
     "selectDistrict": "Select District",
     "selectUpazila": "Select Upazila"
+  },
+  "suggest": {
+    "title": "Suggest a Clinic",
+    "subtitle": "Help our community by suggesting missing veterinary clinics or doctors",
+    "clinicName": "Clinic Name",
+    "clinicNamePlaceholder": "e.g. Care Pet Clinic",
+    "address": "Full Address",
+    "phone": "Phone Number",
+    "is24h": "Open 24/7",
+    "hasEmergency": "Emergency Service Available",
+    "offersHomeVisit": "Offers Home Visits",
+    "services": "Services Offered",
+    "notes": "Additional Notes / Landmarks",
+    "submit": "Submit Suggestion",
+    "successTitle": "Thank You for Your Suggestion!",
+    "successDesc": "Our admin team will verify and add the clinic to the map."
   }
 }
