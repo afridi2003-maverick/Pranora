@@ -22,6 +22,7 @@ export const CATEGORIES: CategoryItem[] = [
   { slug: 'grooming',       icon: '✂️', isMvp: true,  navigateTo: '/services/grooming' },
   { slug: 'boarding',       icon: '🏨', isMvp: true,  navigateTo: '/services/boarding' },
   { slug: 'home_visit',     icon: '🏡', isMvp: true,  navigateTo: '/services/home-visit' },
+  { slug: 'livestock',      icon: '🐄', isMvp: true,  navigateTo: '/services/livestock' },
   { slug: 'online_consult', icon: '💻', isMvp: false, navigateTo: null },
   { slug: 'pet_shop',       icon: '🛒', isMvp: false, navigateTo: null },
   { slug: 'training',       icon: '🎓', isMvp: true,  navigateTo: '/training' },

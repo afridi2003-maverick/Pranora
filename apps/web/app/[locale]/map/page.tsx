@@ -20,6 +20,8 @@ import {
   autoExpandRadius,
   RADIUS_TIERS_KM,
   type RadiusTierKm,
+  saveNearbyCache,
+  getNearbyCache,
 } from '@pranora/api';
 import { useSession } from '../../../hooks/useSession';
 
@@ -90,6 +92,7 @@ export default function WebMapPage() {
   const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
   const [clinics, setClinics] = useState<NearbyClinicResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isOffline, setIsOffline] = useState<boolean>(false);
 
   // Read URL query parameters on mount for shareable filter links (docs/app-flow.md §4)
   useEffect(() => {
@@ -171,6 +174,18 @@ export default function WebMapPage() {
     let active = true;
     async function fetchClinics() {
       setLoading(true);
+
+      // MAP-12: Offline cache check if navigator is offline
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        const cached = getNearbyCache(userCoords);
+        if (cached && cached.clinics.length > 0) {
+          setClinics(cached.clinics);
+          setIsOffline(true);
+          setLoading(false);
+          return;
+        }
+      }
+
       try {
         const results = await getNearbyClinicsWithFallback(
           {
@@ -188,19 +203,23 @@ export default function WebMapPage() {
         );
 
         if (active) {
+          // MAP-12: Cache results for offline resilience
+          saveNearbyCache(results, userCoords, radiusKm * 1000);
+          setIsOffline(false);
+
           if (results.length === 0) {
             // Auto-expand search radius if nothing found (MAP-8)
             const expansion = autoExpandRadius(radiusKm, 0);
             if (expansion.didExpand) {
               setRadiusKm(expansion.nextRadiusKm);
-              setAutoExpandedNotice(
+              setAutoExpandNotice(
                 isBangla
                   ? `${radiusKm} কিমিতে কোনো ক্লিনিক পাওয়া যায়নি, অনুসন্ধান পরিধি বাড়িয়ে ${expansion.nextRadiusKm} কিমি করা হয়েছে`
                   : `No clinics found within ${radiusKm} km, automatically expanded search to ${expansion.nextRadiusKm} km`
               );
             }
           } else {
-            setAutoExpandedNotice(null);
+            setAutoExpandNotice(null);
           }
 
           setClinics(results);
@@ -210,6 +229,12 @@ export default function WebMapPage() {
         }
       } catch (err) {
         console.error('Failed to load nearby clinics:', err);
+        // MAP-12: Fallback to cached results if available
+        const cached = getNearbyCache(userCoords);
+        if (cached && cached.clinics.length > 0) {
+          setClinics(cached.clinics);
+          setIsOffline(true);
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -220,6 +245,25 @@ export default function WebMapPage() {
       active = false;
     };
   }, [userCoords, radiusKm, activeLayer, filterOpenNow, filterEmergency, filterHomeVisit, selectedSpecies, maxFee, isConfigured, supabase, isBangla]);
+
+  // MAP-12: Online/offline event listeners
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => {
+      const cached = getNearbyCache(userCoords);
+      if (cached && cached.clinics.length > 0) {
+        setClinics(cached.clinics);
+        setIsOffline(true);
+      }
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [userCoords]);
 
   // Client-side search and ownership filter (MAP-3 & MAP-10)
   const displayedClinics = useMemo(() => {
@@ -594,6 +638,28 @@ export default function WebMapPage() {
               <span>{autoExpandNotice}</span>
             </div>
             <button onClick={() => setAutoExpandNotice(null)} className="text-amber-700 font-bold hover:underline">✕</button>
+          </div>
+        )}
+
+        {/* MAP-12 Offline Cache Warning Banner */}
+        {isOffline && (
+          <div className="max-w-7xl mx-auto mt-1 px-3 py-1.5 bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-200 rounded-lg text-xs font-bangla flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">📡</span>
+              <div>
+                <span className="font-bold">
+                  {isBangla ? 'অফলাইন মোড:' : 'Offline Mode:'}
+                </span>
+                <span className="ml-1 text-[11px]">
+                  {isBangla
+                    ? 'ইন্টারনেট সংযোগ নেই। পূর্বে সংরক্ষিত নিকটস্থ ক্লিনিক তালিকা প্রদর্শিত হচ্ছে।'
+                    : 'No internet connection. Displaying locally cached nearby clinics.'}
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 font-mono font-bold px-2 py-0.5 rounded">
+              OFFLINE CACHE
+            </span>
           </div>
         )}
       </header>
