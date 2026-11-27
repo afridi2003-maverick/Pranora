@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Modal, Button, Input } from '@pranora/ui';
 import {
@@ -14,7 +14,10 @@ interface AssignRescuerModalProps {
   caseId: string;
   reportSpecies?: string;
   reportArea?: string;
+  lat?: number;
+  lng?: number;
   onAssign: (caseId: string, rescuerId: string) => Promise<{ success: boolean; error?: string }>;
+  onFindNearby?: (params: { lat: number; lng: number; radius_m?: number }) => Promise<RescuerProfileBrief[]>;
   rescuers?: RescuerProfileBrief[];
 }
 
@@ -24,24 +27,56 @@ export function AssignRescuerModal({
   caseId,
   reportSpecies,
   reportArea,
+  lat,
+  lng,
   onAssign,
+  onFindNearby,
   rescuers = MOCK_VERIFIED_RESCUERS,
 }: AssignRescuerModalProps) {
   const { isBangla } = useLocale();
   const [search, setSearch] = useState('');
+  const [radiusFilterKm, setRadiusFilterKm] = useState<number | 'all'>('all');
+  const [activeList, setActiveList] = useState<RescuerProfileBrief[]>(rescuers);
   const [isSubmittingId, setIsSubmittingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const filteredRescuers = rescuers.filter((r) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return (
-      r.name.toLowerCase().includes(q) ||
-      r.name_bn.includes(q) ||
-      r.district_name_en.toLowerCase().includes(q) ||
-      r.district_name_bn.includes(q)
-    );
-  });
+  useEffect(() => {
+    let active = true;
+    if (lat != null && lng != null && onFindNearby) {
+      const radiusM = radiusFilterKm === 'all' ? undefined : radiusFilterKm * 1000;
+      onFindNearby({ lat, lng, radius_m: radiusM })
+        .then((items) => {
+          if (active && items.length > 0) setActiveList(items);
+        })
+        .catch(() => {});
+    } else {
+      setActiveList(rescuers);
+    }
+    return () => {
+      active = false;
+    };
+  }, [lat, lng, onFindNearby, radiusFilterKm, rescuers]);
+
+  const filteredRescuers = activeList
+    .filter((r) => {
+      if (radiusFilterKm !== 'all' && r.distance_meters != null) {
+        if (r.distance_meters > radiusFilterKm * 1000) return false;
+      }
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return (
+        r.name.toLowerCase().includes(q) ||
+        r.name_bn.includes(q) ||
+        r.district_name_en.toLowerCase().includes(q) ||
+        r.district_name_bn.includes(q)
+      );
+    })
+    .sort((a, b) => {
+      if (a.distance_meters != null && b.distance_meters != null) {
+        return a.distance_meters - b.distance_meters;
+      }
+      return 0;
+    });
 
   const handleAssignClick = async (rescuerId: string) => {
     setIsSubmittingId(rescuerId);
@@ -61,11 +96,13 @@ export function AssignRescuerModal({
     }
   };
 
+  const RADIUS_PILLS: (number | 'all')[] = ['all', 5, 10, 25];
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isBangla ? 'উদ্ধারকারী নিয়োগ করুন' : 'Assign Verified Rescuer'}
+      title={isBangla ? 'নিকটস্থ উদ্ধারকারী নিয়োগ করুন (RSC-9)' : 'Assign Nearby Rescuer (RSC-9)'}
     >
       <div className="space-y-4 max-w-lg">
         {/* Case Context Header */}
@@ -74,17 +111,24 @@ export function AssignRescuerModal({
             {isBangla ? 'কেস আইডি: ' : 'Case ID: '}
             <span className="font-mono">{caseId}</span>
           </p>
-          {reportSpecies && (
-            <p className="text-neutral-600 dark:text-neutral-400">
-              {isBangla ? 'প্রাণী: ' : 'Animal: '}
-              <span className="font-semibold capitalize text-foreground">{reportSpecies}</span>
-            </p>
-          )}
-          {reportArea && (
-            <p className="text-neutral-600 dark:text-neutral-400">
-              📍 {reportArea}
-            </p>
-          )}
+          <div className="flex flex-wrap items-center gap-3">
+            {reportSpecies && (
+              <p className="text-neutral-600 dark:text-neutral-400">
+                {isBangla ? 'প্রাণী: ' : 'Animal: '}
+                <span className="font-semibold capitalize text-foreground">{reportSpecies}</span>
+              </p>
+            )}
+            {reportArea && (
+              <p className="text-neutral-600 dark:text-neutral-400">
+                📍 {reportArea}
+              </p>
+            )}
+            {lat != null && lng != null && (
+              <span className="text-[11px] text-green-700 dark:text-green-400 font-medium">
+                🎯 {isBangla ? 'জিপিএস সক্রিয়' : 'GPS Active'}
+              </span>
+            )}
+          </div>
         </div>
 
         {error && (
@@ -92,6 +136,31 @@ export function AssignRescuerModal({
             {error}
           </div>
         )}
+
+        {/* Spatial Distance Filter Bar */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-semibold text-foreground">
+            {isBangla ? 'দূরত্ব ফিল্টার:' : 'Radius filter:'}
+          </span>
+          <div className="flex gap-1">
+            {RADIUS_PILLS.map((p) => (
+              <button
+                key={String(p)}
+                type="button"
+                onClick={() => setRadiusFilterKm(p)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  radiusFilterKm === p
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200'
+                }`}
+              >
+                {p === 'all'
+                  ? isBangla ? 'সকল' : 'All'
+                  : `${p} ${isBangla ? 'কিমি' : 'km'}`}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Search */}
         <Input
@@ -105,31 +174,46 @@ export function AssignRescuerModal({
         />
 
         {/* Rescuers List */}
-        <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+        <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
           {filteredRescuers.map((rescuer) => {
             const isBusy = rescuer.active_cases_count >= 2 || !rescuer.is_available;
             const isThisSubmitting = isSubmittingId === rescuer.id;
+            const coversSpecies =
+              reportSpecies &&
+              rescuer.species?.some((s) => reportSpecies.toLowerCase().includes(s.toLowerCase()));
 
             return (
               <div
                 key={rescuer.id}
                 className="p-3 rounded-xl border border-stroke-subtle bg-white dark:bg-neutral-900 flex items-center justify-between gap-3 hover:border-primary transition-colors"
               >
-                <div>
-                  <div className="flex items-center gap-1.5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-bold text-sm text-foreground">
                       {isBangla ? rescuer.name_bn : rescuer.name}
                     </span>
                     <span className="text-primary text-xs" title="Verified Rescuer">
                       ☑️
                     </span>
+
+                    {rescuer.distance_meters != null && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                        🚗 {(rescuer.distance_meters / 1000).toFixed(1)} {isBangla ? 'কিমি দূরে' : 'km away'}
+                      </span>
+                    )}
+
+                    {rescuer.radius_km != null && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
+                        🎯 {rescuer.radius_km} {isBangla ? 'কিমি কভারেজ' : 'km range'}
+                      </span>
+                    )}
                   </div>
 
-                  <p className="text-xs text-neutral-500 mt-0.5">
+                  <p className="text-xs text-neutral-500">
                     📍 {isBangla ? rescuer.district_name_bn : rescuer.district_name_en}
                   </p>
 
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span
                       className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
                         rescuer.active_cases_count === 0
@@ -145,6 +229,12 @@ export function AssignRescuerModal({
                     {!rescuer.is_available && (
                       <span className="text-[11px] text-neutral-400 italic">
                         {isBangla ? '(অনুপলব্ধ)' : '(Unavailable)'}
+                      </span>
+                    )}
+
+                    {coversSpecies && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400 font-medium">
+                        ⭐ {isBangla ? 'উপযুক্ত প্রজাতি' : 'Species match'}
                       </span>
                     )}
                   </div>
@@ -170,7 +260,7 @@ export function AssignRescuerModal({
             <p className="text-xs text-neutral-500 text-center py-4">
               {isBangla
                 ? 'কোনো উদ্ধারকারী খুঁজে পাওয়া যায়নি।'
-                : 'No verified rescuers found matching query.'}
+                : 'No verified rescuers found matching query or distance.'}
             </p>
           )}
         </div>
@@ -185,3 +275,4 @@ export function AssignRescuerModal({
     </Modal>
   );
 }
+

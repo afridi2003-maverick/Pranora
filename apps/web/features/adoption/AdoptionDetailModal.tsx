@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import { useLocale } from '@pranora/i18n';
 import { Modal, Button } from '@pranora/ui';
 import type { AdoptionListingRow } from '@pranora/api';
+import type { ListingReportReason } from '@pranora/validation';
 import { DISTRICT_MAP } from './mockData';
 import { formatAge } from './AdoptionCard';
+import { ReportListingModal } from './ReportListingModal';
 
 interface AdoptionDetailModalProps {
   listing: AdoptionListingRow | null;
@@ -14,6 +16,11 @@ interface AdoptionDetailModalProps {
   onApply?: (listing: AdoptionListingRow) => void;
   onSave?: (listingId: string) => void;
   isSaved?: boolean;
+  onReport?: (payload: {
+    listingId: string;
+    reason: ListingReportReason;
+    details?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function AdoptionDetailModal({
@@ -23,9 +30,11 @@ export function AdoptionDetailModal({
   onApply,
   onSave,
   isSaved = false,
+  onReport,
 }: AdoptionDetailModalProps) {
   const { isBangla } = useLocale();
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   if (!listing) return null;
 
@@ -50,6 +59,7 @@ export function AdoptionDetailModal({
     : ['https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800'];
 
   return (
+    <>
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-5 max-w-lg">
         {/* Main Photo */}
@@ -196,8 +206,28 @@ export function AdoptionDetailModal({
               ? 'আবেদন করার জন্য একাউন্টে লগইন করতে হবে। অনুমোদন সরাসরি লিস্টার দ্বারা নিয়ন্ত্রিত হয়।'
               : 'Requires logging in to submit application. Approvals are always decided by humans.'}
           </p>
+
+          {/* Report Button */}
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={() => setIsReportOpen(true)}
+              className="text-xs text-neutral-400 hover:text-rose-600 transition-colors flex items-center gap-1.5"
+            >
+              <span>🚩</span>
+              <span>{isBangla ? 'বিজ্ঞাপনটি রিপোর্ট করুন' : 'Report this listing'}</span>
+            </button>
+          </div>
         </div>
       </div>
     </Modal>
+
+    <ReportListingModal
+      listing={listing}
+      isOpen={isReportOpen}
+      onClose={() => setIsReportOpen(false)}
+      onReport={onReport}
+    />
+    </>
   );
 }

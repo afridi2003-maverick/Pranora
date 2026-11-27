@@ -13,6 +13,9 @@ export interface RescuerProfileBrief {
   district_name_en: string;
   active_cases_count: number;
   is_available: boolean;
+  distance_meters?: number;
+  radius_km?: number;
+  species?: string[];
 }
 
 export interface AssignmentWithReport {
@@ -31,6 +34,9 @@ export const MOCK_VERIFIED_RESCUERS: RescuerProfileBrief[] = [
     district_name_en: 'Dhaka (Mirpur, Uttara)',
     active_cases_count: 1,
     is_available: true,
+    distance_meters: 1200,
+    radius_km: 8,
+    species: ['dog', 'cat'],
   },
   {
     id: 'rescuer-002',
@@ -41,6 +47,9 @@ export const MOCK_VERIFIED_RESCUERS: RescuerProfileBrief[] = [
     district_name_en: 'Dhaka (Dhanmondi, Mohammadpur)',
     active_cases_count: 0,
     is_available: true,
+    distance_meters: 3400,
+    radius_km: 5,
+    species: ['cat', 'rabbit'],
   },
   {
     id: 'rescuer-003',
@@ -51,6 +60,9 @@ export const MOCK_VERIFIED_RESCUERS: RescuerProfileBrief[] = [
     district_name_en: 'Chattogram (GEC, Agrabad)',
     active_cases_count: 2,
     is_available: false,
+    distance_meters: 15200,
+    radius_km: 15,
+    species: ['dog', 'cat', 'other'],
   },
 ];
 

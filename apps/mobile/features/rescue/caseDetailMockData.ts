@@ -2,6 +2,7 @@ import type {
   RescueCaseRow,
   AnimalReportRow,
   RescueCaseUpdateRow,
+  PotentialDuplicateReport,
 } from '@pranora/api';
 
 export interface RescueCaseFullDetails {
@@ -90,3 +91,42 @@ export const MOCK_CASE_DETAILS: Record<string, RescueCaseFullDetails> = {
     ],
   },
 };
+
+export const MOCK_POTENTIAL_DUPLICATES: Record<string, PotentialDuplicateReport[]> = {
+  'rep-301': [
+    {
+      id: 'rep-dup-302',
+      reporter_id: 'user-reporter-2',
+      kind: 'injured',
+      species: 'dog',
+      urgency: 'high',
+      description: 'মিরপুর ১০ মোড়ে একটি বাদামি দেশি কুকুর গাড়ির ধাক্কায় রক্তাক্ত অবস্থায় শুয়ে আছে। দ্রুত উদ্ধার প্রয়োজন।',
+      photos: [
+        'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800',
+      ],
+      area_text: 'মিরপুর ১০ গোল চত্বর, ঢাকা',
+      status: 'submitted',
+      distance_meters: 65.4,
+      created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+    },
+    {
+      id: 'rep-dup-303',
+      reporter_id: 'user-reporter-3',
+      kind: 'injured',
+      species: 'dog',
+      urgency: 'critical',
+      description: 'ফায়ার সার্ভিস স্টেশনের সামনে কুকুরটি কাতরাচ্ছে, পেছনের পা ভেঙে গেছে বলে মনে হয়।',
+      photos: [
+        'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800',
+      ],
+      area_text: 'মিরপুর ১০ ফায়ার সার্ভিস সংলগ্ন এলাকা',
+      status: 'submitted',
+      distance_meters: 110.2,
+      created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    },
+  ],
+};
+
+export function getMockDuplicatesForReport(reportId: string): PotentialDuplicateReport[] {
+  return MOCK_POTENTIAL_DUPLICATES[reportId] || [];
+}

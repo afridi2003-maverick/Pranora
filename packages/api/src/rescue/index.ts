@@ -1,5 +1,6 @@
 import type { TypedSupabaseClient } from '../client';
 import type {
+  Database,
   AnimalReportKind,
   SpeciesType,
   UrgencyLevel,
@@ -62,6 +63,8 @@ export interface LostFoundBoardItem {
   last_seen_at: string | null;
   created_at: string;
   approx_location: unknown | null;
+  approx_lat?: number | null;
+  approx_lng?: number | null;
 }
 
 export interface RescueCaseRow {
@@ -176,15 +179,29 @@ export async function getMyReports(
 /** Fetch public lost & found reports */
 export async function getLostFoundBoard(
   client: TypedSupabaseClient,
-  species?: SpeciesType
+  speciesOrOptions?: SpeciesType | {
+    kind?: 'lost' | 'found';
+    species?: SpeciesType;
+    districtId?: number;
+  }
 ): Promise<LostFoundBoardItem[]> {
   let query = client
     .from('lost_found_board')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (species) {
-    query = query.eq('species', species);
+  if (typeof speciesOrOptions === 'string') {
+    query = query.eq('species', speciesOrOptions);
+  } else if (speciesOrOptions && typeof speciesOrOptions === 'object') {
+    if (speciesOrOptions.kind) {
+      query = query.eq('kind', speciesOrOptions.kind);
+    }
+    if (speciesOrOptions.species) {
+      query = query.eq('species', speciesOrOptions.species);
+    }
+    if (speciesOrOptions.districtId) {
+      query = query.eq('district_id', speciesOrOptions.districtId);
+    }
   }
 
   const { data, error } = await query;
@@ -466,5 +483,214 @@ export function calculateEscalationCountdown(
     minutesRemaining: remainingMinutes,
     formattedRemaining: isOverdue ? '0m' : `${remainingMinutes}m`,
   };
+}
+
+export interface PotentialDuplicateReport {
+  id: string;
+  reporter_id: string;
+  kind: AnimalReportKind;
+  species: SpeciesType;
+  urgency: UrgencyLevel;
+  description: string | null;
+  photos: string[];
+  area_text: string | null;
+  status: RescueStatus;
+  distance_meters: number;
+  created_at: string;
+}
+
+/** Find potential duplicate reports matching species, time, and spatial proximity */
+export async function findPotentialDuplicateReports(
+  client: TypedSupabaseClient,
+  reportId: string,
+  radiusMeters = 1500
+): Promise<PotentialDuplicateReport[]> {
+  const { data, error } = await client.rpc('find_potential_duplicate_reports', {
+    p_report_id: reportId,
+    p_radius_meters: radiusMeters,
+  });
+
+  if (error) throw error;
+  return (data as unknown as PotentialDuplicateReport[]) ?? [];
+}
+
+/** Merge a duplicate animal report into an existing canonical report */
+export async function mergeAnimalReports(
+  client: TypedSupabaseClient,
+  duplicateId: string,
+  targetId: string
+): Promise<boolean> {
+  const { data, error } = await client.rpc('merge_animal_reports', {
+    p_duplicate_id: duplicateId,
+    p_target_id: targetId,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+export type RescuerProfileRow = Database['public']['Tables']['rescuer_profiles']['Row'];
+
+export interface NearbyRescuer {
+  rescuer_id: string;
+  distance_meters: number;
+  radius_km: number;
+  is_available: boolean;
+  species: SpeciesType[];
+  display_name: string | null;
+  avatar_url: string | null;
+  active_cases_count: number;
+}
+
+export interface FindNearbyRescuersParams {
+  lat: number;
+  lng: number;
+  radius_m?: number;
+  species?: SpeciesType;
+}
+
+export interface UpsertRescuerProfileParams {
+  userId: string;
+  lat?: number;
+  lng?: number;
+  districtId?: number;
+  radiusKm?: number;
+  species?: SpeciesType[];
+  isAvailable?: boolean;
+}
+
+/** Search nearby available verified rescuers within coverage radius (RSC-9) */
+export async function findNearbyRescuers(
+  client: TypedSupabaseClient,
+  params: FindNearbyRescuersParams
+): Promise<NearbyRescuer[]> {
+  const { data, error } = await client.rpc('nearby_rescuers', {
+    p_lat: params.lat,
+    p_lng: params.lng,
+    p_radius_m: params.radius_m ?? null,
+    p_species: params.species ?? null,
+  });
+
+  if (error) throw error;
+  return (data as unknown as NearbyRescuer[]) ?? [];
+}
+
+/** Fetch a rescuer's profile and availability details */
+export async function getRescuerProfile(
+  client: TypedSupabaseClient,
+  userId: string
+): Promise<RescuerProfileRow | null> {
+  const { data, error } = await client
+    .from('rescuer_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as unknown as RescuerProfileRow | null;
+}
+
+/** Update or create a rescuer coverage profile */
+export async function upsertRescuerProfile(
+  client: TypedSupabaseClient,
+  params: UpsertRescuerProfileParams
+): Promise<RescuerProfileRow> {
+  const { data, error } = await client.rpc('upsert_rescuer_profile', {
+    p_user_id: params.userId,
+    p_lat: params.lat ?? null,
+    p_lng: params.lng ?? null,
+    p_district_id: params.districtId ?? null,
+    p_radius_km: params.radiusKm ?? null,
+    p_species: params.species ?? null,
+    p_is_available: params.isAvailable ?? null,
+  });
+
+  if (error) throw error;
+  return data as unknown as RescuerProfileRow;
+}
+
+/** Quick toggle for rescuer availability status */
+export async function setRescuerAvailability(
+  client: TypedSupabaseClient,
+  userId: string,
+  isAvailable: boolean
+): Promise<boolean> {
+  const { error } = await client
+    .from('rescuer_profiles')
+    .update({ is_available: isAvailable, updated_at: new Date().toISOString() })
+    .eq('user_id', userId);
+
+  if (error) throw error;
+  return true;
+}
+
+export type LostFoundSightingRow = Database['public']['Tables']['lost_found_sightings']['Row'];
+
+export interface SubmitLostFoundSightingParams {
+  reportId: string;
+  message: string;
+  locationText?: string;
+  photos?: string[];
+  contactPhone?: string;
+}
+
+/** Submit a sighting / "I've seen it" report for a lost or found animal (RSC-10) */
+export async function submitLostFoundSighting(
+  client: TypedSupabaseClient,
+  params: SubmitLostFoundSightingParams
+): Promise<string> {
+  const { data, error } = await client.rpc('submit_lost_found_sighting', {
+    p_report_id: params.reportId,
+    p_message: params.message,
+    p_location_text: params.locationText ?? null,
+    p_photos: params.photos ?? [],
+    p_contact_phone: params.contactPhone ?? null,
+  });
+
+  if (error) throw error;
+  return data as string;
+}
+
+/** Reporter shares their contact phone number with the spotter (RSC-10) */
+export async function shareSightingContact(
+  client: TypedSupabaseClient,
+  sightingId: string
+): Promise<boolean> {
+  const { data, error } = await client.rpc('share_sighting_contact', {
+    p_sighting_id: sightingId,
+  });
+
+  if (error) throw error;
+  return Boolean(data);
+}
+
+/** Fetch sightings submitted for a specific report */
+export async function getReportSightings(
+  client: TypedSupabaseClient,
+  reportId: string
+): Promise<LostFoundSightingRow[]> {
+  const { data, error } = await client
+    .from('lost_found_sightings')
+    .select('*')
+    .eq('report_id', reportId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data ?? []) as unknown as LostFoundSightingRow[];
+}
+
+/** Trigger nearby alerts for a new lost/found report (RSC-10) */
+export async function alertNearbyUsersForLostFound(
+  client: TypedSupabaseClient,
+  reportId: string,
+  radiusKm = 3.0
+): Promise<number> {
+  const { data, error } = await client.rpc('alert_nearby_users_for_lost_found', {
+    p_report_id: reportId,
+    p_radius_km: radiusKm,
+  });
+
+  if (error) throw error;
+  return Number(data ?? 0);
 }
 

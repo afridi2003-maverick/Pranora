@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 import { useLocale } from '@pranora/i18n';
 import type { AdoptionListingRow } from '@pranora/api';
+import type { ListingReportReason } from '@pranora/validation';
 import { DISTRICT_MAP } from './mockData';
 import { formatAge } from './AdoptionCard';
+import { ReportListingModal } from './ReportListingModal';
 
 interface AdoptionDetailModalProps {
   listing: AdoptionListingRow | null;
@@ -19,6 +21,11 @@ interface AdoptionDetailModalProps {
   onApply?: (listing: AdoptionListingRow) => void;
   onSave?: (listingId: string) => void;
   isSaved?: boolean;
+  onReport?: (payload: {
+    listingId: string;
+    reason: ListingReportReason;
+    details?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
 }
 
 export function AdoptionDetailModal({
@@ -28,8 +35,10 @@ export function AdoptionDetailModal({
   onApply,
   onSave,
   isSaved = false,
+  onReport,
 }: AdoptionDetailModalProps) {
   const { isBangla } = useLocale();
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   if (!listing) return null;
 
@@ -52,6 +61,7 @@ export function AdoptionDetailModal({
   const photo = listing.photos[0] || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800';
 
   return (
+    <>
     <Modal visible={visible} animationType="slide" transparent={false} onRequestClose={onClose}>
       <View className="flex-1 bg-white">
         {/* Header Bar */}
@@ -188,8 +198,27 @@ export function AdoptionDetailModal({
               ? 'আবেদনের জন্য লগইন প্রয়োজন। সিদ্ধান্ত সর্বদা মানুষ দ্বারা যাচাই করা হয়।'
               : 'Requires login to apply. Review decisions are always made by humans.'}
           </Text>
+
+          {/* Report Button */}
+          <TouchableOpacity
+            onPress={() => setIsReportOpen(true)}
+            className="items-center justify-center flex-row gap-1.5 py-2 mb-6"
+            activeOpacity={0.7}
+          >
+            <Text className="text-xs text-rose-500 font-medium">
+              🚩 {isBangla ? 'বিজ্ঞাপনটি রিপোর্ট করুন' : 'Report this listing'}
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
     </Modal>
+
+    <ReportListingModal
+      listing={listing}
+      visible={isReportOpen}
+      onClose={() => setIsReportOpen(false)}
+      onReport={onReport}
+    />
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { useLocale } from '@pranora/i18n';
 import {
   RescuerCasesList,
   AssignRescuerModal,
+  RescuerProfileCard,
   MOCK_ASSIGNMENTS,
 } from '../../features/rescue';
 
@@ -55,6 +56,16 @@ export default function RescuerAssignmentsScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Rescuer Profile & Availability Card */}
+      <View className="px-4 pt-3">
+        <RescuerProfileCard
+          districtName={isBangla ? 'ঢাকা মেট্রো' : 'Dhaka Metro'}
+          onSave={async () => {
+            await new Promise((resolve) => setTimeout(resolve, 300));
+          }}
+        />
+      </View>
+
       {/* Main List */}
       <RescuerCasesList
         initialAssignments={MOCK_ASSIGNMENTS}
@@ -67,8 +78,10 @@ export default function RescuerAssignmentsScreen() {
         visible={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
         caseId="case-201"
-        reportSpecies="dog (কুকুর)"
+        reportSpecies="dog"
         reportArea="Mirpur 10, Dhaka"
+        lat={23.8069}
+        lng={90.3687}
         onAssign={handleAssign}
       />
     </View>

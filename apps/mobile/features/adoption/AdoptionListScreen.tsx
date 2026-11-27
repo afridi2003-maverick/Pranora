@@ -9,6 +9,7 @@ import {
 import { useLocale } from '@pranora/i18n';
 import type { AdoptionListingRow } from '@pranora/api';
 import type { SpeciesType } from '@pranora/types';
+import type { ListingReportReason } from '@pranora/validation';
 import { AdoptionCard } from './AdoptionCard';
 import { AdoptionDetailModal } from './AdoptionDetailModal';
 import { MOCK_ADOPTION_LISTINGS, MOCK_SAVED_LISTING_IDS, DISTRICT_MAP } from './mockData';
@@ -16,6 +17,11 @@ import { MOCK_ADOPTION_LISTINGS, MOCK_SAVED_LISTING_IDS, DISTRICT_MAP } from './
 interface AdoptionListScreenProps {
   initialListings?: AdoptionListingRow[];
   onApply?: (listing: AdoptionListingRow) => void;
+  onReport?: (payload: {
+    listingId: string;
+    reason: ListingReportReason;
+    details?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
 }
 
 const SPECIES_OPTIONS: { id: SpeciesType | 'all'; bn: string; en: string; icon: string }[] = [
@@ -36,6 +42,7 @@ const AGE_OPTIONS = [
 export function AdoptionListScreen({
   initialListings = MOCK_ADOPTION_LISTINGS,
   onApply,
+  onReport,
 }: AdoptionListScreenProps) {
   const { isBangla } = useLocale();
 
@@ -267,6 +274,7 @@ export function AdoptionListScreen({
         onApply={onApply}
         onSave={handleToggleSave}
         isSaved={selectedListing ? savedIds.has(selectedListing.id) : false}
+        onReport={onReport}
       />
     </ScrollView>
   );

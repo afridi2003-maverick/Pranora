@@ -400,6 +400,42 @@ export interface Database {
         };
         Relationships: [];
       };
+      lost_found_sightings: {
+        Row: {
+          id: string;
+          report_id: string;
+          reporter_user_id: string | null;
+          message: string;
+          location_text: string | null;
+          photos: string[];
+          contact_phone: string | null;
+          contact_shared: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          report_id: string;
+          reporter_user_id?: string | null;
+          message: string;
+          location_text?: string | null;
+          photos?: string[];
+          contact_phone?: string | null;
+          contact_shared?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          report_id?: string;
+          reporter_user_id?: string | null;
+          message?: string;
+          location_text?: string | null;
+          photos?: string[];
+          contact_phone?: string | null;
+          contact_shared?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       app_config: {
         Row: {
           key: string;
@@ -1223,6 +1259,85 @@ export interface Database {
           p_pet_id?: string | null;
         };
         Returns: boolean;
+      };
+      find_potential_duplicate_reports: {
+        Args: {
+          p_report_id: string;
+          p_radius_meters?: number;
+        };
+        Returns: {
+          id: string;
+          reporter_id: string;
+          kind: AnimalReportKind;
+          species: SpeciesType;
+          urgency: UrgencyLevel;
+          description: string | null;
+          photos: string[];
+          area_text: string | null;
+          status: RescueStatus;
+          distance_meters: number;
+          created_at: string;
+        }[];
+      };
+      merge_animal_reports: {
+        Args: {
+          p_duplicate_id: string;
+          p_target_id: string;
+        };
+        Returns: boolean;
+      };
+      nearby_rescuers: {
+        Args: {
+          p_lat: number;
+          p_lng: number;
+          p_radius_m?: number | null;
+          p_species?: SpeciesType | null;
+        };
+        Returns: {
+          rescuer_id: string;
+          distance_meters: number;
+          radius_km: number;
+          is_available: boolean;
+          species: SpeciesType[];
+          display_name: string | null;
+          avatar_url: string | null;
+          active_cases_count: number;
+        }[];
+      };
+      upsert_rescuer_profile: {
+        Args: {
+          p_user_id: string;
+          p_lat?: number | null;
+          p_lng?: number | null;
+          p_district_id?: number | null;
+          p_radius_km?: number | null;
+          p_species?: SpeciesType[] | null;
+          p_is_available?: boolean | null;
+        };
+        Returns: Database['public']['Tables']['rescuer_profiles']['Row'];
+      };
+      submit_lost_found_sighting: {
+        Args: {
+          p_report_id: string;
+          p_message: string;
+          p_location_text?: string | null;
+          p_photos?: string[] | null;
+          p_contact_phone?: string | null;
+        };
+        Returns: string;
+      };
+      share_sighting_contact: {
+        Args: {
+          p_sighting_id: string;
+        };
+        Returns: boolean;
+      };
+      alert_nearby_users_for_lost_found: {
+        Args: {
+          p_report_id: string;
+          p_radius_km?: number | null;
+        };
+        Returns: number;
       };
       my_report_status: {
         Args: {

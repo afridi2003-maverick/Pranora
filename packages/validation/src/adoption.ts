@@ -104,6 +104,26 @@ export type SubmitAdoptionFollowupInput = z.infer<
   typeof SubmitAdoptionFollowupSchema
 >;
 
+export const ListingReportReasonSchema = z.enum([
+  'fake',
+  'scam',
+  'commercial_sale',
+  'animal_cruelty',
+  'inaccurate_info',
+  'other',
+]);
+export type ListingReportReason = z.infer<typeof ListingReportReasonSchema>;
+
+export const ReportAdoptionListingSchema = z.object({
+  listing_id: z.string().uuid(),
+  reason: ListingReportReasonSchema,
+  details: z.string().max(1000).optional(),
+  evidence_urls: z.array(z.string().url()).max(5).default([]),
+});
+export type ReportAdoptionListingInput = z.infer<
+  typeof ReportAdoptionListingSchema
+>;
+
 export const AdoptionAgeGroupSchema = z.enum(['all', 'baby', 'young', 'adult', 'senior']);
 export type AdoptionAgeGroup = z.infer<typeof AdoptionAgeGroupSchema>;
 

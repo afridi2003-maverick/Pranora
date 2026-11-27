@@ -7,19 +7,75 @@ import { Button } from '@pranora/ui';
 import {
   RescuerCasesList,
   AssignRescuerModal,
+  RescuerProfileCard,
   MOCK_ASSIGNMENTS,
 } from '../../../../features/rescue';
-import { assignRescuer, respondToAssignment } from '@pranora/api';
+import {
+  assignRescuer,
+  respondToAssignment,
+  findNearbyRescuers,
+  upsertRescuerProfile,
+} from '@pranora/api';
+import type { SpeciesType } from '@pranora/types';
 import { useSession } from '../../../../hooks/useSession';
 import { useToast } from '../../../../components/ToastProvider';
 
 export default function RescuerAssignmentsPage() {
   const { isBangla, locale } = useLocale();
   const router = useRouter();
-  const { supabase, isConfigured, isAuthenticated } = useSession();
+  const { supabase, user, isConfigured, isAuthenticated } = useSession();
   const { showToast } = useToast();
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
+  const handleSaveProfile = async (profile: {
+    isAvailable: boolean;
+    radiusKm: number;
+    species: SpeciesType[];
+  }) => {
+    if (isConfigured && isAuthenticated && user) {
+      await upsertRescuerProfile(supabase, {
+        userId: user.id,
+        radiusKm: profile.radiusKm,
+        species: profile.species,
+        isAvailable: profile.isAvailable,
+      });
+      showToast({
+        type: 'success',
+        message: isBangla ? 'কভারেজ প্রোফাইল সংরক্ষিত হয়েছে' : 'Coverage profile updated',
+      });
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  };
+
+  const handleFindNearby = async (params: {
+    lat: number;
+    lng: number;
+    radius_m?: number;
+  }) => {
+    if (isConfigured && isAuthenticated) {
+      const items = await findNearbyRescuers(supabase, {
+        lat: params.lat,
+        lng: params.lng,
+        radius_m: params.radius_m,
+      });
+      return items.map((r) => ({
+        id: r.rescuer_id,
+        name: r.display_name || 'Rescuer',
+        name_bn: r.display_name || 'উদ্ধারকারী',
+        phone: '+8801700000000',
+        district_name_en: 'Dhaka Coverage',
+        district_name_bn: 'ঢাকা কভারেজ এলাকা',
+        active_cases_count: r.active_cases_count,
+        is_available: r.is_available,
+        distance_meters: r.distance_meters,
+        radius_km: Number(r.radius_km),
+        species: r.species,
+      }));
+    }
+    return [];
+  };
 
   const handleRespond = async (
     assignmentId: string,
@@ -91,6 +147,12 @@ export default function RescuerAssignmentsPage() {
           </Button>
         </div>
 
+        {/* Rescuer Availability & Coverage Profile */}
+        <RescuerProfileCard
+          districtName={isBangla ? 'ঢাকা মেট্রো ও পার্শ্ববর্তী এলাকা' : 'Dhaka Metro & Outskirts'}
+          onSave={handleSaveProfile}
+        />
+
         {/* Rescuer Cases List */}
         <RescuerCasesList
           initialAssignments={MOCK_ASSIGNMENTS}
@@ -103,9 +165,12 @@ export default function RescuerAssignmentsPage() {
           isOpen={isAssignModalOpen}
           onClose={() => setIsAssignModalOpen(false)}
           caseId="case-201"
-          reportSpecies="dog (কুকুর)"
+          reportSpecies="dog"
           reportArea="Mirpur 10, Dhaka"
+          lat={23.8069}
+          lng={90.3687}
           onAssign={handleAssign}
+          onFindNearby={handleFindNearby}
         />
       </main>
     </div>
