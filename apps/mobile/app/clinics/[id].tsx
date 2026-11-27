@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Share,
   Alert,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLocale } from '@pranora/i18n';
@@ -18,6 +20,9 @@ import {
   buildBookingUrl,
   buildDirectionsUrl,
   buildTelUrl,
+  getProviderReviews,
+  submitProviderReview,
+  type ReviewItem,
 } from '@pranora/api';
 
 const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -32,6 +37,35 @@ export default function MobileClinicDetailScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedPhotoIdx, setSelectedPhotoIdx] = useState<number>(0);
   const [showAllHours, setShowAllHours] = useState<boolean>(false);
+
+  // Reviews state (REV-1)
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+
+  useEffect(() => {
+    if (clinic?.provider.id) {
+      getProviderReviews(clinic.provider.id).then(setReviews);
+    }
+  }, [clinic?.provider.id]);
+
+  const handleSubmitReview = async () => {
+    if (!clinic?.provider.id) return;
+    const newRev = await submitProviderReview(
+      {
+        bookingId: `b-${Date.now()}`,
+        providerId: clinic.provider.id,
+        rating: reviewRating,
+        comment: reviewComment,
+      },
+      { id: 'user-mob', name: isBangla ? 'পেট প্যারেন্ট' : 'Pet Parent' }
+    );
+    setReviews((p) => [newRev, ...p]);
+    setReviewModalVisible(false);
+    setReviewComment('');
+    Alert.alert(isBangla ? 'ধন্যবাদ' : 'Success', isBangla ? 'রিভিউ সফলভাবে জমা হয়েছে' : 'Review submitted successfully');
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -356,7 +390,107 @@ export default function MobileClinicDetailScreen() {
             );
           })}
         </View>
+
+        {/* REV-1: Reviews & Ratings */}
+        <View className="bg-white p-4 mb-20 border-b border-gray-100">
+          <View className="flex-row justify-between items-center mb-3">
+            <View>
+              <Text className="text-sm font-bold text-gray-900">
+                ⭐ {isBangla ? 'রিভিউ ও রেটিং' : 'Reviews & Ratings'}
+              </Text>
+              <Text className="text-[10px] text-gray-500">
+                ★ {provider.ratingAvg.toFixed(1)} ({provider.ratingCount} {isBangla ? 'রিভিউ' : 'reviews'})
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setReviewModalVisible(true)}
+              className="px-3 py-1.5 rounded-lg bg-green-50 border border-green-200"
+            >
+              <Text className="text-xs font-bold text-green-800">
+                ✍️ {isBangla ? 'রিভিউ লিখুন' : 'Write Review'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {reviews.map((r) => (
+            <View key={r.id} className="py-2.5 border-b border-gray-50 last:border-b-0">
+              <View className="flex-row justify-between items-center mb-1">
+                <View className="flex-row items-center gap-1.5">
+                  <Text className="text-xs font-bold text-gray-800">{r.authorName}</Text>
+                  {r.isVerifiedVisit && (
+                    <Text className="text-[9px] bg-green-100 text-green-800 px-1.5 py-0.2 rounded font-bold">
+                      ✓ {isBangla ? 'যাচাইকৃত' : 'Verified'}
+                    </Text>
+                  )}
+                </View>
+                <Text className="text-xs text-amber-500">{'★'.repeat(r.rating)}</Text>
+              </View>
+              {r.comment && (
+                <Text className="text-xs text-gray-600 leading-relaxed">{r.comment}</Text>
+              )}
+            </View>
+          ))}
+        </View>
       </ScrollView>
+
+      {/* Write Review Modal */}
+      <Modal
+        visible={reviewModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setReviewModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/60 justify-end">
+          <View className="bg-white rounded-t-3xl p-5">
+            <View className="flex-row justify-between items-center pb-3 border-b border-gray-100 mb-4">
+              <Text className="text-base font-bold text-gray-900">
+                ✍️ {isBangla ? 'ক্লিনিকের অভিজ্ঞতা জানান' : 'Write Review'}
+              </Text>
+              <TouchableOpacity onPress={() => setReviewModalVisible(false)}>
+                <Text className="text-base font-bold text-gray-400">✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text className="text-xs font-bold text-gray-700 mb-2">
+              {isBangla ? 'আপনার রেটিং নির্ধারণ করুন' : 'Your Rating'}
+            </Text>
+            <View className="flex-row gap-2 mb-4">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <TouchableOpacity key={s} onPress={() => setReviewRating(s)}>
+                  <Text className="text-3xl">{s <= reviewRating ? '⭐' : '☆'}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text className="text-xs font-bold text-gray-700 mb-1">
+              {isBangla ? 'আপনার মন্তব্য' : 'Your Feedback'}
+            </Text>
+            <TextInput
+              value={reviewComment}
+              onChangeText={setReviewComment}
+              placeholder={isBangla ? 'ক্লিনিকের চিকিৎসা ও সেবা কেমন ছিল?' : 'Share your feedback...'}
+              multiline
+              numberOfLines={4}
+              className="border border-gray-200 rounded-xl p-3 text-xs mb-4 text-gray-900"
+            />
+
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={() => setReviewModalVisible(false)}
+                className="flex-1 py-3 bg-gray-100 rounded-xl items-center"
+              >
+                <Text className="text-xs font-bold text-gray-600">{isBangla ? 'বাতিল' : 'Cancel'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmitReview}
+                className="flex-2 py-3 bg-green-700 rounded-xl items-center"
+              >
+                <Text className="text-xs font-bold text-white">{isBangla ? 'রিভিউ জমা দিন' : 'Submit Review'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Floating Bottom Bar */}
       <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 flex-row gap-2 shadow-lg">

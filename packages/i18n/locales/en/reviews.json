@@ -42,5 +42,24 @@
   },
   "badge": "Report",
   "clinic_report_hint": "Is the address, phone number, or hours incorrect?",
-  "review_report_hint": "Is this review fake, spam, or abusive?"
+  "review_report_hint": "Is this review fake, spam, or abusive?",
+  "section": {
+    "title": "Reviews & Ratings",
+    "verified_visit": "Verified Visit",
+    "write_button": "Write a Review",
+    "no_reviews": "No reviews yet. Be the first to share your experience!",
+    "ratings_breakdown": "Rating Breakdown",
+    "based_on": "based on {{count}} reviews"
+  },
+  "create_modal": {
+    "title": "Share Your Clinic Experience",
+    "rating_label": "Your Rating",
+    "doctor_label": "Doctor / Vet (Optional)",
+    "comment_label": "Your Feedback",
+    "comment_placeholder": "How was the treatment, hygiene, and care for your pet?",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "success_title": "Review Submitted!",
+    "success_message": "Thank you for helping the pet parent community make informed decisions."
+  }
 }

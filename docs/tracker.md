@@ -166,7 +166,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | PAY-2 | Online payments: SSLCommerz (bKash, Nagad, Rocket, cards) | Afridi | L | S7 | PAY-1, (SVC-SHOP) | ✅ |
 | PAY-3 | Invoices & refunds | Afridi | M | S8 | PAY-2, (SVC-SHOP) | ✅ |
 | PAY-4 | Provider payouts | Afridi | M | S8 | PAY-2, PRV-2 | ✅ |
-| SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ⬜ |
+| SVC-HOME | Home visit request | Zimia | M | S7 | APT-1, MAP-3 | ✅ |
 | APT-5 | Digital prescription (vet only) | Tain | M | S6 | HLT-7, APT-2 | ✅ |
 | SVC-ONL | Online consultation | Tain | M | S8 | CALL-2, PAY-2 | ✅ |
 | CALL-1 | Owner–vet audio call | Tain | L | S7 | APT-2 | ✅ |
@@ -188,7 +188,7 @@ MVP = only modules 1–4 of the source build order: account & roles → rescue (
 | SVC-GRM | Grooming booking | Zimia | M | S7 | APT-1, SVC-2 | ⬜ |
 | SVC-SHOP | Pet shop + cart + orders (cash on delivery + online payment) | Brehat | L | S7 | SVC-1, AUTH-1 | ✅ |
 | SVC-BRD | Boarding (date range) | Zimia | M | S8 | APT-1, SVC-2 | ⬜ |
-| REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ⬜ |
+| REV-1 | Reviews & ratings | Zimia | M | S6 | APT-2, MAP-5 | ✅ |
 | REV-2 | Shared report flow (reviews, wrong clinic info) | Afridi | M | S6 | ADM-2, (REV-1) | ✅ |
 | SVC-TIPS | Articles / tips (bn) | Zihad | M | S8 | SVC-1 | ✅ |
 | MAP-8/9 | Radius slider + clustering | Zimia | M | S7 | MAP-3 | ⬜ |

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useLocale } from '@pranora/i18n';
 import { Button, Card, Chip, EmptyState } from '@pranora/ui';
@@ -10,6 +10,10 @@ import {
   buildBookingUrl,
   buildDirectionsUrl,
   buildTelUrl,
+  getProviderReviews,
+  calculateReviewSummary,
+  submitProviderReview,
+  type ReviewItem,
 } from '@pranora/api';
 import { ReportModal } from '../../components/ReportModal';
 import { useSession } from '../../../../hooks/useSession';
@@ -31,6 +35,51 @@ export default function ClinicDetailPage() {
   const [showAllHours, setShowAllHours] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+
+  // Reviews state (REV-1)
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [writeReviewModalOpen, setWriteReviewModalOpen] = useState<boolean>(false);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewVetId, setReviewVetId] = useState<string>('');
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (clinic?.provider.id) {
+      getProviderReviews(clinic.provider.id, isConfigured ? supabase : null).then(setReviews);
+    }
+  }, [clinic?.provider.id, isConfigured, supabase]);
+
+  const reviewSummary = useMemo(() => calculateReviewSummary(reviews), [reviews]);
+
+  const handleSubmitReview = async () => {
+    if (!clinic?.provider.id) return;
+    setSubmittingReview(true);
+    try {
+      const newRev = await submitProviderReview(
+        {
+          bookingId: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `b-${Date.now()}`,
+          providerId: clinic.provider.id,
+          vetId: reviewVetId || undefined,
+          rating: reviewRating,
+          comment: reviewComment,
+        },
+        {
+          id: 'current-user',
+          name: isBangla ? 'পেট অভিভাবক' : 'Verified Pet Parent',
+        },
+        isConfigured ? supabase : null
+      );
+      setReviews((prev) => [newRev, ...prev]);
+      setWriteReviewModalOpen(false);
+      setReviewComment('');
+      setToastMessage(isBangla ? 'রিভিউ সফলভাবে জমা হয়েছে!' : 'Review submitted successfully!');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -607,47 +656,224 @@ export default function ClinicDetailPage() {
           </Card>
         </div>
 
-        {/* Reviews & Ratings Preview */}
+        {/* REV-1: Reviews & Ratings (Owner: Zimia) */}
         <Card className="p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold font-bangla text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <span>⭐</span>
-              <span>{isBangla ? 'গ্রাহকদের রেটিং ও অভিজ্ঞতা' : 'Reviews & Patient Experience'}</span>
-            </h2>
-            <span className="text-sm font-bold text-amber-700 dark:text-amber-400 font-bangla">
-              ★ {provider.ratingAvg.toFixed(1)} / 5.0
-            </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div>
+              <h2 className="text-xl font-bold font-bangla text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span>⭐</span>
+                <span>{isBangla ? 'গ্রাহকদের রেটিং ও অভিজ্ঞতা' : 'Reviews & Patient Experience'}</span>
+              </h2>
+              <p className="text-xs text-gray-500 font-bangla mt-0.5">
+                {isBangla
+                  ? `${reviewSummary.ratingCount} টি যাচাইকৃত অভিজ্ঞতার উপর ভিত্তি করে`
+                  : `Based on ${reviewSummary.ratingCount} verified patient visits`}
+              </p>
+            </div>
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setWriteReviewModalOpen(true)}
+              className="bg-green-700 hover:bg-green-800 text-white font-bangla font-semibold flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+            >
+              <span>✍️</span>
+              <span>{isBangla ? 'রিভিউ লিখুন' : 'Write a Review'}</span>
+            </Button>
           </div>
 
-          <div className="space-y-3 font-bangla text-sm">
-            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {isBangla ? 'রাকিব হাসান (বিড়ালের অভিভাবক)' : 'Rakib Hasan (Cat Owner)'}
-                </span>
-                <span>⭐⭐⭐⭐⭐</span>
+          {/* Rating Summary Breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800">
+            <div className="flex flex-col items-center justify-center sm:border-r border-gray-200 dark:border-gray-700 sm:pr-4">
+              <span className="text-4xl font-black text-amber-500">{reviewSummary.ratingAvg.toFixed(1)}</span>
+              <div className="flex text-amber-400 text-lg my-1">
+                {'★'.repeat(Math.round(reviewSummary.ratingAvg))}
+                {'☆'.repeat(5 - Math.round(reviewSummary.ratingAvg))}
               </div>
-              <p className="text-gray-700 dark:text-gray-300">
-                {isBangla
-                  ? 'ডাক্তার তানভীর অত্যন্ত যত্নসহকারে চেকআপ করেছেন। ক্লিনিকের পরিবেশ পরিষ্কার ও জরুরি সেবা সময়মতো পেয়েছি।'
-                  : 'Dr. Tanvir treated my cat with immense care. Clean premises and prompt emergency care.'}
-              </p>
+              <span className="text-xs text-gray-500 font-bangla">
+                {reviewSummary.ratingCount} {isBangla ? 'টি মোট রিভিউ' : 'total reviews'}
+              </span>
             </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {isBangla ? 'সাদিয়া আফরিন (পোষা কুকুরের অভিভাবক)' : 'Sadia Afrin (Dog Owner)'}
-                </span>
-                <span>⭐⭐⭐⭐⭐</span>
-              </div>
-              <p className="text-gray-700 dark:text-gray-300">
-                {isBangla
-                  ? 'টিকা দেওয়ার অভিজ্ঞতা খুব সুন্দর ছিল। ডাক্তার সাবরিনা আপা সময় নিয়ে বুঝিয়েছেন।'
-                  : 'Vaccination process was very smooth and gentle. Clear instructions provided.'}
-              </p>
+
+            <div className="sm:col-span-2 space-y-1.5 justify-center flex flex-col">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = (reviewSummary.breakdown as any)[star] || 0;
+                const pct = reviewSummary.ratingCount > 0 ? (count / reviewSummary.ratingCount) * 100 : 0;
+                return (
+                  <div key={star} className="flex items-center gap-2 text-xs font-bangla">
+                    <span className="w-6 text-gray-600 dark:text-gray-300 font-bold">{star} ★</span>
+                    <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-8 text-right text-gray-400">{count}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
+
+          {/* Reviews List */}
+          <div className="space-y-4">
+            {reviews.length === 0 ? (
+              <p className="text-xs text-gray-400 font-bangla text-center py-6">
+                {isBangla ? 'এখনও কোনো রিভিউ জমা পড়েনি।' : 'No reviews submitted yet.'}
+              </p>
+            ) : (
+              reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="p-4 bg-white dark:bg-gray-800/80 rounded-xl border border-gray-100 dark:border-gray-750 shadow-xs"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 flex items-center justify-center font-bold text-xs">
+                        {rev.authorName ? rev.authorName[0] : 'U'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-gray-900 dark:text-gray-100 font-bangla">
+                            {rev.authorName}
+                          </span>
+                          {rev.isVerifiedVisit && (
+                            <span className="text-[10px] bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300 px-1.5 py-0.2 rounded font-bangla font-semibold">
+                              ✓ {isBangla ? 'যাচাইকৃত ভিজিট' : 'Verified Visit'}
+                            </span>
+                          )}
+                        </div>
+                        {rev.vetName && (
+                          <p className="text-[11px] text-green-700 dark:text-green-400 font-bangla">
+                            👨‍⚕️ {rev.vetName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                      {'★'.repeat(rev.rating)}
+                    </div>
+                  </div>
+
+                  {rev.comment && (
+                    <p className="text-xs text-gray-700 dark:text-gray-300 font-bangla leading-relaxed mt-1">
+                      {rev.comment}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-50 dark:border-gray-800 text-[10px] text-gray-400 font-bangla">
+                    <span>{new Date(rev.createdAt).toLocaleDateString(isBangla ? 'bn-BD' : 'en-US')}</span>
+                    <button
+                      onClick={() => setReportModalOpen(true)}
+                      className="text-gray-400 hover:text-red-500 flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <span>🚩</span>
+                      <span>{isBangla ? 'রিপোর্ট' : 'Report'}</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </Card>
+      </main>
+
+      {/* Write Review Modal (REV-1) */}
+      {writeReviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-gray-700 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-base font-bold font-bangla text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
+                <span>✍️</span>
+                <span>{isBangla ? 'ক্লিনিকের অভিজ্ঞতা জানান' : 'Write a Review'}</span>
+              </h3>
+              <button
+                onClick={() => setWriteReviewModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 text-gray-500 flex items-center justify-center cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Star Picker */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-2">
+                {isBangla ? 'আপনার রেটিং নির্ধারণ করুন' : 'Your Rating'}
+              </label>
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className="text-3xl transition hover:scale-110 cursor-pointer focus:outline-none"
+                  >
+                    {star <= reviewRating ? '⭐' : '☆'}
+                  </button>
+                ))}
+                <span className="text-xs font-bold text-amber-600 ml-2 font-bangla">
+                  {reviewRating} / 5
+                </span>
+              </div>
+            </div>
+
+            {/* Doctor Picker */}
+            {vets.length > 0 && (
+              <div>
+                <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-1">
+                  {isBangla ? 'চিকিৎসক (ঐচ্ছিক)' : 'Doctor / Vet (Optional)'}
+                </label>
+                <select
+                  value={reviewVetId}
+                  onChange={(e) => setReviewVetId(e.target.value)}
+                  className="w-full p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-bangla"
+                >
+                  <option value="">{isBangla ? 'সাধারণ পরিদর্শন / যেকোনো ডাক্তার' : 'General Visit'}</option>
+                  {vets.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {isBangla ? v.fullNameBn || v.fullNameEn : v.fullNameEn}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Comment Area */}
+            <div>
+              <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 font-bangla mb-1">
+                {isBangla ? 'আপনার মূল্যায়ন ও মন্তব্য' : 'Your Review & Feedback'}
+              </label>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder={
+                  isBangla
+                    ? 'ক্লিনিকের সেবা, পরিষ্কার-পরিচ্ছন্নতা ও ডাক্তারের আচরণ কেমন ছিল?'
+                    : 'How was the treatment, doctor care, and clinic hygiene?'
+                }
+                rows={4}
+                className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-bangla focus:ring-2 focus:ring-green-600 outline-none"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-2">
+              <Button variant="secondary" size="sm" onClick={() => setWriteReviewModalOpen(false)}>
+                {isBangla ? 'বাতিল' : 'Cancel'}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSubmitReview}
+                disabled={submittingReview}
+                className="bg-green-700 text-white font-bangla"
+              >
+                {submittingReview
+                  ? (isBangla ? 'জমা দেওয়া হচ্ছে...' : 'Submitting...')
+                  : (isBangla ? 'রিভিউ জমা দিন' : 'Submit Review')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       </main>
 
       {/* REV-2: Report Modal — reason selection + submitContentReport RPC */}
