@@ -17,7 +17,8 @@
     "pet_shop": "Pet Shop",
     "training": "Training",
     "sitting": "Pet Sitting & Walking",
-    "taxi": "Pet Taxi"
+    "taxi": "Pet Taxi",
+    "livestock": "Livestock / Farm Animals"
   },
   "types": {
     "vet_appointment": "Vet Appointment",
@@ -32,7 +33,8 @@
     "pet_shop": "Pet Shop",
     "training": "Training",
     "sitting": "Pet Sitting",
-    "taxi": "Pet Taxi"
+    "taxi": "Pet Taxi",
+    "livestock": "Livestock Vets"
   },
   "phase": {
     "mvp": "Available now",
@@ -101,5 +103,24 @@
     "dateRange": "Boarding Date Range",
     "vaccineRequired": "Core vaccinations required for admission",
     "confirm": "Confirm Boarding Reservation"
+  },
+  "livestock": {
+    "title": "Livestock & Farm Veterinary Services",
+    "subtitle": "Government Upazila Livestock Hospitals (DLS), subsidized vaccination, artificial insemination, and farm emergency care",
+    "vaccineSchedule": "Subsidized Livestock Vaccines (DLS)",
+    "govtRate": "Govt Rate ৳10–৳30",
+    "drugChecker": "Livestock Drug Safety Checker (BVC & Environmental Regulations)",
+    "drugDesc": "Diclofenac and Ketoprofen are strictly prohibited for livestock in Bangladesh. Check safe alternatives (Meloxicam, Tolfenamic acid):",
+    "drugPlaceholder": "Type drug name to check (e.g., Diclofenac, Meloxicam...)",
+    "safeDrug": "Safe for livestock use according to DLS & BVC guidelines.",
+    "requestTitle": "Request Upazila Livestock Doctor / Emergency Mobile Unit",
+    "farmerName": "Farmer Name",
+    "species": "Livestock Species",
+    "animalCount": "Number of Animals",
+    "serviceType": "Service Required",
+    "farmAddress": "Farm / Village Address",
+    "phone": "Contact Mobile Phone",
+    "problem": "Symptoms / Issue Description",
+    "submit": "Dispatch Emergency Livestock Call"
   }
 }

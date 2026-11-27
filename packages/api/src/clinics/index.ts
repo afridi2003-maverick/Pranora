@@ -15,6 +15,7 @@ export * from './home-visit';
 export * from './grooming';
 export * from './boarding';
 export * from './suggest';
+export * from './livestock';
 
 export interface ClinicFullDetail {
   location: ProviderLocationDetail;

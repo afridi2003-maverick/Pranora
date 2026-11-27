@@ -27,6 +27,8 @@ import {
   clusterMarkers,
   autoExpandRadius,
   RADIUS_TIERS_KM,
+  saveNearbyCache,
+  getNearbyCache,
 } from '@pranora/api';
 import { Modal } from 'react-native';
 
@@ -90,6 +92,7 @@ export default function MobileMapScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedClinicId, setSelectedClinicId] = useState<string | null>(null);
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -106,6 +109,10 @@ export default function MobileMapScreen() {
           limit: 50,
         });
         if (active) {
+          // MAP-12: Cache results locally
+          saveNearbyCache(results, userCoords, radiusKm * 1000);
+          setIsOffline(false);
+
           if (results.length === 0) {
             const expansion = autoExpandRadius(radiusKm, 0);
             if (expansion.didExpand) {
@@ -127,6 +134,12 @@ export default function MobileMapScreen() {
         }
       } catch (err) {
         console.error('Failed to load nearby clinics:', err);
+        // MAP-12: Fallback to local cache
+        const cached = getNearbyCache(userCoords);
+        if (cached && cached.clinics.length > 0) {
+          setClinics(cached.clinics);
+          setIsOffline(true);
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -331,6 +344,23 @@ export default function MobileMapScreen() {
             <TouchableOpacity onPress={() => setAutoExpandNotice(null)}>
               <Text className="text-[10px] font-bold text-amber-700 ml-1">✕</Text>
             </TouchableOpacity>
+          </View>
+        )}
+
+        {/* MAP-12 Offline Cache Banner */}
+        {isOffline && (
+          <View className="bg-amber-100/90 border border-amber-300 rounded-lg p-1.5 mt-1 flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1 mr-2">
+              <Text className="text-xs mr-1">📡</Text>
+              <Text className="text-[10px] text-amber-900 font-medium flex-1">
+                {isBangla
+                  ? 'অফলাইন মোড: সংরক্ষিত নিকটস্থ ক্লিনিক তালিকা প্রদর্শিত হচ্ছে'
+                  : 'Offline Mode: Showing locally cached clinics'}
+              </Text>
+            </View>
+            <View className="bg-amber-200 px-1.5 py-0.5 rounded">
+              <Text className="text-[9px] font-bold text-amber-900 font-mono">CACHED</Text>
+            </View>
           </View>
         )}
       </View>
